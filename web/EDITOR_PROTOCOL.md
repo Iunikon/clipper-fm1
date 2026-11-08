@@ -524,6 +524,21 @@ reverb's TYPE (global 28) goes ROOM, PLATE, HALL, SHIMMER (0..3). A sound of an 
 patchByCount: the common values by place up to the older P_E0, the engine's 8 by theirs, the rest left as the device has
 them). UP_PUT carries P_COUNT values as before (126).
 
+## v15: Live (a personal build: the tablet beside the FM-1, web/live)
+
+INFO ends with 15. Five commands (firmware/src/editor_live.c) for an editor that follows the device:
+
+| cmd | Request args | Reply args |
+| --- | --- | --- |
+| 97 PAGE | — | home (0/1), family, page (index in params.c `PAGES`), title string, then what the 4 knobs edit: scope (0 the sound's `P_*`, 1 the globals `G_*`, 2 nothing `SET` reaches) and 4 ids (127: none). On HOME the engine's four. Also a push while watched, when the page shown or HOME changes |
+| 98 FAVS | — | n, the favourite playing (127: none), then n × (engine (NENGINES: a user preset), preset or user slot, kind string, name string) |
+| 99 FAV_GO | index | index, rc (0 loaded, 1 no such favourite). Loads it as SAVE > FAVS does (a `RELOAD` push follows) |
+| 100 FAV_SET | add (1) / remove (0) | n. The sound playing becomes a favourite or stops being one, as KNOB 4 on PRESETS |
+| 101 FAVS_CHANGED (push) | — | — : the favourites changed on the device; read `FAVS` again. Not after the editor's own `FAV_SET` |
+
+`PAGE` and `FAVS_CHANGED` are pushed before `RELOAD` / `CHANGED`, one per pass. The family numbers are params.c's `FAM_*`
+(0 HOME, 1 ENV, 2 LFO, 3 FX, 4 SEL, 5 EDIT, 6 GLO, 7 SAVE, 8 ARP, 9 SEQ, 10 TRACKS).
+
 ## Notes for the editor
 
 - **One request at a time.** Wait for the reply, about 10–50 ms, before sending the next.

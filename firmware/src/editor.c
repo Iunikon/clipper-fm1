@@ -33,8 +33,8 @@ enum { ED_INFO = 1, ED_GET, ED_SET, ED_DUMP, ED_DESC, ED_STEP_GET, ED_STEP_SET, 
        ED_FM6_GET = 68, ED_FM6_PUT, ED_FM6_LIST, ED_FM6_ERASE };                /* v9: FM6 patches (Felucca's numbers) */
 /* v10 (SLOOP 2.5): DSYN_LIST .. DSYN_PLAY = 72..76, editor_dsyn.c; backup object 9 = the SYN kits */
 /* v11 (Clipper): HY_GET, HY_PUT = 77, 78, editor_hybrid.c */
-#define ED_PROTO (CLIPPER_SYNTH ? 14u : 11u)           /* the protocol version INFO ends with (12: Clipper's FMX, 13: its
-                                                        * MOD SEQ, JUNO, VECTOR, 14: the TUNING) */
+#define ED_PROTO (CLIPPER_SYNTH ? 15u : 11u)           /* the protocol version INFO ends with (12: Clipper's FMX, 13: its
+                                                        * MOD SEQ, JUNO, VECTOR, 14: the TUNING, 15: Live, editor_live.c) */
 
 static uint8_t ed_out[600];
 static uint32_t ed_n;
@@ -319,6 +319,10 @@ UI_SMALL static void ed_known(uint32_t k, uint32_t id)            /* the editor'
             ed_w.tv[k * 3u + j] = trk[k].p[id];
 }
 
+#if CLIPPER_SYNTH
+static void ed_lv_shadow(void);
+static int ed_lv_sync(void);
+#endif
 UI_SMALL static void ed_sync(void)                                /* main loop */
 {
     uint32_t i, n = 0, now = fm1_ms;
@@ -329,6 +333,10 @@ UI_SMALL static void ed_sync(void)                                /* main loop *
         ed_w.on = 0;                                     /* no host, USB reset, or 3 s without a request */
         return;
     }
+#if CLIPPER_SYNTH
+    if (ed_room() && ed_lv_sync())                       /* (v15) the page shown, the favourites */
+        return;
+#endif
     if (sync_reload || ed_eng(TSEL) != ed_w.eng || TSEL->preset != ed_w.preset || song.sel != ed_w.sel) {
         if (!ed_room())
             return;
@@ -745,6 +753,7 @@ UI_SMALL static int ed_backup(uint32_t cmd, const uint8_t *a, uint32_t na)   /* 
 #include "editor_hybrid.c"                            /* v11 (Clipper): the HYBRID patches (77, 78) */
 #if CLIPPER_SYNTH
 #include "editor_fmx.c"                               /* v12 (Clipper 0.6): the FMX patches (90..92) */
+#include "editor_live.c"                              /* v15 (Live): the page shown, the favourites (97..101) */
 #endif
 
 UI_SMALL static void ed_handle(const uint8_t *f, uint32_t n)   /* f: the bytes between F0 and F7 */
@@ -774,7 +783,8 @@ UI_SMALL static void ed_handle(const uint8_t *f, uint32_t n)   /* f: the bytes b
         return;
     }
 #if CLIPPER_SYNTH
-    if (ed_fmx_handle(cmd, a, na) || ed_mseq_handle(cmd, a, na)) {   /* v12: the FMX patches; v13: the MOD SEQ */
+    if (ed_fmx_handle(cmd, a, na) || ed_mseq_handle(cmd, a, na) || ed_lv_handle(cmd, a, na)) {   /* v12: FMX; v13: the
+                                                                                                    * MOD SEQ; v15: Live */
         ed_send();
         return;
     }
@@ -1051,8 +1061,12 @@ UI_SMALL static void ed_handle(const uint8_t *f, uint32_t n)   /* f: the bytes b
         ed_w.on = a[0] & 1u;
         ed_w.v4 = (uint8_t)(ed_w.on && (a[0] & 2u));     /* v4: also TRACK_CHANGED; the reply says it is known */
         ed_w.resets = usb.resets;
-        if (ed_w.on)
+        if (ed_w.on) {
             ed_shadow();
+#if CLIPPER_SYNTH
+            ed_lv_shadow();
+#endif
+        }
         ed_b(ed_w.on | ed_w.v4 << 1);
         break;
     case ED_PING:

@@ -180,6 +180,10 @@ run "FMX: a voice given up (voice budget, overload) and played again starts from
 $SYN -o "$OUT/model_switch_test" tests/model_switch_test.c -lm
 run "filter MODEL changed under a held chord (ANALOG, WAVE, VECTOR): no click" "$OUT/model_switch_test"
 run "the editor protocol and the other inputs (USB / TRS MIDI, damaged flash) fuzzed under ASan + UBSan, and its reproducers" sh tests/editor_fuzz.sh "${EDFZ_N:-2000}" 1
+# (Live, protocol v15: the page shown and the favourites; built as editor_fuzz.sh builds, on its build/host/edfz/gen)
+${CC_UB:-cc} -DCLIPPER_SYNTH=1 -O1 -g -w -fsanitize=address,undefined -fno-sanitize=shift-base,signed-integer-overflow \
+    -fno-sanitize-recover=all -I"$OUT/edfz/gen" -Ibuild/gen -Ifirmware/src -Ifirmware/hal -o "$OUT/live_editor_test" tests/live_editor_test.c -lm
+run "Live (v15): PAGE and its push, FAVS, FAV_GO, FAV_SET, FAVS_CHANGED under ASan + UBSan" "$OUT/live_editor_test"
 if $SYN_UB -o "$OUT/fmx_ub" tests/fmx_test.c -lm 2>/dev/null; then
     run "Clipper 0.6 FMX under ASan + UBSan" sh -c "'$OUT/fmx_ub' >/dev/null && echo clean"
 fi

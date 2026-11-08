@@ -74,6 +74,7 @@ static uint32_t scope_w;
                              FL_IN(off, n, FL_FM6_LO, FL_FM6_HI) || FL_IN(off, n, FL_USR4_LO, FL_USR4_HI))
 #define FL_RANGE_OK(off, n) (FL_STORE_OK(off, n) || FL_IN(off, n, FL_OTA_LO, FL_OTA_HI))
 #define FL_FAR(fn) fn
+#include "../firmware/hal/fm1_flash_id.h"             /* (1.3.1) FL_JEDEC_OK, as hal/fm1_flash.h has it */
 static uint32_t fl_erases, fl_progs, fl_bad;          /* counters; fl_bad: a refused (out of range) access */
 static int fl_fail_at = -1;                           /* > 0: the n-th program from now fails (a torn write) */
 static uint32_t fl_jedec_ram(void) { return 0x856014u; }
