@@ -729,6 +729,13 @@ UI_SMALL static void graph_scope(uint16_t c)
  * scope under it (from the top of the graph strip: cv_oy 0) */
 static uint32_t preset_pos(uint32_t *total);
 static const char *preset_kind(uint32_t n);
+#if CLIPPER_SYNTH
+UI_SMALL static void edited_dot(int32_t x, int32_t y)          /* (Live) the sound edited since loaded: 6 px, round */
+{
+    cv_rect(x + 1, y, 4, 6, TE_COL[3]);
+    cv_rect(x, y + 1, 6, 4, TE_COL[3]);
+}
+#endif
 UI_SMALL static void graph_home(uint16_t c)
 {
     static int16_t snap[SCOPE_N];
@@ -744,6 +751,13 @@ UI_SMALL static void graph_home(uint16_t c)
         str_cpy(name, e->presets[TSEL->preset % e->npresets].name, sizeof name);
     if (text_w(f, name) > 236)
         f = &FONT_S;
+#if CLIPPER_SYNTH
+    if (hist_edited && !hist_cmp_on) {               /* (Live) edited since loaded: an orange dot after the name */
+        int32_t w = (int32_t)text_w(f, name), x0 = w + 10 <= 236 ? (240 - w - 10) / 2 : (240 - w) / 2;
+        cv_text(x0, f == &FONT_L ? 0 : 8, f, name, C_WHITE);
+        edited_dot(w + 10 <= 236 ? x0 + w + 4 : 233, f == &FONT_L ? 13 : 13);
+    } else
+#endif
     cv_text((240 - text_w(f, name)) / 2, f == &FONT_L ? 0 : 8, f, name, C_WHITE);
     x = cv_text(4, 36, &FONT_S, preset_kind(cur), c);
     fmt_int(b, (int32_t)cur + 1);
@@ -754,7 +768,7 @@ UI_SMALL static void graph_home(uint16_t c)
     if (hist_cmp_on)                                 /* (0.7) COMPARE: the sound as loaded; else edited since */
         cv_text(x + 8, 36, &FONT_S, "ORIG", C_AMB);
     else if (hist_edited)
-        cv_text(x + 8, 36, &FONT_S, "EDITED", C_AMB);
+        cv_text(x + 8, 36, &FONT_S, "EDITED", TE_COL[3]);   /* (Live: in the dot's orange) */
 #endif
     cv_text(236 - text_w(&FONT_S, e->name), 36, &FONT_S, e->name, C_HI);
     for (i = 0; i < SCOPE_N; i++) {                  /* the scope, auto-scaled, triggered on a rising zero */
@@ -955,6 +969,9 @@ UI_SMALL static void draw_foot(void)
         uint32_t ph = song.playing && t->seq_idx / 16u == ui.bank ? t->seq_idx : 0xFFu;
         sig = str_hash(0x9E3779B9u, s) + ph * 97u + (song.seq_mode ? ui.cursor : 0xFFu) * 3001u + steps_hash(t) +
               ui.bank * 7u + (uint32_t)t->p[P_SLEN] * 13u;
+#if CLIPPER_SYNTH
+        sig += (uint32_t)(hist_edited && !hist_cmp_on) * 104723u;   /* (Live: the edited dot) */
+#endif
     }
     if (!ui.force && sig == ui.foot_sig)
         return;
@@ -986,6 +1003,13 @@ UI_SMALL static void draw_foot(void)
     {
         char pf[16];
         int32_t room = 236 - text_w(&FONT_S, ti) - 10 - (x + 10);
+#if CLIPPER_SYNTH
+        if (hist_edited && !hist_cmp_on && !is_drum(t)) {   /* (Live) edited since loaded: the dot before the name */
+            edited_dot(x + 10, 25);
+            x += 10;
+            room -= 10;
+        }
+#endif
         str_cpy(pf, pn, sizeof pf);
         while (pf[0] && text_w(&FONT_S, pf) > room)
             pf[str_len(pf) - 1u] = 0;

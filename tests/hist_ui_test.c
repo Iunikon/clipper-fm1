@@ -34,6 +34,14 @@ static void go_page(const char *t)
     frame();
 }
 static void knob(uint32_t k, int32_t s) { encs[panel.enc[EN_K1 + k]] = s; frame(); }
+/* (Live) the edited dot's orange (TE_COL[3]) in screen rows y0..y1 */
+static int orange_px(int y0, int y1)
+{
+    int n = 0, i;
+    for (i = y0 * 240; i < y1 * 240 && i < 240 * 240; i++)
+        n += swap16(screen[i]) == TE_COL[3];
+    return n;
+}
 static void rest(void) { frames(70); }                  /* past HIST_REST (16 ms a frame) */
 
 int main(int argc, char **argv)
@@ -63,6 +71,10 @@ int main(int argc, char **argv)
     rest();
     ok(e1 != e0 && hist_n == 1u && hist_edited, "UNDO: a knob turned and left: one step, the sound EDITED");
     go_home(); frame(); ppm("hist-home-edited");
+    ok(orange_px(Y_GRAPH, Y_GRAPH + 34) > 8, "(Live) HOME: an edited sound's name has the orange dot");
+    go_page("EDIT 2"); ui.force = 1; frame();
+    ok(orange_px(Y_FOOT + 18, Y_FOOT + 34) > 8, "(Live) the footer, on any page: the dot before the sound's name");
+    go_home(); frame();
     go_page("EDIT 2");
     knob(1, t->p[P_E0 + 5] > 60 ? -6 : 6);             /* another value: a second step */
     rest();
@@ -75,6 +87,10 @@ int main(int argc, char **argv)
     knob(0, -1);
     rest();
     ok(t->p[P_E0 + 4] == e0 && hist_r == 2u && !hist_edited, "UNDO left again: the sound as loaded (not EDITED)");
+    { uint8_t h = ui.home, pg = ui.page;               /* (HOME's name and the footer looked at; the page then as it was) */
+      go_home(); ui.force = 1; frame();
+      ok(orange_px(Y_GRAPH, Y_GRAPH + 34) == 0 && orange_px(Y_FOOT + 18, Y_FOOT + 34) == 0, "(Live) as loaded: no dot");
+      ui.home = h; ui.page = pg; ui.force = 1; frame(); }
     ppm("hist-undo-back");
     knob(0, 2);
     rest();
