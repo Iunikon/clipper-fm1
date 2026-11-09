@@ -17,7 +17,7 @@
     --page: #000; --panel: #0d0d0f; --raised: #17171a; --press: #202024;
     --line: #232327; --line-2: #34343a;
     --tx: #f2f2f3; --tx-2: #a4a4ad; --tx-3: #8a8a95;
-    --k1: #287cff; --k2: #1ecc70; --k3: #ffc618; --k4: #ff621a; --fav: #ff621a; --ok: #1ecc70; --studio: #9d8cff;
+    --k1: #287cff; --k2: #1ecc70; --k3: #ffc618; --k4: #ff621a; --fav: #ff621a; --kind: #1ecc70; --eng: #6ea8ff; --kind-d: #0a6b36; --eng-d: #1a4fc4; --ok: #1ecc70; --studio: #9d8cff;
     --sans: system-ui, Roboto, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     --num: "Terminus", ui-monospace, monospace;
     --r: 0; --r-s: 0;
@@ -61,7 +61,7 @@
   .now .cv { width: 16px; height: 16px; color: var(--tx-3); transition: transform .2s var(--ease); }
   .now[aria-expanded="true"] .cv { transform: rotate(180deg); }
   .now .m { font-size: 12px; color: var(--tx-2); display: flex; gap: 8px; }
-  .now .m .k { color: var(--fav); }
+  .now .m .k { color: var(--kind); } .now .m .e { color: var(--eng); }
   .right { display: flex; align-items: center; gap: 16px; }
   .where { display: flex; align-items: center; gap: 8px; color: var(--tx-2); font-size: 12px; }
   .where b { color: var(--tx); font-weight: 600; font-size: 13px; }
@@ -115,7 +115,7 @@
   .meta { padding: 12px 16px 14px; display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 13px; border-top: 1px solid var(--line); flex: none; }
   .meta dt { color: var(--tx-3); }
   .meta dd { text-align: right; }
-  .meta dd .k { color: var(--fav); }
+  .meta dd .k { color: var(--kind); }
   .dsc { font-size: 12px; font-weight: 700; color: var(--tx); text-decoration: underline; text-underline-offset: 3px; margin-left: 6px; }
   .btn { height: 44px; border-radius: 0; background: var(--raised); border: 1px solid var(--line); display: flex; align-items: center;
     justify-content: center; gap: 8px; font-weight: 600; font-size: 13px; transition: background .15s var(--ease), border-color .15s var(--ease); }
@@ -131,11 +131,11 @@
   .fv:hover { background: var(--raised); }
   .fv .i { grid-row: span 2; color: var(--tx-3); font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; }
   .fv .n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .fv .k { font-size: 12px; color: var(--fav); }
-  .fv .k span { color: var(--tx-3); }
+  .fv .k { font-size: 12px; color: var(--kind); }
+  .fv .k .e { color: var(--eng); }
   .fv[aria-current="true"] { background: var(--tx); color: var(--page); }
-  .fv[aria-current="true"] .i, .fv[aria-current="true"] .k span { color: #55555c; }
-  .fv[aria-current="true"] .k { color: #c2410c; }
+  .fv[aria-current="true"] .i { color: #55555c; } .fv[aria-current="true"] .k .e { color: var(--eng-d); }
+  .fv[aria-current="true"] .k { color: var(--kind-d); }
   .fv.empty { cursor: default; }
   .fv.empty .n { color: var(--tx-3); font-weight: 400; }
   .fv.empty:hover { background: none; }
@@ -190,12 +190,12 @@
   .sd:hover { border-color: var(--line-2); }
   .sd .n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sd .m { grid-column: 1; font-size: 12px; color: var(--tx-3); display: flex; gap: 8px; }
-  .sd .m .k { color: var(--fav); }
+  .sd .m .k { color: var(--kind); } .sd .m .e { color: var(--eng); }
   .sd .x { grid-row: 1 / span 2; grid-column: 2; align-self: center; color: var(--tx-3); font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; }
   .sd .st { width: 14px; height: 14px; color: var(--fav); fill: currentColor; }
   .sd[aria-current="true"] { background: var(--tx); color: var(--page); }
   .sd[aria-current="true"] .m, .sd[aria-current="true"] .x { color: #55555c; }
-  .sd[aria-current="true"] .m .k { color: #c2410c; }
+  .sd[aria-current="true"] .m .k { color: var(--kind-d); } .sd[aria-current="true"] .m .e { color: var(--eng-d); }
   .brf { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; border-top: 1px solid var(--line); color: var(--tx-3); font-size: 12px; }
   .brf .alg { display: flex; gap: 6px; }
   .brf .btn { height: 36px; padding: 0 12px; }
@@ -424,8 +424,17 @@
 
   /* ==== SAVE: the sounds ==== */
   .sv { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 16px; align-items: start; }
-  .svk { position: sticky; top: 0; display: flex; flex-direction: column; gap: 2px; }
-  .kf { display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 44px; padding: 0 12px; font-size: 14px; font-weight: 700; letter-spacing: .02em; color: var(--tx-2); background: var(--panel); text-align: left; }
+  .svl { position: sticky; top: 0; display: flex; flex-direction: column; gap: 16px; max-height: calc(100dvh - 168px); overflow-y: auto; }
+  .svk { display: flex; flex-direction: column; gap: 2px; }
+  /* SAVE > TOOLS: the device's three, a second tap to act */
+  .tools { display: flex; flex-direction: column; gap: 6px; border-top: 2px solid var(--line-2); padding-top: 12px; }
+  .tools h3 { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); margin-bottom: 2px; }
+  .tools.dev h3::after { content: "En el sinte"; margin-left: 8px; font-size: 10px; background: var(--tx); color: var(--page); padding: 2px 6px; }
+  .tool { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 12px; min-height: 48px; flex: none; text-align: left; background: var(--panel); border: 1px solid var(--line); }
+  .tool b { font-size: 13px; font-weight: 800; letter-spacing: .04em; }
+  .tool span { font-size: 12px; color: var(--tx-3); }
+  .tool.arm { background: var(--fav); border-color: var(--fav); color: #000; } .tool.arm span { color: rgba(0, 0, 0, .7); }
+  .kf { display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 40px; flex: none; padding: 0 12px; font-size: 14px; font-weight: 700; letter-spacing: .02em; color: var(--tx-2); background: var(--panel); text-align: left; }
   .kf .num { font-size: 16px; color: var(--tx-3); }
   .kf.fk { color: var(--fav); margin-bottom: 8px; }
   .kf:nth-child(2) { margin-bottom: 8px; }
@@ -437,7 +446,7 @@
   .svn { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
   .svn .c { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-3); }
   .svn b { font-size: 40px; line-height: 44px; font-weight: 800; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .svn .m { display: flex; gap: 10px; font-size: 14px; color: var(--tx-2); flex-wrap: wrap; } .svn .m .k { color: var(--fav); font-weight: 700; } .svn .edtx { color: var(--fav); font-weight: 700; }
+  .svn .m { display: flex; gap: 10px; font-size: 14px; color: var(--tx-2); flex-wrap: wrap; } .svn .m .k { color: var(--kind); font-weight: 700; } .svn .m .e { color: var(--eng); } .svn .edtx { color: var(--fav); font-weight: 700; }
   .sva { display: flex; flex-direction: column; gap: 8px; min-width: 260px; }
   .sva .btn { padding: 0 14px; justify-content: flex-start; } .sva .alg { display: grid; grid-template-columns: 1fr auto; gap: 8px; } .sva .alg .btn:last-child { justify-content: center; }
   .sva .go2 { margin-top: 4px; }
@@ -449,8 +458,8 @@
   .sc .sn { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; overflow: hidden; }
   .sc .fi { font-size: 16px; color: var(--fav); }
   .sc .st { width: 14px; height: 14px; color: var(--fav); fill: currentColor; flex: none; }
-  .sc .sm { display: flex; gap: 8px; font-size: 12px; color: var(--tx-3); } .sc .sm .k { color: var(--fav); font-weight: 700; } .sc .sm .num { margin-left: auto; }
-  .sc.cur { background: var(--tx); color: var(--page); border-color: var(--tx); } .sc.cur .sm { color: #55555c; } .sc.cur .sm .k, .sc.cur .fi { color: #c2410c; }
+  .sc .sm { display: flex; gap: 8px; font-size: 12px; color: var(--tx-3); } .sc .sm .k { color: var(--kind); font-weight: 700; } .sc .sm .e { color: var(--eng); } .sc .sm .num { margin-left: auto; }
+  .sc.cur { background: var(--tx); color: var(--page); border-color: var(--tx); } .sc.cur .sm { color: #55555c; } .sc.cur .sm .k { color: var(--kind-d); } .sc.cur .sm .e { color: var(--eng-d); } .sc.cur .fi { color: #c2410c; }
   .sc.free { border-style: dashed; border-color: var(--line-2); background: none; } .sc.free .sn { color: var(--tx-3); font-weight: 600; } .sc.free .sm { font-size: 12px; white-space: normal; }
 
   /* ==== Guardar: the button (orange while there is something to keep) and its sheet ==== */
@@ -503,6 +512,54 @@
     .right { gap: 8px; }
   }
 
+  /* ==== SEQ > NOTES: the pattern, 16 steps a row; the step playing lit; the picked step's editor under it ==== */
+  .sqb .bh { gap: 16px; }
+  .sqb .bh .c { color: var(--tx-3); font-size: 16px; }
+  .sqp { margin-left: auto; height: 40px; padding: 0 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: .06em; border: 1px solid var(--line-2); color: var(--tx); }
+  .sqp svg { width: 16px; height: 16px; fill: currentColor; stroke: none; }
+  .sqp.on { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .sqw { color: var(--tx-3); font-size: 13px; padding: 8px 0; }
+  .sqg { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 4px; }
+  .sq { position: relative; height: 72px; padding: 6px 6px 8px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left;
+    background: var(--panel); border: 1px solid var(--line); min-width: 0; overflow: hidden; }
+  .sq.beat { border-left: 2px solid var(--line-2); }
+  .sq .si { font-size: 12px; color: var(--tx-3); }
+  .sq .sn { font-size: 16px; color: var(--tx); white-space: nowrap; }
+  .sq .ch { position: absolute; right: 5px; top: 5px; font-size: 12px; color: var(--tx-2); }
+  .sq .sv { position: absolute; left: 0; bottom: 0; height: 3px; width: calc(var(--v) * 100%); background: var(--k1); }
+  .sq.on { background: rgba(40, 124, 255, .16); border-color: rgba(40, 124, 255, .55); }
+  .sq.tie { background: rgba(40, 124, 255, .07); border-style: dashed; border-color: rgba(40, 124, 255, .35); }
+  .sq.tie .sn { color: var(--k1); }
+  .sq .ac { position: absolute; right: 5px; bottom: 9px; width: 8px; height: 8px; background: var(--tx); }
+  .sq .sl { position: absolute; right: 16px; bottom: 9px; width: 12px; height: 8px; background: linear-gradient(to top right, transparent 45%, var(--tx-2) 45%, var(--tx-2) 62%, transparent 62%); }
+  .sq.out { opacity: .3; }
+  .sq.sel { outline: 2px solid var(--tx); outline-offset: -2px; }
+  .sq.ph { box-shadow: inset 0 0 0 999px rgba(242, 242, 243, .14); }
+  .sq.ph .si { color: var(--tx); }
+  .sqe { margin-top: 10px; display: grid; grid-template-columns: 112px minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; align-items: start; padding: 16px; background: var(--panel); border: 1px solid var(--line); }
+  .sqh { display: flex; flex-direction: column; gap: 4px; }
+  .sqh .c { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-3); }
+  .sqh b { font-size: 48px; line-height: 48px; font-weight: 400; -webkit-font-smoothing: none; }
+  .sqh .st { font-size: 12px; color: var(--tx-2); }
+  .sqn { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .sqn .nv { font-size: 48px; line-height: 48px; -webkit-font-smoothing: none; }
+  .nud { display: flex; gap: 6px; } .nud button { flex: 1; height: 40px; background: var(--raised); font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; }
+  .pcs { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; }
+  .pcs button { height: 40px; font-size: 12px; font-weight: 700; background: var(--raised); color: var(--tx-2); padding: 0; }
+  .pcs button.blk { background: var(--page); border: 1px solid var(--line); }
+  .pcs button[aria-checked="true"] { background: var(--k1); color: #000; border-color: var(--k1); }
+  .sqx { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+  .sqvel { position: relative; flex: 1 1 100%; height: 56px; padding: 8px 12px; display: flex; flex-direction: column; justify-content: space-between; background: var(--raised); cursor: ew-resize; touch-action: none; overflow: hidden; }
+  .sqvel .l { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); position: relative; z-index: 1; }
+  .sqvel .v { font-size: 24px; line-height: 24px; -webkit-font-smoothing: none; position: relative; z-index: 1; }
+  .sqvel .f { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--v) * 100%); background: var(--k1); opacity: .28; }
+  .sqt2 { height: 44px; padding: 0 14px; font-size: 13px; font-weight: 800; letter-spacing: .04em; background: var(--raised); color: var(--tx-2); }
+  .sqt2[aria-pressed="true"] { background: var(--tx); color: var(--page); }
+  .sqt2.del { color: var(--tx-3); border: 1px dashed var(--line-2); background: none; }
+  .rat { display: flex; gap: 3px; } .rat button { width: 44px; height: 44px; font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; background: var(--raised); color: var(--tx-2); }
+  .rat button[aria-checked="true"] { background: var(--tx); color: var(--page); }
+  .sqx .btn.pri { padding: 0 18px; }
+
 </style>
 </head>
 <body class="off">
@@ -515,6 +572,8 @@
   <symbol id="i-disk" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6"/></symbol>
   <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
   <symbol id="i-fs" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5v14l11-7z"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></symbol>
   <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v14M12 3l-2.5 3M12 3l2.5 3M12 13l-4-2.5V8M12 15l4-2.5V10"/><circle cx="12" cy="19" r="2"/></symbol>
@@ -649,8 +708,8 @@ function fmtValue(d, v) {
 
 /* ---------------------------------------------------------------- protocol --- */
 const HDR = [0x7D, 0x46, 0x4C];
-const C = { INFO: 1, GET: 2, SET: 3, DUMP: 4, DESC: 5, UP_LIST: 16, UP_STORE: 19, WATCH: 22, CHANGED: 23, RELOAD: 24, PING: 25, STEP_CHANGED: 26, TRACK_CHANGED: 32,
-  PAGE: 97, FAVS: 98, FAV_GO: 99, FAV_SET: 100, FAVS_CHANGED: 101, LIST: 102, LIST_GO: 103, EDITED: 104 };
+const C = { INFO: 1, GET: 2, SET: 3, DUMP: 4, DESC: 5, STEP_GET: 6, STEP_SET: 7, UP_LIST: 16, UP_STORE: 19, WATCH: 22, CHANGED: 23, RELOAD: 24, PING: 25, STEP_CHANGED: 26, TRACK_CHANGED: 32,
+  PAGE: 97, FAVS: 98, FAV_GO: 99, FAV_SET: 100, FAVS_CHANGED: 101, LIST: 102, LIST_GO: 103, EDITED: 104, TOOL: 105, PLAY: 106, TRANSPORT: 107 };
 const PUSH = new Set([C.CHANGED, C.RELOAD, C.STEP_CHANGED, C.TRACK_CHANGED, C.FAVS_CHANGED, C.EDITED]);
 const v14 = (v) => { const u = Math.max(-8192, Math.min(8191, Math.round(v))) + 8192; return [u & 127, (u >> 7) & 127]; };
 const u14 = (n) => [n & 127, (n >> 7) & 127];
@@ -680,6 +739,8 @@ const P = {
     o.cur = r.more ? r.u() : null; if (o.cur === 16383) o.cur = -1; return o; },          /* (cur: the LIST entry playing) */
   entry(r) { return { e: r.b(), k: r.b(), kind: r.s(), name: r.s() }; },
   favs(a) { const r = new Reader(a), n = r.b(), cur = r.b(), list = []; for (let i = 0; i < n; i++) list.push(P.entry(r)); return { cur: cur === 127 ? -1 : cur, list }; },
+  step(a) { const r = new Reader(a), o = { index: r.b(), n: r.b(), notes: [r.b(), r.b(), r.b(), r.b()], time: r.b(), flags: r.b(), vel: r.b(), lvl: 0, rat: 0 };
+    if (r.more) { const lo = r.b(), hi = r.b(), ra = r.b(); o.lvl = lo | (hi & 1) << 7; o.rat = ra | ((hi >> 1) & 1) << 7; } return o; },
   list(a) { const r = new Reader(a), total = r.u(), start = r.u(), n = r.b(), items = []; for (let i = 0; i < n; i++) items.push(P.entry(r)); return { total, start, items }; },
   uplist(a) { const r = new Reader(a), start = r.b(), n = r.b(), total = r.b(), items = []; for (let i = 0; i < n; i++) items.push({ used: !!r.b(), e: r.b(), name: r.s() }); return { start, total, items }; },
 };
@@ -709,7 +770,7 @@ class Link {
     const f = unframe(data); if (!f) return;
     const c = this.cur;
     if (c && f.cmd === c.cmd) { this.finish(f.a); return; }
-    if (PUSH.has(f.cmd) || f.cmd === C.PAGE) this.onPush(f);
+    if (PUSH.has(f.cmd) || f.cmd === C.PAGE || f.cmd === C.PLAY) this.onPush(f);
   }
   close() { this.closed = true; const all = (this.cur ? [this.cur] : []).concat(this.q); if (this.cur) clearTimeout(this.cur.timer); this.cur = null; this.q = []; all.forEach((r) => r.rej(new Error("closed"))); }
 }
@@ -720,6 +781,11 @@ class Link {
 function makeMock(onFrame) {
   const D = JSON.parse($("mockdata").textContent), info = D.info, pe0 = info.pe0;
   const ups = Array.from({ length: 32 }, () => null), NE = info.nengines;
+  const steps = Array.from({ length: info.nstep }, (_, i) => { const on = [0, 3, 6, 8, 10, 12, 14].includes(i), n = [36, 36, 48, 39, 36, 41, 43][[0, 3, 6, 8, 10, 12, 14].indexOf(i)];
+    return { n: on ? 1 : 0, notes: [on ? n : 0, 0, 0, 0], time: on ? 0 : i === 7 ? 1 : 2, flags: i === 6 ? 1 : i === 10 ? 2 : 0, vel: 100, lvl: 0, rat: 0 }; });
+  const stepArgs = (i) => { const st = steps[i]; return [i, st.n, ...st.notes, st.time, st.flags, st.vel, st.lvl & 127, ((st.lvl >> 7) & 1) | (((st.rat >> 7) & 1) << 1), st.rat & 127]; };
+  const sq = { playing: 0, pos: 0, t: 0 };
+  const playArgs = () => [sq.playing, sq.pos & 127, sq.pos >> 7];
   const relist = () => { D.list = D.list.filter((x) => x[0] < NE).concat(ups.map((u, k) => u && [NE, k, "USER", u.name]).filter(Boolean)); };
   const m = { p: D.dump.p.slice(), g: D.dump.g.slice(), engine: D.dump.engine, preset: D.dump.preset, n: 0, favs: [0, 6, 64, 120, 200, 290],
     page: { home: 1, fam: 0, page: 0, title: "HOME", scope: 0, ids: [] }, watch: false, edited: 0 };
@@ -741,6 +807,16 @@ function makeMock(onFrame) {
         if (!a[0] && !m.edited) { m.edited = 1; if (m.watch) push(C.EDITED, [1]); } return [a[0], a[1], ...v14(c)]; }
       case C.WATCH: m.watch = !!(a[0] & 1); return [a[0] & 3];
       case C.PING: return [0];
+      case C.TOOL: return [a[0], [22, 23, 31].includes(a[0]) ? 0 : 1];
+      case C.STEP_GET: return a[0] < steps.length ? stepArgs(a[0]) : null;
+      case C.STEP_SET: { const i = a[0]; if (i >= steps.length) return null;
+        steps[i] = { n: Math.min(4, a[1]), notes: a.slice(2, 6), time: Math.min(2, a[6]), flags: a[7] & 3, vel: a[8], lvl: a.length > 9 ? a[9] | (a[10] & 1) << 7 : 0, rat: a.length > 9 ? a[11] | ((a[10] >> 1) & 1) << 7 : 0 };
+        return stepArgs(i); }
+      case C.PLAY: return playArgs();
+      case C.TRANSPORT: sq.playing = a[0] & 1; clearInterval(sq.t);
+        if (sq.playing) sq.t = setInterval(() => { sq.pos = (sq.pos + 1) % Math.max(1, m.p[29] || 16); if (m.watch) push(C.PLAY, playArgs()); }, 125);
+        else { sq.pos = 0; if (m.watch) push(C.PLAY, playArgs()); }
+        return [sq.playing];
       case C.UP_LIST: { const st = Math.min(a[0], 32), n = Math.min(a[1], 16, 32 - st); return [st, n, 32, ...Array.from({ length: n }, (_, i) => { const u = ups[st + i]; return [u ? 1 : 0, u ? u.engine : 0, ...enc.s(u ? u.name : "")]; }).flat()]; }
       case C.UP_STORE: { const k = a[0], nm = String.fromCharCode(...a.slice(1, a.indexOf(0, 1) < 0 ? a.length : a.indexOf(0, 1))); if (k >= 32 || nm.length > 12) return [k, 1];
         ups[k] = { engine: m.engine, name: nm || `${info.engines[m.engine]} ${String(k + 1).padStart(2, "0")}` }; relist(); return [k, 0]; }
@@ -898,7 +974,9 @@ function onPush(f) {
       paintValue(s, id);
       fromDevice(s, id, old, v);
       logChange(s, id, old, v, "sinte");
-    } else if (f.cmd === C.RELOAD) reloadSoon();
+    } else if (f.cmd === C.RELOAD) { SQ.loaded = false; reloadSoon(); }
+    else if (f.cmd === C.STEP_CHANGED) sqStepChanged(f.a[0]);
+    else if (f.cmd === C.PLAY) sqOnPlay(f.a);
     else if (f.cmd === C.FAVS_CHANGED) readFavs().then(renderBar).catch(() => {});
     else if (f.cmd === C.EDITED) { M.edited = !!f.a[0]; renderBar(); }
     else if (f.cmd === C.PAGE) {
@@ -1067,11 +1145,11 @@ function renderBar() {
   $("name").textContent = x ? x.name : (M.info.engines[M.engine] || "") + " " + (M.preset + 1);
   $("now").classList.toggle("edited", M.edited); $("saveb").classList.toggle("ed", M.edited);
   $("now").setAttribute("aria-label", `${$("name").textContent}${M.edited ? ", editado" : ""}: abrir sonidos`);
-  $("meta").innerHTML = `<span class="${fav ? "k" : ""}">${esc(x ? x.kind : "USER")}</span><span>${esc(M.info.engines[M.engine] || "")}</span><span class="num">${n >= 0 ? n + 1 : "--"}/${M.list.length}</span>`;
+  $("meta").innerHTML = `<span class="k">${esc(x ? x.kind : "USER")}</span><span class="e">${esc(M.info.engines[M.engine] || "")}</span><span class="num">${n >= 0 ? n + 1 : "--"}/${M.list.length}</span>`;
   $("favt").classList.toggle("fav", fav); $("favt").setAttribute("aria-pressed", fav);
   $("fcount").textContent = `${M.favs.length}/16`;
   $("favs").innerHTML = M.favs.map((f, i) => `<button class="fv" role="listitem" data-favgo="${i}" aria-current="${i === M.favCur}"><span class="i">${String(i + 1).padStart(2, "0")}</span>
-    <span class="n">${esc(f.name)}</span><span class="k">${esc(f.kind)} <span>${esc(M.info.engines[f.e] || "USER")}</span></span></button>`).join("");
+    <span class="n">${esc(f.name)}</span><span class="k">${esc(f.kind)} <span class="e">${esc(M.info.engines[f.e] || "USER")}</span></span></button>`).join("");
   renderMeta(); renderLog();
   if (B.open) renderBrowser();
   if (S.folder === "SAVE") renderWork();
@@ -1094,7 +1172,7 @@ function renderBrowser() {
   $("brc").textContent = `${B.kind === "FAVS" ? "Favoritos" : B.kind === "ALL" ? "Todos" : B.kind}  ${items.length}`;
   $("snds").innerHTML = items.map((o) => { const f = favKeys.has(o.x.e + ":" + o.x.k + ":" + o.x.name);
     return `<button class="sd" role="listitem" ${o.fav != null ? `data-favgo="${o.fav}"` : `data-load="${o.n}"`} aria-current="${o.n === cur}"><span class="n">${esc(o.x.name)}</span><span class="x">${o.n >= 0 ? o.n + 1 : ""}</span>
-      <span class="m">${B.kind === "ALL" || B.kind === "FAVS" ? `<span class="k">${esc(o.x.kind)}</span>` : ""}<span>${esc(M.info.engines[o.x.e] || "USER")}</span>${f ? '<svg class="i st"><use href="#i-star"/></svg>' : ""}</span></button>`; }).join("");
+      <span class="m">${B.kind === "ALL" || B.kind === "FAVS" ? `<span class="k">${esc(o.x.kind)}</span>` : ""}<span class="e">${esc(M.info.engines[o.x.e] || "USER")}</span>${f ? '<svg class="i st"><use href="#i-star"/></svg>' : ""}</span></button>`; }).join("");
 }
 function openBrowser(on, kind) {
   B.open = on;
@@ -1123,13 +1201,14 @@ function soundsView() {
   const card = (o) => { const f = favs.has(favKey(o.x)), cur = o.n === n && n >= 0;
     return `<button class="sc${cur ? " cur" : ""}" role="listitem" ${o.fav != null ? `data-favgo="${o.fav}"` : `data-load="${o.n}"`} aria-current="${cur}">
       <span class="sn">${o.fav != null ? `<span class="fi num">${String(o.fav + 1).padStart(2, "0")}</span>` : ""}${esc(o.x.name)}${f && o.fav == null ? '<svg class="i st" aria-label="favorito"><use href="#i-star"/></svg>' : ""}</span>
-      <span class="sm">${SV.kind === "ALL" || SV.kind === "FAVS" ? `<span class="k">${esc(o.x.kind)}</span>` : ""}<span>${esc(M.info.engines[o.x.e] || "USER")}</span><span class="num">${o.n >= 0 ? o.n + 1 : ""}</span></span></button>`; };
+      <span class="sm">${SV.kind === "ALL" || SV.kind === "FAVS" ? `<span class="k">${esc(o.x.kind)}</span>` : ""}<span class="e">${esc(M.info.engines[o.x.e] || "USER")}</span><span class="num">${o.n >= 0 ? o.n + 1 : ""}</span></span></button>`; };
   const free = SV.kind === "FAVS" ? Array.from({ length: 16 - M.favs.length }, (_, i) => `<div class="sc free" role="listitem"><span class="sn"><span class="fi num">${String(M.favs.length + i + 1).padStart(2, "0")}</span>Libre</span><span class="sm">Carga un sonido y márcalo con la estrella</span></div>`).join("") : "";
   return `<div class="sv">
-    <nav class="svk" aria-label="Carpetas de sonidos">${kinds.map((k) => `<button class="kf${k === "FAVS" ? " fk" : ""}" data-skind="${k}" aria-current="${SV.kind === k}"><span>${k === "FAVS" ? "Favoritos" : k === "ALL" ? "Todos" : k}</span><span class="num">${cnt(k)}</span></button>`).join("")}</nav>
+    <div class="svl"><nav class="svk" aria-label="Carpetas de sonidos">${kinds.map((k) => `<button class="kf${k === "FAVS" ? " fk" : ""}" data-skind="${k}" aria-current="${SV.kind === k}"><span>${k === "FAVS" ? "Favoritos" : k === "ALL" ? "Todos" : k}</span><span class="num">${cnt(k)}</span></button>`).join("")}</nav>
+      ${toolsHtml()}</div>
     <div class="svm">
       <section class="svc${M.edited ? " edited" : ""}"><div class="svn"><span class="c">Suena ahora</span><b>${esc(name)}</b>
-        <span class="m">${x ? `<span class="k">${esc(x.kind)}</span>` : ""}<span>${esc(M.info.engines[M.engine] || "USER")}</span><span class="num">${n >= 0 ? `${n + 1}/${M.list.length}` : ""}</span>${M.edited ? '<span class="edtx">Editado</span>' : ""}</span></div>
+        <span class="m">${x ? `<span class="k">${esc(x.kind)}</span>` : ""}<span class="e">${esc(M.info.engines[M.engine] || "USER")}</span><span class="num">${n >= 0 ? `${n + 1}/${M.list.length}` : ""}</span>${M.edited ? '<span class="edtx">Editado</span>' : ""}</span></div>
         <div class="sva">
           <button class="btn pri2${M.edited ? " ed" : ""}" data-save="1"><svg class="i"><use href="#i-disk"/></svg>Guardar como sonido de usuario</button>
           <button class="btn${fav ? " on" : ""}" data-svfav="1"><svg class="i"><use href="#i-star"/></svg>${fav ? `Favorito ${M.favCur + 1}: quitar` : "Marcar como favorito"}</button>
@@ -1140,6 +1219,27 @@ function soundsView() {
       <div class="scs" role="list">${items.map(card).join("")}${free}</div>
     </div></div>`;
 }
+
+/* SAVE > TOOLS, as on the device (CLRSQ, INIT, NEW), each a second tap within 3 s to act (the device's two detents) */
+const TOOLS = [["CLRSQ", "Borrar el patrón"], ["INIT", "Iniciar el sonido"], ["NEW", "Proyecto nuevo"]];
+const toolArm = { id: -1, t: 0 };
+function toolsHtml() {
+  const pg = LAYOUT.find((x) => x.title === "TOOLS"); if (!pg) return "";
+  const lv = M.page && !M.page.home && M.page.title === "TOOLS";
+  const btn = ([lab, what]) => { const id = pg.ids.find((i) => i < 127 && desc(1, i) && desc(1, i).label === lab); if (id == null) return "";
+    const arm = toolArm.id === id; return `<button class="tool${arm ? " arm" : ""}" data-tool="${id}"><b>${lab}</b><span>${arm ? "Toca otra vez para confirmar" : what}</span></button>`; };
+  return `<section class="tools${lv ? " dev" : ""}" data-title="TOOLS" aria-label="TOOLS"><h3>TOOLS</h3>${TOOLS.map(btn).join("")}</section>`;
+}
+async function toolTap(id) {
+  if (toolArm.id !== id) { toolArm.id = id; clearTimeout(toolArm.t); toolArm.t = setTimeout(() => { toolArm.id = -1; if (S.folder === "SAVE") renderWork(); }, 3000); renderWork(); return; }
+  toolArm.id = -1; clearTimeout(toolArm.t); renderWork();
+  const lab = desc(1, id).label;
+  try {
+    const r = await rq(C.TOOL, [id], { timeout: 2000, retries: 0 });
+    toast(-1, r[1] === 0 ? `<b>${esc(lab)}</b> hecho` : r[1] === 3 ? "Para la reproducción primero" : r[1] === 1 && lab === "INIT" ? "La pista de batería no tiene sonido que iniciar" : "El FM-1 no lo hizo");
+  } catch (e) { toast(-1, "El FM-1 no contestó"); }
+}
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-tool]"); if (b) toolTap(+b.dataset.tool); });
 
 /* ------------------------------------------- the left rail: the device's page --- */
 /* its four knobs as the FM-1 shows them now (a tap on its name opens its folder here) */
@@ -1516,7 +1616,8 @@ function block(ps) {
 }
 function bentoView(folder) {
   const pages = pagesOf(folder);
-  if (folder !== "HOME") return `<div class="blks">${blocksOf(folder, pages).map(block).join("")}</div>${folder === "SEQ" ? `<p class="note">Las notas del patrón se editan en Estudio, en el secuenciador.</p>` : ""}`;
+  if (folder === "SEQ") return `<div class="blks">${seqBlock()}${blocksOf(folder, pages.filter((p) => p.title !== "NOTES")).map(block).join("")}</div>`;   /* (NOTES: seq.js) */
+  if (folder !== "HOME") return `<div class="blks">${blocksOf(folder, pages).map(block).join("")}</div>`;
   const out = [];                                          /* (HOME in EDITAR: one bento, a look at all of it) */
   pages.forEach((p) => {
     if (isAway(p)) return;
@@ -1623,6 +1724,136 @@ $("edit").addEventListener("keydown", (e) => {
   const el = e.target.closest("[data-fd]"), st = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1, PageUp: 8, PageDown: -8 }[e.key];
   if (!el || !st) return; e.preventDefault();
   const [s, id] = el.dataset.fd.split(":").map(Number); setVal(s, id, val(s, id) + st);
+});
+
+/* -------------------------------------------------------------------- seq --- */
+/* SEQ > NOTES, here: the selected part's pattern as a grid of steps (16 a row, as many rows as LEN needs), the step
+   playing lit (PLAY, pushed while it plays), PLAY / STOP (TRANSPORT). A tap on an empty step puts a note there (the
+   last one used) and picks it; a tap on the picked one empties it. The picked step's editor under the grid: its note,
+   velocity, ACC, SLIDE, TIE, ratchets. STEP_GET / STEP_SET as editor.html; STEP_CHANGED brings a step changed on the
+   device again */
+const NOTE_N = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const noteName = (n) => NOTE_N[n % 12] + (Math.floor(n / 12) - 1);
+const ST_NOTE = 0, ST_TIE = 1, ST_REST = 2, SF_ACC = 1, SF_SLIDE = 2;
+const SQ = { steps: [], loaded: false, loading: null, sel: 0, playing: false, pos: -1, last: 60 };
+const sqLenId = () => { const p = LAYOUT.find((x) => x.title === "PATTERN"); return p ? p.ids[0] : -1; };
+const sqLen = () => { const id = sqLenId(); return id >= 0 && desc(0, id) ? Math.max(1, val(0, id)) : 16; };
+const sqOn = (st) => st && st.time === ST_NOTE && st.n > 0;
+
+async function sqLoad() {
+  if (SQ.loading) return SQ.loading;
+  SQ.loading = (async () => {
+    try {
+      const n = M.info.nstep, out = [];
+      for (let i = 0; i < n; i++) out.push(P.step(await rq(C.STEP_GET, [i])));
+      SQ.steps = out; SQ.loaded = true;
+      const lastOn = out.slice(0, sqLen()).filter(sqOn).pop(); if (lastOn) SQ.last = lastOn.notes[0];   /* (a new note: the pattern's) */
+      const p = await rq(C.PLAY); sqPlayFrom(p);
+    } catch (e) { /* the next visit asks again */ }
+    SQ.loading = null;
+    if (S.folder === "SEQ") renderWork();
+  })();
+  return SQ.loading;
+}
+function sqPlayFrom(a) { SQ.playing = !!a[0]; SQ.pos = SQ.playing ? a[1] | (a[2] << 7) : -1; }
+function sqOnPlay(a) {
+  sqPlayFrom(a);
+  document.querySelectorAll(".sq.ph").forEach((x) => x.classList.remove("ph"));
+  if (SQ.playing) document.querySelector(`.sq[data-sq="${SQ.pos}"]`)?.classList.add("ph");
+  const b = document.querySelector("[data-sqplay]"); if (b) sqPlayBtn(b);
+}
+const sqPlayInner = () => (SQ.playing ? `<svg class="i"><use href="#i-stop"/></svg>STOP` : `<svg class="i"><use href="#i-play"/></svg>PLAY`);
+function sqPlayBtn(b) { b.classList.toggle("on", SQ.playing); b.setAttribute("aria-pressed", SQ.playing); b.innerHTML = sqPlayInner(); }
+async function sqStepChanged(i) {
+  if (!SQ.loaded || i >= SQ.steps.length) return;
+  try { SQ.steps[i] = P.step(await rq(C.STEP_GET, [i])); sqPaint(i); } catch (e) { /* (a RELOAD reads them all) */ }
+}
+
+/* a step to the device: the whole of it, the reply is what it keeps */
+function sqSet(i, patch) {
+  const st = { ...SQ.steps[i], ...patch, notes: (patch.notes || SQ.steps[i].notes).slice() };
+  SQ.steps[i] = st; sqPaint(i);
+  if (sqOn(st)) SQ.last = st.notes[0];
+  const lvl = st.lvl | 0, rat = st.rat | 0;
+  rq(C.STEP_SET, [i, st.n, ...st.notes.map((x) => x & 127), st.time, st.flags & 3, st.vel & 127, lvl & 127, ((lvl >> 7) & 1) | (((rat >> 7) & 1) << 1), rat & 127], { key: "step:" + i })
+    .then((a) => { SQ.steps[i] = P.step(a); sqPaint(i); }).catch(() => {});
+}
+const sqEmpty = (st) => ({ n: 0, notes: [0, 0, 0, 0], time: ST_REST, flags: 0, vel: st ? st.vel : 100, lvl: 0, rat: 0 });
+
+function sqCell(i, len) {
+  const st = SQ.steps[i] || {}, on = sqOn(st), tie = st.time === ST_TIE;
+  return `<button class="sq${on ? " on" : ""}${tie ? " tie" : ""}${i >= len ? " out" : ""}${i === SQ.sel ? " sel" : ""}${SQ.playing && SQ.pos === i ? " ph" : ""}${i % 4 === 0 ? " beat" : ""}"
+    data-sq="${i}" style="--v:${(st.vel | 0) / 127}" aria-label="Paso ${i + 1}: ${on ? noteName(st.notes[0]) : tie ? "ligado" : "vacío"}" aria-pressed="${i === SQ.sel}">
+    <span class="si num">${i + 1}</span>${on ? `<span class="sn num">${noteName(st.notes[0])}</span>${st.n > 1 ? `<span class="ch num">+${st.n - 1}</span>` : ""}` : tie ? `<span class="sn num">—</span>` : ""}
+    ${on ? `<span class="sv"></span>` : ""}${on && st.flags & SF_ACC ? `<i class="ac"></i>` : ""}${on && st.flags & SF_SLIDE ? `<i class="sl"></i>` : ""}</button>`;
+}
+function sqEditor() {
+  const i = SQ.sel, st = SQ.steps[i]; if (!st) return "";
+  const on = sqOn(st), tie = st.time === ST_TIE, n = on ? st.notes[0] : SQ.last, pc = n % 12, rat = (st.rat | 0) & 3;
+  const tg = (k, lab, act) => `<button class="sqt2" data-sqf="${k}" aria-pressed="${act}">${lab}</button>`;
+  return `<div class="sqe">
+    <div class="sqh"><span class="c">Paso</span><b class="num">${i + 1}</b><span class="st">${on ? (st.n > 1 ? `Acorde de ${st.n} notas` : "Nota") : tie ? "Ligado al anterior" : "Vacío"}</span></div>
+    ${on ? `<div class="sqn"><span class="nv num">${noteName(n)}</span>
+      <div class="nud">${[-12, -1, 1, 12].map((d) => `<button data-sqd="${d}">${d > 0 ? "+" : "−"}${Math.abs(d)}</button>`).join("")}</div>
+      <div class="pcs" role="radiogroup" aria-label="Nota">${NOTE_N.map((x, k) => `<button role="radio" aria-checked="${k === pc}" data-sqpc="${k}" class="${x.length > 1 ? "blk" : ""}">${x}</button>`).join("")}</div></div>
+    <div class="sqx">
+      <div class="sqvel" data-sqvel="1" role="slider" aria-label="Velocidad" aria-valuenow="${st.vel}" aria-valuemin="0" aria-valuemax="127" tabindex="0" style="--v:${st.vel / 127}"><span class="l">VEL</span><span class="v num">${st.vel}</span><span class="f"></span></div>
+      ${tg("acc", "ACC", !!(st.flags & SF_ACC))}${tg("slide", "SLIDE", !!(st.flags & SF_SLIDE))}
+      <div class="rat" role="radiogroup" aria-label="Ratchet">${[0, 1, 2, 3].map((r) => `<button role="radio" aria-checked="${r === rat}" data-sqr="${r}">x${r + 1}</button>`).join("")}</div>
+      <button class="sqt2 del" data-sqf="rest">Vaciar</button></div>`
+    : `<div class="sqx"><button class="btn pri" data-sqf="note">Poner ${noteName(SQ.last)}</button>${i > 0 ? tg("tie", "Ligar al anterior", tie) : ""}${tie ? `<button class="sqt2 del" data-sqf="rest">Vaciar</button>` : ""}</div>`}
+  </div>`;
+}
+function seqBlock() {
+  if (!SQ.loaded) { sqLoad(); return `<section class="blk"><header class="bh"><h2><svg class="i"><use href="#i-seq"/></svg>NOTES</h2></header><p class="sqw">Leyendo el patrón del FM-1…</p></section>`; }
+  const len = sqLen(), rows = Math.ceil(Math.min(len, SQ.steps.length) / 16), cells = [];
+  for (let i = 0; i < rows * 16 && i < SQ.steps.length; i++) cells.push(sqCell(i, len));
+  const lv = M.page && !M.page.home && M.page.title === "NOTES";
+  return `<section class="blk sqb${lv ? " dev" : ""}" data-title="NOTES"><header class="bh"><h2><svg class="i"><use href="#i-seq"/></svg>NOTES</h2>
+      <span class="c num">${len} pasos</span><button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
+    <div class="sqg" role="group" aria-label="Pasos">${cells.join("")}</div>${sqEditor()}</section>`;
+}
+function sqPaint(i) {
+  const el = document.querySelector(`.sq[data-sq="${i}"]`); if (el) el.outerHTML = sqCell(i, sqLen());
+  if (i === SQ.sel) { const e = document.querySelector(".sqe"); if (e) e.outerHTML = sqEditor(); }
+}
+function sqPick(i) {
+  const prev = SQ.sel; SQ.sel = i;
+  sqPaint(prev); sqPaint(i);
+}
+
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-sq],[data-sqplay],[data-sqd],[data-sqpc],[data-sqf],[data-sqr]"); if (!b || !SQ.loaded) return;
+  const i = SQ.sel, st = SQ.steps[i];
+  if (b.dataset.sqplay) { rq(C.TRANSPORT, [SQ.playing ? 0 : 1]).then((a) => { SQ.playing = !!a[0]; sqPlayBtn(b); }).catch(() => {}); return; }
+  if (b.dataset.sq) {
+    const k = +b.dataset.sq, s2 = SQ.steps[k];
+    if (k !== SQ.sel) { sqPick(k); if (!sqOn(s2) && s2.time !== ST_TIE) sqSet(k, { n: 1, notes: [SQ.last, 0, 0, 0], time: ST_NOTE, vel: s2.vel || 100 }); }
+    else if (sqOn(s2) || s2.time === ST_TIE) sqSet(k, sqEmpty(s2));
+    else sqSet(k, { n: 1, notes: [SQ.last, 0, 0, 0], time: ST_NOTE, vel: s2.vel || 100 });
+    return;
+  }
+  if (b.dataset.sqd) { const n = Math.max(0, Math.min(127, st.notes[0] + +b.dataset.sqd)); sqSet(i, { notes: [n, ...st.notes.slice(1)] }); }
+  else if (b.dataset.sqpc) { const n = Math.min(127, st.notes[0] - (st.notes[0] % 12) + +b.dataset.sqpc); sqSet(i, { notes: [n, ...st.notes.slice(1)] }); }
+  else if (b.dataset.sqr) sqSet(i, { rat: ((st.rat | 0) & ~3) | +b.dataset.sqr });
+  else if (b.dataset.sqf === "acc") sqSet(i, { flags: st.flags ^ SF_ACC });
+  else if (b.dataset.sqf === "slide") sqSet(i, { flags: st.flags ^ SF_SLIDE });
+  else if (b.dataset.sqf === "rest") sqSet(i, sqEmpty(st));
+  else if (b.dataset.sqf === "note") sqSet(i, { n: 1, notes: [SQ.last, 0, 0, 0], time: ST_NOTE, vel: st.vel || 100 });
+  else if (b.dataset.sqf === "tie") sqSet(i, st.time === ST_TIE ? sqEmpty(st) : { n: 0, time: ST_TIE });
+});
+/* the velocity: slide along it */
+let sqv = null;
+const sqVelAt = (e) => { const r = sqv.getBoundingClientRect(), v = Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * 127);
+  sqv.style.setProperty("--v", v / 127); sqv.querySelector(".v").textContent = v; sqv.setAttribute("aria-valuenow", v);
+  const i = SQ.sel; SQ.steps[i].vel = v; const c = document.querySelector(`.sq[data-sq="${i}"]`); if (c) c.style.setProperty("--v", v / 127);
+  clearTimeout(sqv._t); sqv._t = setTimeout(() => sqSet(i, { vel: v }), 40); };
+document.addEventListener("pointerdown", (e) => { const v = e.target.closest("[data-sqvel]"); if (!v) return; sqv = v; v.setPointerCapture(e.pointerId); sqVelAt(e); });
+document.addEventListener("pointermove", (e) => { if (sqv) sqVelAt(e); });
+document.addEventListener("pointerup", () => { sqv = null; });
+document.addEventListener("keydown", (e) => {
+  const v = e.target.closest && e.target.closest("[data-sqvel]"), d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
+  if (!v || !d) return; e.preventDefault(); const st = SQ.steps[SQ.sel]; sqSet(SQ.sel, { vel: Math.max(0, Math.min(127, st.vel + d)) });
 });
 
 /* ------------------------------------------------------------------ start --- */

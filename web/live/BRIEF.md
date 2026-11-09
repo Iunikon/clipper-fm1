@@ -70,8 +70,9 @@ Al abrirla, la app aparece vacía y en el centro está «Conectar el FM-1»; los
 
 - **RÁPIDO** (inicio): un panel en bento con el Filtro (gráfica), los Efectos (4 medidores que se encienden o apagan tocando su nombre), Arpegiador, Transponer (−12 −1 +1 +12), Tempo con TAP, Pánico y 6 interruptores (Latch, Acordes, Escala, Voces, Glide, Insert). Los interruptores recuerdan su valor al apagarse y encenderse. «Editar más» lleva a EDITAR.
 - **EDITAR (HOME):** un bento que muestra de un vistazo los 4 diales de HOME y las gráficas de ENV, FILTER, LFO, FX y MACROS.
-- **Carpetas** (EDIT, ENV, LFO, FX, SEL, ARP, SEQ, GLO): **bloques**, uno por efecto, LFO o envolvente. Cada bloque lleva el nombre de la página del sinte y pone su gráfica a la izquierda y sus baldosas a la derecha.
-- **SAVE:** una vista propia. A la izquierda las carpetas (Favoritos x/16, Todos, BASS, KEYS…, USER). Arriba el sonido que suena con sus acciones (Guardar, favorito, Descartar lo editado, anterior/siguiente). Debajo, las tarjetas de sonidos. En Favoritos se ven las 16 posiciones, también las libres.
+- **SEQ:** el secuenciador, nativo. Una cuadrícula de pasos (16 por fila, tantas filas como LEN), el paso que suena iluminado (el sinte lo envía mientras suena) y PLAY/STOP. Al tocar un paso vacío se pone una nota (la última usada) y se selecciona; al tocar el seleccionado, se vacía. Debajo va el editor del paso: nota (−12 −1 +1 +12 y las 12 notas), VEL, ACC, SLIDE, ratchet x1–x4, ligar al anterior y vaciar. Después, el bloque PATTERN (LEN, DIV, SWG, GATE).
+- **Carpetas** (EDIT, ENV, LFO, FX, SEL, ARP, GLO): **bloques**, uno por efecto, LFO o envolvente. Cada bloque lleva el nombre de la página del sinte y pone su gráfica a la izquierda y sus baldosas a la derecha.
+- **SAVE:** una vista propia. A la izquierda las carpetas (Favoritos x/16, Todos, BASS, KEYS…, USER) y debajo **TOOLS** del sinte (CLRSQ, INIT, NEW), que piden un segundo toque para confirmar, como los dos clics del knob en el sinte. Arriba el sonido que suena con sus acciones (Guardar, favorito, Descartar lo editado, anterior/siguiente). Debajo, las tarjetas de sonidos. En Favoritos se ven las 16 posiciones, también las libres.
 - **Guardar:** una ventana con el nombre (12 caracteres, mayúsculas, tipografía Terminus grande) y las 32 ranuras U01–U32. Una ranura ocupada cambia el botón a «Reemplazar» en naranja.
 - **ESTUDIO:** abre el editor clásico completo (`clipper-editor-1.3.1.html`), destacado en violeta.
 
@@ -89,6 +90,7 @@ Al abrirla, la app aparece vacía y en el centro está «Conectar el FM-1»; los
 | `--tx` / `--tx-2` / `--tx-3` | `#f2f2f3` / `#a4a4ad` / `#8a8a95` | Texto principal, secundario y terciario (`--tx-3` ≥ 4.5:1 sobre `--panel`). |
 | `--k1`…`--k4` | `#287cff` `#1ecc70` `#ffc618` `#ff621a` | Los colores de los 4 knobs del FM-1. |
 | `--fav` | `#ff621a` | Favorito, editado y Guardar con cambios (el naranja del sinte). |
+| `--kind` / `--eng` | `#1ecc70` / `#6ea8ff` | El tipo de sonido (BASS, PAD…) en verde y el motor (HYBRID, ANALOG…) en azul. Nunca en naranja. |
 | `--studio` | `#9d8cff` | Solo Estudio. |
 | `--r` | `0` | **Sin esquinas redondeadas, en ninguna parte.** |
 
@@ -100,7 +102,7 @@ Al abrirla, la app aparece vacía y en el centro está «Conectar el FM-1»; los
 **Reglas de color:**
 1. **El color de un parámetro es el del knob que lo gira en su página del FM-1** (K1 azul, K2 verde, K3 amarillo, K4 naranja). Así el músico conecta la tablet con el sinte sin leer.
 2. **Blanco** = lo seleccionado, lo que está sonando o lo que el sinte tiene abierto («En el sinte»).
-3. **Naranja** = favorito, editado y Guardar con cambios, igual que en el sinte (el punto naranja junto al nombre).
+3. **Naranja** = favorito, editado y Guardar con cambios, igual que en el sinte (el punto naranja junto al nombre). Nada más va en naranja: el tipo de sonido es verde y el motor azul.
 4. **Violeta** = Estudio, nada más.
 
 **Controles según el tipo de parámetro:**
@@ -133,6 +135,10 @@ Las decisiones vienen del feedback del usuario, en orden aproximado. **Una audit
 | Riel izquierdo con «En el sinte» (4 knobs en vivo) y «Cambios» (deshacer). | El riel estaba desaprovechado. Ahora refleja el sinte y permite volver atrás. |
 | Botón Guardar (U01–U32). | Faltaba. Funciona como SAVE > USER del sinte y después carga el sonido desde su ranura, así desaparece el punto naranja. |
 | Fondo de los popups más oscuro (78 %). | Petición explícita. |
+| Secuenciador nativo en SEQ. | El usuario lo necesita en la tablet, no solo en Estudio. |
+| TOOLS (CLRSQ, INIT, NEW) en SAVE. | Faltaban; en el sinte se confirman con dos clics y en la web con dos toques. |
+| Sin TOCAR. | No aportaba frente a RÁPIDO. |
+| Gráficas como las del sinte. | Las de la web se veían distintas (la envolvente plana, el LFO). |
 | Estudio en violeta. | Debe destacar como salida a otra herramienta. |
 | Sin teclado de piano en pantalla. | El usuario lo descartó en las propuestas. |
 | Ver propuestas antes de construir. | Es como prefiere trabajar el usuario: comparar opciones (`web/live-proposals.html`, `web/live-home-variants.html`). |

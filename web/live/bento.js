@@ -173,7 +173,8 @@ function block(ps) {
 }
 function bentoView(folder) {
   const pages = pagesOf(folder);
-  if (folder !== "HOME") return `<div class="blks">${blocksOf(folder, pages).map(block).join("")}</div>${folder === "SEQ" ? `<p class="note">Las notas del patrón se editan en Estudio, en el secuenciador.</p>` : ""}`;
+  if (folder === "SEQ") return `<div class="blks">${seqBlock()}${blocksOf(folder, pages.filter((p) => p.title !== "NOTES")).map(block).join("")}</div>`;   /* (NOTES: seq.js) */
+  if (folder !== "HOME") return `<div class="blks">${blocksOf(folder, pages).map(block).join("")}</div>`;
   const out = [];                                          /* (HOME in EDITAR: one bento, a look at all of it) */
   pages.forEach((p) => {
     if (isAway(p)) return;

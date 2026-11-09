@@ -854,8 +854,7 @@ UI_SMALL static void ed_handle(const uint8_t *f, uint32_t n)   /* f: the bytes b
             fm1_irq_off();
             ed_step_in(TSEL, a[0], a + 1, na - 1u);
             fm1_irq_on();
-            ui.force = 1;
-        }
+        }                                                 /* (Live: no whole redraw; the roll and the foot see it) */
         ed_w.st[a[0]] = ed_step_sig(TSEL, a[0]);
         ed_b(a[0]);
         ed_step_out(TSEL, a[0]);

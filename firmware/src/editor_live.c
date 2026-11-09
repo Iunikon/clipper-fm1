@@ -13,16 +13,23 @@
  *  102 LIST start count -> total, start, n, then n x (engine, preset or user slot, kind, name): the list PRESETS walks
  *                        (every factory sound by kind, then the user presets; no FAV rows). start and total: 2 x 7 bits
  *  103 LIST_GO n      -> n (2 x 7 bits), rc (0 loaded, 1 no such entry). Loads entry n of LIST
+ *  105 TOOL id        -> id, rc: runs SAVE > TOOLS's CLRSQ (G_CLRSEQ), INIT (G_INITSND) or NEW (G_NEWPRJ) as its second
+ *                        detent does (the editor confirms on its own). rc 0 done, 1 not one of them / the drum track has no
+ *                        sound to init, 3 stop the song first
  *  104 EDITED         (push) edited (1) or as loaded (0): the sound changed since it was loaded (ui_synth.c hist_edited, not
  *                        while COMPARE shows the original). PAGE has the same byte after HOME's four, then the LIST entry
  *                        the selected part plays (2 x 7 bits; 16383: none: the drum track, a sound the list does not have)
+ *  106 PLAY           -> playing (0/1), the step the selected part plays (2 x 7 bits; its index in its pattern). Also
+ *                        pushed while watched when either changes (the sequencer's playhead)
+ *  107 TRANSPORT on   -> playing: starts (1) or stops (0) the sequencer as the PLAY button does
  * Included by editor.c after ui.c (fav_list, preset_go, fav_toggle). */
-enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO, ED_EDITED };
+enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO, ED_EDITED, ED_TOOL, ED_PLAY, ED_TRANSPORT };
 #define ED_LV_EDITED ((uint8_t)(hist_edited && !hist_cmp_on))
 static struct {
     uint8_t home, page, edited;
-    uint32_t fsig;
+    uint32_t fsig, play;
 } ed_lv;
+#define ED_LV_PLAY ((uint32_t)song.playing << 15 | (TSEL->seq_idx % trk_len(TSEL)))   /* playing, and the step */
 
 UI_SMALL static uint32_t ed_lv_fsig(void)                          /* the favourites, in order */
 {
@@ -92,6 +99,13 @@ UI_SMALL static void ed_lv_shadow(void)                            /* WATCH: in 
     ed_lv.page = ui.page;
     ed_lv.fsig = ed_lv_fsig();
     ed_lv.edited = ED_LV_EDITED;
+    ed_lv.play = ED_LV_PLAY;
+}
+UI_SMALL static void ed_lv_play(uint32_t pl)
+{
+    ed_b(pl >> 15);
+    ed_b(pl & 127u);
+    ed_b((pl >> 7) & 127u);
 }
 UI_SMALL static int ed_lv_sync(void)                               /* while watched: 1 = a push went out */
 {
@@ -111,6 +125,15 @@ UI_SMALL static int ed_lv_sync(void)                               /* while watc
         ed_send();
         return 1;
     }
+    h = ED_LV_PLAY;
+    if (h != ed_lv.play && (song.playing || ed_lv.play >> 15)) {   /* (stopped: the step it rests on is no news) */
+        ed_lv.play = h;
+        ed_begin(ED_PLAY);
+        ed_lv_play(h);
+        ed_send();
+        return 1;
+    }
+    ed_lv.play = h;
     h = ed_lv_fsig();
     if (h != ed_lv.fsig) {
         ed_lv.fsig = h;
@@ -162,6 +185,20 @@ UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   
         ed_b(n);
         for (k = 0; k < n; k++)
             ed_lv_entry(i + k);
+        return 1;
+    case ED_PLAY:                                   /* -> playing, step */
+        ed_lv_play(ED_LV_PLAY);
+        return 1;
+    case ED_TRANSPORT:                              /* on -> playing (what was asked: the start waits for the next block) */
+        i = na && (a[0] & 1u);
+        if (i != song.playing)
+            transport_req = i ? 1u : 2u;
+        ed_b(i);
+        return 1;
+    case ED_TOOL:                                   /* id -> id, rc */
+        i = na ? a[0] : 0u;
+        ed_b(i);
+        ed_b(i == G_CLRSEQ || i == G_INITSND || i == G_NEWPRJ ? (uint32_t)tool_go(i) : 1u);
         return 1;
     case ED_LIST_GO:                                /* n (2 x 7) -> n, rc */
         base_pos(&total);

@@ -482,6 +482,40 @@ UI_SMALL static void project_new(void)
     ui.force = 1;
 }
 
+/* SAVE > TOOLS, once armed (or asked by Clipper Live, which confirms on its own: editor_live.c ED_TOOL): CLRSQ clears
+ * the pattern, INIT the sound, NEW the project. 0 done, 1 not here (the drum track has no sound to init), 3 stop the
+ * song first */
+UI_SMALL static int tool_go(uint32_t id)
+{
+    switch (id) {
+    case G_CLRSEQ:
+        undo_mark(TSEL, (undo_sess += 4u) | 3u);
+        fm1_irq_off();
+        track_defaults_steps(TSEL);
+        fm1_irq_on();
+        ui_message("PATTERN CLEARED");
+        return 0;
+    case G_INITSND:
+        if (is_drum(TSEL))
+            return 1;
+        set_engine(TSEL->eng_req);                              /* engine defaults + its first preset */
+        ui_message("SOUND INIT");
+        ui.force = 1;
+        return 0;
+    case G_NEWPRJ:
+#if FELUCCA_ARRANGER
+        if (song.playing && arrangement_enabled) {      /* (the song's stop would bring the old loop back) */
+            ui_message("STOP THE SONG FIRST");
+            return 3;
+        }
+#endif
+        project_new();
+        ui_message("NEW PROJECT");
+        return 0;
+    default:
+        return 1;
+    }
+}
 UI_SMALL static void edit_param(uint32_t slot, int32_t steps)
 {
     int16_t *vp;
@@ -572,29 +606,10 @@ UI_SMALL static void edit_param(uint32_t slot, int32_t steps)
         project_save((uint32_t)song.g[G_SLOT] - 1u);
         break;
     case G_CLRSEQ:
-        *vp = 0;
-        undo_mark(TSEL, (undo_sess += 4u) | 3u);
-        fm1_irq_off();
-        track_defaults_steps(TSEL);
-        fm1_irq_on();
-        ui_message("PATTERN CLEARED");
-        break;
     case G_INITSND:
-        *vp = 0;
-        set_engine(TSEL->eng_req);                              /* engine defaults + its first preset */
-        ui_message("SOUND INIT");
-        ui.force = 1;
-        break;
     case G_NEWPRJ:
         *vp = 0;
-#if FELUCCA_ARRANGER
-        if (song.playing && arrangement_enabled) {      /* (the song's stop would bring the old loop back) */
-            ui_message("STOP THE SONG FIRST");
-            break;
-        }
-#endif
-        project_new();
-        ui_message("NEW PROJECT");
+        tool_go(id);
         break;
     default:
         break;

@@ -193,6 +193,32 @@ int main(void)
         TSEL->p[P_E0 + 4] = v0;
         check(frames_pushing(80, ED_EDITED, 0) == 1u && !hist_edited, "back as loaded: EDITED (0) pushed");
     }
+    /* TOOL: SAVE > TOOLS without its arming detent (the editor confirms); anything else refused */
+    {
+        uint8_t q[1];
+        TSEL->step[0].time = ST_NOTE; TSEL->step[0].n = 1; TSEL->step[0].note[0] = 60;
+        q[0] = G_CLRSEQ; ed(ED_TOOL, q, 1);
+        check(arg()[0] == G_CLRSEQ && arg()[1] == 0u && !step_on(&TSEL->step[0]), "TOOL CLRSQ: done, the pattern cleared");
+        q[0] = G_BPM; ed(ED_TOOL, q, 1);
+        check(arg()[1] == 1u, "TOOL with another id: refused");
+    }
+    /* PLAY: the playhead, asked and pushed; TRANSPORT: start / stop as the PLAY button */
+    {
+        uint8_t q[1];
+        ed(ED_PLAY, a, 0);
+        check(rx_last[4] == ED_PLAY && arg()[0] == 0u, "PLAY: stopped");
+        a[0] = 1; ed(ED_WATCH, a, 1);
+        frames_pushing(2, 0, 0);
+        song.playing = 1; TSEL->seq_idx = 5;
+        check(frames_pushing(3, ED_PLAY, 0) == 1u, "playing, step 5: PLAY pushed once");
+        TSEL->seq_idx = 6;
+        check(frames_pushing(3, ED_PLAY, 0) == 1u, "the next step: pushed");
+        song.playing = 0; TSEL->seq_idx = 0;
+        check(frames_pushing(3, ED_PLAY, 0) == 1u && frames_pushing(5, ED_PLAY, 0) == 0u, "stopped: pushed once, then nothing");
+        q[0] = 1; ed(ED_TRANSPORT, q, 1);
+        check(arg()[0] == 1u && transport_req == 1u, "TRANSPORT 1: the start asked for");
+        transport_req = 0;
+    }
     printf("live: %s\n", fails ? "FAILED" : "all passed");
     return fails != 0;
 }
