@@ -258,6 +258,7 @@ async function load() {
 async function descOrNull(s, i) { try { return P.desc(await rq(C.DESC, [s, i])); } catch (e) { if (e.message === "closed") throw e; return null; } }
 async function readSound(full) {
   const was = M.engine, pe0 = M.info.pe0, d = P.dump(await rq(C.DUMP), M.info);
+  if (d.engine !== was || d.preset !== M.preset) LOG.length = 0;
   M.engine = d.engine; M.preset = d.preset; M.p = d.p; M.g = d.g;
   if (full || d.engine !== was) for (let k = 0; k < 8; k++) M.pdesc[pe0 + k] = await descOrNull(0, pe0 + k);
   M.page = P.page(await rq(C.PAGE));
@@ -284,6 +285,7 @@ function onPush(f) {
       arr[id] = v;
       paintValue(s, id);
       fromDevice(s, id, old, v);
+      logChange(s, id, old, v, "sinte");
     } else if (f.cmd === C.RELOAD) reloadSoon();
     else if (f.cmd === C.FAVS_CHANGED) readFavs().then(renderBar).catch(() => {});
     else if (f.cmd === C.EDITED) { M.edited = !!f.a[0]; renderBar(); }
@@ -300,7 +302,7 @@ function followPage() {
   const pg = M.page;
   if (pg.home) { if (S.folder !== "HOME") { S.folder = "HOME"; renderAll(); } flashRow("HOME"); return; }
   const folder = FAM[pg.fam];
-  if (folder === "SAVE") { openBrowser(true, pg.title === "FAVS" ? "FAVS" : null); return; }
+  if (folder === "SAVE") { const k = pg.title === "FAVS" ? "FAVS" : pg.title === "USER" ? "USER" : null; if (k) SV.kind = k; if (S.folder !== "SAVE") { S.folder = "SAVE"; if (S.mode === "play") setMode("edit"); else renderAll(); } else renderWork(); return; }
   if (!folder || folder === "HOME") return;
   if (S.folder !== folder) { S.folder = folder; renderAll(); } else renderNav();
   flashRow(pg.title);
@@ -327,6 +329,7 @@ function setVal(s, id, v) {
   const d = desc(s, id); if (!d || !M.link) return;
   v = Math.max(d.min, Math.min(d.max, Math.round(v)));
   if (val(s, id) === v) return;
+  if (!undoing) logChange(s, id, val(s, id), v, "tablet");
   (s ? M.g : M.p)[id] = v;
   sets.set(keyOf(s, id), performance.now());
   paintValue(s, id);
@@ -361,6 +364,7 @@ function paintValue(s, id) {
   if (S.mode === "play") { drawXY(); drawFaders(); }
   paintTile(s, id);
   paintCards(s, id);
+  renderDev();
   if (id === 0 || id === 25 || id === 26) renderMeta();
 }
 /* a page's shape, from its values */
@@ -483,18 +487,18 @@ function quickView() {
 }
 
 function renderWork() {
-  $("edit").innerHTML = S.folder === "HOME" && S.mode === "quick" ? quickBento() : bentoView(S.folder);
+  $("edit").innerHTML = S.folder === "SAVE" ? soundsView() : S.folder === "HOME" && S.mode === "quick" ? quickBento() : bentoView(S.folder);
 }
 function flashRowQuiet(title) { document.querySelectorAll(`#edit [data-title="${CSS.escape(title)}"]`).forEach((r) => r.classList.add("dev")); }
-function renderWhere() { $("where").textContent = !M.page ? "" : M.page.home ? "HOME" : M.page.title; renderNav(); }
+function renderWhere() { $("where").textContent = !M.page ? "" : M.page.home ? "HOME" : M.page.title; renderNav(); renderDev(); }
 function renderNav() {
   const dev = M.page ? (M.page.home ? "HOME" : FAM[M.page.fam]) : "";
   $("nav").innerHTML = NAV.map(([n, ic]) => `<button class="nb${n === dev ? " dev" : ""}${n === "ESTUDIO" ? " est" : ""}" ${n === S.folder ? 'aria-current="page"' : ""} data-f="${n}"><svg class="i"><use href="#i-${ic}"/></svg>${n}</button>`).join("");
 }
 function renderMeta() {
-  const n = entryNow(), x = M.list[n], d = (s, id) => (desc(s, id) ? fmtValue(desc(s, id), val(s, id))[0] : "--"), fav = M.favCur >= 0;
-  $("metal").innerHTML = `<dt>Motor</dt><dd>${esc(M.info.engines[M.engine] || "--")}</dd><dt>Tipo</dt><dd><span class="${fav ? "k" : ""}">${esc(x ? x.kind : "--")}</span></dd>
-    <dt>En la lista</dt><dd class="num">${n >= 0 ? n + 1 : "--"}/${M.list.length}</dd><dt>Tonalidad</dt><dd>${esc(d(0, 25))} ${esc(d(0, 26))}</dd><dt>Tempo</dt><dd class="num">${esc(d(1, 0))} BPM</dd><dt>Estado</dt><dd>${M.edited ? '<span class="edtx">Editado</span>' : "Como se cargó"}</dd>`;
+  const d = (s, id) => (desc(s, id) ? fmtValue(desc(s, id), val(s, id))[0] : "--"), n = entryNow();
+  $("metal").innerHTML = `<dt>Tonalidad</dt><dd>${esc(d(0, 25))} ${esc(d(0, 26))}</dd><dt>Tempo</dt><dd class="num">${esc(d(1, 0))} BPM</dd>
+    <dt>Estado</dt><dd>${M.edited ? `<span class="edtx">Editado</span>${n >= 0 ? ` <button class="dsc" data-discard="1">Descartar</button>` : ""}` : "Como se cargó"}</dd>`;
 }
 function renderBar() {
   const n = entryNow(), x = M.list[n], fav = M.favCur >= 0;
@@ -503,13 +507,12 @@ function renderBar() {
   $("now").setAttribute("aria-label", `${$("name").textContent}${M.edited ? ", editado" : ""}: abrir sonidos`);
   $("meta").innerHTML = `<span class="${fav ? "k" : ""}">${esc(x ? x.kind : "USER")}</span><span>${esc(M.info.engines[M.engine] || "")}</span><span class="num">${n >= 0 ? n + 1 : "--"}/${M.list.length}</span>`;
   $("favt").classList.toggle("fav", fav); $("favt").setAttribute("aria-pressed", fav);
-  $("favb").classList.toggle("on", fav);
-  $("favb").querySelector("span").textContent = fav ? `Favorito ${M.favCur + 1} de ${M.favs.length}` : "Marcar como favorito";
   $("fcount").textContent = `${M.favs.length}/16`;
   $("favs").innerHTML = M.favs.map((f, i) => `<button class="fv" role="listitem" data-favgo="${i}" aria-current="${i === M.favCur}"><span class="i">${String(i + 1).padStart(2, "0")}</span>
     <span class="n">${esc(f.name)}</span><span class="k">${esc(f.kind)} <span>${esc(M.info.engines[f.e] || "USER")}</span></span></button>`).join("");
-  renderMeta();
+  renderMeta(); renderLog();
   if (B.open) renderBrowser();
+  if (S.folder === "SAVE" && S.mode !== "play") renderWork();
 }
 function renderAll() { renderBar(); renderWhere(); renderWork(); if (S.mode === "play") renderPlay(); }
 
@@ -537,6 +540,82 @@ function openBrowser(on, kind) {
   $("br").classList.toggle("on", on); $("scrim").classList.toggle("on", on); $("now").setAttribute("aria-expanded", on);
   if (on) setTimeout(() => ($("snds").querySelector('[aria-current="true"]') || $("snds").querySelector(".sd"))?.focus(), 50);
 }
+
+/* ------------------------------------------------- SAVE: the sounds, a view --- */
+/* Every folder at once down the side; the sound that plays on top with what can be done to it (a favourite, its edits
+   discarded, the one before or after it in its folder); the folder's sounds as cards. Favourites: the 16 slots, the
+   free ones too */
+const SV = { kind: null };
+const favKey = (x) => x.e + ":" + x.k + ":" + x.name;
+function svItems(kind) {
+  if (kind === "FAVS") return M.favs.map((f, i) => ({ fav: i, x: f, n: M.list.findIndex((y) => favKey(y) === favKey(f)) }));
+  return M.list.map((x, n) => ({ x, n })).filter((o) => kind === "ALL" || o.x.kind === kind);
+}
+function soundsView() {
+  const n = entryNow(), x = M.list[n], fav = M.favCur >= 0;
+  if (!SV.kind) SV.kind = x ? x.kind : "FAVS";
+  const kinds = ["FAVS", "ALL", ...KINDS.filter((k) => M.list.some((y) => y.kind === k))];
+  const cnt = (k) => (k === "FAVS" ? `${M.favs.length}/16` : svItems(k).length);
+  const items = svItems(SV.kind), favs = new Set(M.favs.map(favKey)), inKind = x ? svItems(x.kind) : [], at = inKind.findIndex((o) => o.n === n);
+  const name = x ? x.name : (M.info.engines[M.engine] || "") + " " + (M.preset + 1);
+  const card = (o) => { const f = favs.has(favKey(o.x)), cur = o.n === n && n >= 0;
+    return `<button class="sc${cur ? " cur" : ""}" role="listitem" ${o.fav != null ? `data-favgo="${o.fav}"` : `data-load="${o.n}"`} aria-current="${cur}">
+      <span class="sn">${o.fav != null ? `<span class="fi num">${String(o.fav + 1).padStart(2, "0")}</span>` : ""}${esc(o.x.name)}${f && o.fav == null ? '<svg class="i st" aria-label="favorito"><use href="#i-star"/></svg>' : ""}</span>
+      <span class="sm">${SV.kind === "ALL" || SV.kind === "FAVS" ? `<span class="k">${esc(o.x.kind)}</span>` : ""}<span>${esc(M.info.engines[o.x.e] || "USER")}</span><span class="num">${o.n >= 0 ? o.n + 1 : ""}</span></span></button>`; };
+  const free = SV.kind === "FAVS" ? Array.from({ length: 16 - M.favs.length }, (_, i) => `<div class="sc free" role="listitem"><span class="sn"><span class="fi num">${String(M.favs.length + i + 1).padStart(2, "0")}</span>Libre</span><span class="sm">Carga un sonido y márcalo con la estrella</span></div>`).join("") : "";
+  return `<div class="sv">
+    <nav class="svk" aria-label="Carpetas de sonidos">${kinds.map((k) => `<button class="kf${k === "FAVS" ? " fk" : ""}" data-skind="${k}" aria-current="${SV.kind === k}"><span>${k === "FAVS" ? "Favoritos" : k === "ALL" ? "Todos" : k}</span><span class="num">${cnt(k)}</span></button>`).join("")}</nav>
+    <div class="svm">
+      <section class="svc${M.edited ? " edited" : ""}"><div class="svn"><span class="c">Suena ahora</span><b>${esc(name)}</b>
+        <span class="m">${x ? `<span class="k">${esc(x.kind)}</span>` : ""}<span>${esc(M.info.engines[M.engine] || "USER")}</span><span class="num">${n >= 0 ? `${n + 1}/${M.list.length}` : ""}</span>${M.edited ? '<span class="edtx">Editado</span>' : ""}</span></div>
+        <div class="sva">
+          <button class="btn${fav ? " on" : ""}" data-svfav="1"><svg class="i"><use href="#i-star"/></svg>${fav ? `Favorito ${M.favCur + 1}: quitar` : "Marcar como favorito"}</button>
+          ${M.edited && n >= 0 ? `<button class="btn" data-discard="1"><svg class="i"><use href="#i-undo"/></svg>Descartar lo editado</button>` : ""}
+          <div class="alg">${at >= 0 ? `<button class="btn" data-load="${inKind[(at - 1 + inKind.length) % inKind.length].n}"><svg class="i"><use href="#i-prev"/></svg>Anterior en ${esc(x.kind)}</button><button class="btn" data-load="${inKind[(at + 1) % inKind.length].n}">Siguiente<svg class="i"><use href="#i-next"/></svg></button>` : ""}</div>
+          <a class="go2" href="${STUDIO_URL}">Guardar o renombrar en Estudio<svg class="i"><use href="#i-next"/></svg></a></div></section>
+      <header class="svh"><h2>${SV.kind === "FAVS" ? "Favoritos" : SV.kind === "ALL" ? "Todos los sonidos" : esc(SV.kind)}</h2><span class="c num">${SV.kind === "FAVS" ? `${M.favs.length} de 16` : `${items.length} sonidos`}</span></header>
+      <div class="scs" role="list">${items.map(card).join("")}${free}</div>
+    </div></div>`;
+}
+
+/* ------------------------------------------- the left rail: the device's page --- */
+/* its four knobs as the FM-1 shows them now (a tap on its name opens its folder here) */
+function renderDev() {
+  const pg = M.page; if (!pg || !M.info) return;
+  const s = pg.home ? 0 : pg.scope, ids = pg.home ? M.homeIds : pg.ids, folder = pg.home ? "HOME" : FAM[pg.fam] || "";
+  const k4 = s < 2 ? ids.map((id, k) => { const d = id < 127 && desc(s, id); if (!d) return `<div class="dk off"><span class="l">KNOB ${k + 1}</span><span class="v">–</span></div>`;
+    const v = val(s, id); return `<div class="dk" style="--c:${KC[k]};${fillVars(d, v)}"><span class="l"><i></i>${esc(d.label)}</span><span class="v num">${valHtml(d, v)}</span><span class="b"></span></div>`; }).join("") : "";
+  $("dvp").innerHTML = `<button class="dvh" data-f="${folder}" aria-label="Abrir ${esc(folder)}"><span class="c">En el sinte</span><b>${esc(pg.home ? "HOME" : pg.title)}</b><span class="f">${esc(folder)}</span></button>
+    ${k4 ? `<div class="dvk">${k4}</div>` : `<p class="dvn">Esta página se usa en el sinte.</p>`}`;
+}
+
+/* -------------------------------------- the left rail: what changed, undoable --- */
+const LOG = [];
+let undoing = false;
+const kOf = (s, id) => { const p = LAYOUT.find((x) => x.scope === s && x.ids.includes(id)); return p ? p.ids.indexOf(id) : 0; };
+function logChange(s, id, old, v, src) {
+  const now = performance.now(), top = LOG[0];
+  if (top && top.s === s && top.id === id && top.src === src && now - top.t < 2500) { top.v = v; top.t = now; if (top.v === top.old) LOG.shift(); }
+  else LOG.unshift({ s, id, old, v, src, t: now });
+  if (LOG.length > 24) LOG.length = 24;
+  renderLog();
+}
+function renderLog() {
+  if (!M.info) return;
+  $("chgx").hidden = !LOG.length;
+  $("chl").innerHTML = LOG.length ? LOG.map((e, i) => { const d = desc(e.s, e.id); if (!d) return ""; const a = fmtValue(d, e.old), b = fmtValue(d, e.v);
+    return `<div class="lg" role="listitem" style="--c:${KC[kOf(e.s, e.id)]}"><span class="l"><i></i>${esc(d.label)}<em>${e.src === "sinte" ? "en el sinte" : "aquí"}</em></span>
+      <span class="vv num">${esc(a[0] + a[1])} → ${esc(b[0] + b[1])}</span><button class="ud" data-undo="${i}" aria-label="Deshacer ${esc(d.label)}: volver a ${esc(a[0] + a[1])}"><svg class="i"><use href="#i-undo"/></svg></button></div>`; }).join("")
+    : `<p class="dvn">Aquí sale lo que cambies, en el sinte o aquí. Toca <svg class="i"><use href="#i-undo"/></svg> para volver atrás.</p>`;
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-undo],[data-discard],[data-skind],[data-svfav],#chgx"); if (!b) return;
+  if (b.dataset.undo) { const i = +b.dataset.undo, x = LOG[i]; if (!x) return; LOG.splice(i, 1); undoing = true; setVal(x.s, x.id, x.old); undoing = false; renderLog(); }
+  else if (b.dataset.discard) { const n = entryNow(); if (n >= 0) { LOG.length = 0; listGo(n); toast(-1, "Lo editado se descartó"); } }
+  else if (b.dataset.skind) { SV.kind = b.dataset.skind; renderWork(); $("edit").scrollTop = 0; }
+  else if (b.dataset.svfav) favToggle();
+  else if (b.id === "chgx") { LOG.length = 0; renderLog(); }
+});
 
 /* ---------------------------------------------------------------- TOCAR --- */
 const playParams = () => HOME_ROWS.flatMap(([t, , , s, ids]) => (ids || M.homeIds).filter((id) => id < 127 && desc(s, id) && desc(s, id).fmt !== F.ENUM).map((id) => ({ s, id, name: `${t}  ${desc(s, id).label}` })));
@@ -602,7 +681,7 @@ async function favToggle() {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && B.open) { openBrowser(false); $("now").focus(); } });
 $("scrim").addEventListener("click", () => openBrowser(false));
 document.addEventListener("click", (e) => {
-  const b = e.target.closest("#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-mode],[data-mode-go],[data-qtog],[data-qstep],[data-qn],[data-tap],[data-panic],#prev,#next,#favt,#favb,#usb,#follow,[data-f]");
+  const b = e.target.closest("#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-mode],[data-mode-go],[data-qtog],[data-qstep],[data-qn],[data-tap],[data-panic],#prev,#next,#favt,#usb,#follow,[data-f]");
   if (!b) return;
   if (b.id === "now") openBrowser(!B.open);
   else if (b.id === "brx") openBrowser(false);
@@ -620,11 +699,10 @@ document.addEventListener("click", (e) => {
     const n = M.favs.length, d = b.id === "next" ? 1 : -1;
     if (n) favGo(M.favCur < 0 ? (d > 0 ? 0 : n - 1) : (M.favCur + d + n) % n);
   }
-  else if (b.id === "favt" || b.id === "favb") favToggle();
+  else if (b.id === "favt") favToggle();
   else if (b.id === "usb") usbAudio();
   else if (b.id === "follow") { S.follow = !S.follow; b.setAttribute("aria-pressed", S.follow); if (S.follow && M.page) followPage(); }
   else if (b.dataset.f === "ESTUDIO") location.href = STUDIO_URL;
-  else if (b.dataset.f === "SAVE") openBrowser(true);
   else if (b.dataset.f) { S.folder = b.dataset.f; if (S.mode === "play") setMode(S.folder === "HOME" ? "quick" : "edit"); else { renderNav(); renderWork(); } $("edit").scrollTop = 0; }
 });
 

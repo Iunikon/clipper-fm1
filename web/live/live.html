@@ -17,6 +17,7 @@ __CSS__
   <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
   <symbol id="i-open" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M4 5v5h5M5 10a8 8 0 1 1 1.5 7"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></symbol>
   <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v14M12 3l-2.5 3M12 3l2.5 3M12 13l-4-2.5V8M12 15l4-2.5V10"/><circle cx="12" cy="19" r="2"/></symbol>
@@ -63,12 +64,10 @@ __CSS__
   <div class="body">
     <aside class="rail l">
       <div class="ph"><h2>Salida</h2><span class="c">AUDIO USB</span></div>
-      <div class="scope"><canvas id="scope"></canvas><span class="src" id="src">Sin audio</span></div>
+      <div class="scope"><canvas id="scope"></canvas><button class="src" id="usb"><svg class="i"><use href="#i-usb"/></svg><span id="src">Usar audio USB del FM-1</span></button></div>
+      <section class="dvp" id="dvp" aria-label="La página del sinte"></section>
+      <section class="chg"><div class="ph"><h2>Cambios</h2><button class="clr" id="chgx" hidden>Borrar</button></div><div class="chl" id="chl" role="list"></div></section>
       <dl class="meta" id="metal"></dl>
-      <div class="act">
-        <button class="btn" id="favb"><svg class="i"><use href="#i-star"/></svg><span>Marcar como favorito</span></button>
-        <button class="btn" id="usb"><svg class="i"><use href="#i-usb"/></svg><span>Usar audio USB del FM-1</span></button>
-      </div>
     </aside>
 
     <main class="work" id="edit"></main>

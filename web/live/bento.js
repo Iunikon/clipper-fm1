@@ -54,10 +54,10 @@ function gEq(s, ids) {
   return { svg: `<line x1="0" y1=".5" x2="1" y2=".5" class="axis"/><path d="${p}" class="line"/>`, handles: [] };
 }
 function gMeters(s, ids, toggles) {
-  return live(ids).map(({ id, k }) => { const d = desc(s, id); if (!d) return ""; const f = frac(d, val(s, id)), [t, u] = fmtValue(d, val(s, id));
+  return live(ids).map(({ id, k }) => { const d = desc(s, id); if (!d) return ""; const f = frac(d, val(s, id)), z = zeroOf(d), [t, u] = fmtValue(d, val(s, id));
     const q = toggles && QSPEC.get(keyOf(s, id)), off = q && !qOn(q);
     return `<div class="mt${off ? " off" : ""}" style="--c:${KC[k]}" data-mt="${keyOf(s, id)}"><span class="mv num">${esc(t)}<small>${esc(u)}</small></span>
-      <div class="mtr" data-drag="v" data-k="${keyOf(s, id)}"><b style="height:${f * 100}%"></b></div>
+      <div class="mtr${z ? " bi" : ""}" data-drag="v" data-k="${keyOf(s, id)}"><b style="bottom:${Math.min(f, z) * 100}%;height:${Math.abs(f - z) * 100}%"></b></div>
       ${q ? `<button class="ml" data-qtog="${keyOf(s, id)}" role="switch" aria-checked="${!off}">${esc(q.name)}</button>` : `<span class="ml">${esc(d.label)}</span>`}</div>`; }).join("");
 }
 function gArcs(s, ids) {
@@ -92,10 +92,10 @@ function readout(s, id, k) {
 }
 
 /* a parameter's tile, by what it is */
-function tileP(s, id, k, pt) {
+function tileP(s, id, k, pt, tag = pt) {
   const d = desc(s, id); if (!d) return "";
-  const v = val(s, id), key = keyOf(s, id), lv = devLive(S.folder, pt) ? " dev" : "", at = `style="--c:${KC[k]}${isChoice(d) ? "" : ";" + fillVars(d, v)}" data-cell="${key}" data-kk="${k}" data-title="${esc(pt)}"`;
-  const top = `<span class="tt"><span class="tlb"><i></i>${esc(d.label)}</span><span class="pg">${esc(pt)}</span></span>`;
+  const v = val(s, id), key = keyOf(s, id), lv = devLive(S.folder, pt) ? " dev" : "", at = `style="--c:${KC[k]}${isChoice(d) ? "" : ";" + fillVars(d, v)}" data-cell="${key}" data-kk="${k}" data-title="${esc(pt)}" data-tag="${tag ? 1 : 0}"`;
+  const top = `<span class="tt"><span class="tlb"><i></i>${esc(d.label)}</span>${tag ? `<span class="pg">${esc(pt)}</span>` : ""}</span>`;
   if (isOnOff(d)) { const on = v !== d.min;
     return `<button class="tp t-sw${on ? " on" : ""}${lv}" ${at} role="switch" aria-checked="${on}" data-set="${key}" data-v="${on ? d.min : d.max}" aria-label="${esc(d.label)}">${top}<span class="tv num">${valHtml(d, v)}</span><span class="knob" aria-hidden="true"></span></button>`; }
   const opts = () => d.names.map((n, i) => `<button role="radio" aria-checked="${i + d.min === v}" data-set="${key}" data-v="${i + d.min}">${esc(n)}</button>`).join("");
@@ -113,25 +113,53 @@ function module(p, kind, opt = {}) {
   const lv = p.folder === "HOME" ? !!(M.page && M.page.home) : devLive(p.folder, p.title);
   const ro = kind === "meters" || kind === "arcs" ? "" : `<div class="ros">${GUSE[kind].filter((k) => p.ids[k] < 127).map((k) => readout(p.s, p.ids[k], k)).join("")}</div>`;
   return `<section class="bx g-${kind}${lv ? " dev" : ""}${opt.cls ? " " + opt.cls : ""}" data-title="${esc(p.title)}" data-g="${kind}">
-    <header><h3><svg class="i"><use href="#i-${ICON[p.folder] || "edit"}"/></svg>${esc(opt.name || p.title)}</h3>${lv ? `<span class="live2">En el sinte</span>` : opt.hint ? `<span class="hint2">${esc(opt.hint)}</span>` : ""}</header>
+    ${opt.bare && !lv ? "" : `<header>${opt.bare ? "<span></span>" : `<h3><svg class="i"><use href="#i-${ICON[p.folder] || "edit"}"/></svg>${esc(opt.name || p.title)}</h3>`}${lv ? `<span class="live2">En el sinte</span>` : opt.hint ? `<span class="hint2">${esc(opt.hint)}</span>` : ""}</header>`}
     <div class="gr" data-gr="${kind}" data-s="${p.s}" data-ids="${p.ids.join(",")}"${opt.toggles ? ' data-toggles="1"' : ""}>${graphHtml(kind, p.s, p.ids, opt)}</div>${ro}</section>`;
 }
 function pagesOf(folder) {
   if (folder === "HOME") return [{ title: "HOME", folder: "HOME", s: 0, ids: M.homeIds }, ...["ENV", "FILTER", "LFO", "FX", "MACROS"].map((t) => { const x = LAYOUT.find((y) => y.title === t); return { title: t, folder: x.folder, s: x.scope, ids: x.ids }; })];
   return LAYOUT.filter((x) => x.folder === folder).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
 }
+/* a folder in blocks: an effect, an LFO, an envelope… each with its pages (named by its first, as on the device) */
+const BLOCKS = {
+  ENV: [["ENV", "ENV DEST"], ["ENV 2", "ENV 2 LOOP"]],
+  LFO: [["LFO", "LFO DEST"], ["LFO 2"], ["LFO 3"], ["MOD", "MOD SEQ 2", "MATRIX", "MOD SEQ"]],
+  FX: [["FX"], ["FILTER"], ["INSERT", "INSERT 2"], ["DLY", "DLY 2"], ["REVERB"], ["CHORUS"], ["EQ+COMP"]],
+  EDIT: [["EDIT 1"], ["MACROS", "EDIT 2"], ["VOICE", "VOICE 2", "VOICE 3"], ["LAYER", "LAYER 2", "MORPH", "RANDOM", "UNDO"]],
+  ARP: [["ARP", "ARP 2"], ["SPICE"]],
+  GLO: [["GLOBAL"], ["MASTER"], ["SYSTEM", "TUNING", "MIDI", "MIDI 2"]],
+};
+function blocksOf(folder, pages) {
+  const def = BLOCKS[folder] || [], seen = new Set(), out = [];
+  def.forEach((titles) => { const ps = titles.map((t) => pages.find((p) => p.title === t)).filter(Boolean); ps.forEach((p) => seen.add(p)); if (ps.length) out.push(ps); });
+  pages.filter((p) => !seen.has(p)).forEach((p) => out.push([p]));
+  return out;
+}
+const isAway = (p) => p.scope === 2 || p.title === "TOOLS" || !live(p.ids).length;
+function block(ps) {
+  const mods = [], tiles = [], away = ps.filter(isAway).map((p) => p.title), many = ps.filter((p) => !isAway(p)).length > 1;
+  ps.filter((p) => !isAway(p)).forEach((p) => {
+    const kind = GRAPH[p.title], used = kind ? GUSE[kind] : [];
+    if (kind) mods.push(module(p, kind, { bare: p.title === ps[0].title }));
+    live(p.ids).filter(({ k }) => !used.includes(k)).forEach(({ id, k }) => tiles.push(tileP(p.s, id, k, p.title, many)));
+  });
+  if (away.length) tiles.push(`<section class="tp away"><span class="tt"><span class="tlb">${esc(away.join(", "))}</span></span><p>${away.length > 1 ? "Se editan" : "Se edita"} en el sinte o en Estudio.</p>
+    <a class="go2" href="${STUDIO_URL}">Abrir Estudio<svg class="i"><use href="#i-next"/></svg></a></section>`);
+  const lay = mods.length && tiles.length ? "side" : mods.length ? "solo" : "flat";
+  return `<section class="blk" data-blk="${esc(ps[0].title)}"><header class="bh"><h2><svg class="i"><use href="#i-${ICON[ps[0].folder] || "edit"}"/></svg>${esc(ps[0].title)}</h2></header>
+    <div class="bb ${lay}">${mods.join("")}${tiles.length ? `<div class="tz${tiles.length === 1 ? " one" : ""}">${tiles.join("")}</div>` : ""}</div></section>`;
+}
 function bentoView(folder) {
-  const out = [], away = [];
-  pagesOf(folder).forEach((p) => {
-    const cells = live(p.ids);
-    if (p.scope === 2 || p.title === "TOOLS" || !cells.length) { away.push(p.title); return; }
+  const pages = pagesOf(folder);
+  if (folder !== "HOME") return `<div class="blks">${blocksOf(folder, pages).map(block).join("")}</div>${folder === "SEQ" ? `<p class="note">Las notas del patrón se editan en Estudio, en el secuenciador.</p>` : ""}`;
+  const out = [];                                          /* (HOME in EDITAR: one bento, a look at all of it) */
+  pages.forEach((p) => {
+    if (isAway(p)) return;
     const kind = GRAPH[p.title], used = kind ? GUSE[kind] : [];
     if (kind) out.push(module(p, kind));
-    cells.filter(({ k }) => !used.includes(k)).forEach(({ id, k }) => out.push(tileP(p.s, id, k, p.title)));
+    live(p.ids).filter(({ k }) => !used.includes(k)).forEach(({ id, k }) => out.push(tileP(p.s, id, k, p.title)));
   });
-  if (away.length) out.push(`<section class="tp away"><span class="tt"><span class="tlb">${esc(away.join(", "))}</span></span><p>${away.length > 1 ? "Se editan" : "Se edita"} en el sinte o en Estudio.</p>
-    <a class="go2" href="${STUDIO_URL}">Abrir Estudio<svg class="i"><use href="#i-next"/></svg></a></section>`);
-  return `<div class="bento">${out.join("")}</div>${folder === "SEQ" ? `<p class="note">Las notas del patrón se editan en Estudio, en el secuenciador.</p>` : ""}`;
+  return `<div class="bento">${out.join("")}</div>`;
 }
 
 /* ---- RÁPIDO as a bento: the sweep filter and the sends large, the switches around them */
@@ -159,7 +187,7 @@ function paintCards(s, id) {
         const kk = gr.dataset.gr === "meters" ? el.dataset.mt : el.dataset.k;
         if (kk !== key) return;
         const d = desc(s, id), f = frac(d, val(s, id));
-        if (gr.dataset.gr === "meters") { el.querySelector(".mtr b").style.height = f * 100 + "%"; el.querySelector(".mv").innerHTML = valHtml(d, val(s, id)); const q = gr.dataset.toggles && QSPEC.get(kk); if (q) { el.classList.toggle("off", !qOn(q)); el.querySelector(".ml").setAttribute("aria-checked", qOn(q)); } }
+        if (gr.dataset.gr === "meters") { const z = zeroOf(d), bb = el.querySelector(".mtr b"); bb.style.bottom = Math.min(f, z) * 100 + "%"; bb.style.height = Math.abs(f - z) * 100 + "%"; el.querySelector(".mv").innerHTML = valHtml(d, val(s, id)); const q = gr.dataset.toggles && QSPEC.get(kk); if (q) { el.classList.toggle("off", !qOn(q)); el.querySelector(".ml").setAttribute("aria-checked", qOn(q)); } }
         else { const tmp = document.createElement("div"); tmp.innerHTML = gArcs(s, ids.map((x) => (x === id ? x : 127))); const nn = tmp.querySelector(".arc"); el.querySelector("svg").replaceWith(nn.querySelector("svg")); el.querySelector(".av").innerHTML = nn.querySelector(".av").innerHTML; }
       });
     } else gr.innerHTML = graphHtml(gr.dataset.gr, s, ids);
@@ -170,7 +198,7 @@ function paintCards(s, id) {
       const f = frac(d, v), z = zeroOf(d);
       el.style.setProperty("--lo", Math.min(f, z)); el.style.setProperty("--hi", Math.max(f, z)); el.style.setProperty("--f", f);
       el.querySelector(el.classList.contains("ro") ? ".rv" : ".tv").innerHTML = valHtml(d, v); el.setAttribute("aria-valuenow", v);
-    } else el.outerHTML = el.classList.contains("ro") ? readout(s, id, +el.dataset.ro) : tileP(s, id, +el.dataset.kk, el.dataset.title);
+    } else el.outerHTML = el.classList.contains("ro") ? readout(s, id, +el.dataset.ro) : tileP(s, id, +el.dataset.kk, el.dataset.title, el.dataset.tag === "1");
   });
 }
 
