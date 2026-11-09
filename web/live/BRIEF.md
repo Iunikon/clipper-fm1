@@ -4,6 +4,23 @@ Documento de contexto para revisar el diseño de Clipper Live con Claude Design 
 
 > **Proyecto personal.** Clipper Live vive en la rama local `live` de `clipper-fm1`, un firmware de la comunidad para el sintetizador FM-1. No se propone al repositorio original ni se envía upstream.
 
+## Dónde está
+
+| Qué | Dónde |
+|---|---|
+| **App publicada** | **https://clipper-live-eta.vercel.app**: Vercel, proyecto `clipper-live` en la cuenta `jorge-roblez` (plan Hobby). Abre la app vacía con «Conectar el FM-1» y el botón «Descargar para usar sin internet». |
+| **Código** | Rama `live` del repositorio `clipper-fm1` de Jorge (GitHub [Iunikon/clipper-fm1](https://github.com/Iunikon/clipper-fm1)). Por ahora la rama solo está en local: no se ha subido a GitHub. Nunca va al repositorio original ([isod89/clipper-fm1](https://github.com/isod89/clipper-fm1)). |
+| **Archivos** | `web/live/` (la fuente y este brief), `web/live.html` (la app montada), `tools/live_build.py`, `firmware/src/editor_live.c`. |
+| **Editor clásico (Estudio)** | `clipper-editor-1.3.1.html`, publicado junto a la app en Vercel. |
+| **Firmware** | Clipper 1.3.1 con el protocolo 15 de Live (`build/felucca.fwsc`), instalado en el FM-1. |
+
+**Publicar de nuevo** (Node y la CLI de Vercel están en `~/.local/opt/node/bin`):
+
+```bash
+python3 tools/live_build.py --site build/vercel
+cd build/vercel && ~/.local/opt/node/bin/vercel deploy --prod --yes --project clipper-live
+```
+
 ---
 
 ## 1. Qué es
