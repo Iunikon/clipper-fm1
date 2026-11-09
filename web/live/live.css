@@ -290,3 +290,6 @@
   .tl.panic button.tg:active { background: rgba(255, 98, 26, .18); }
   .quick { gap: 12px; }
   .tl { min-height: 112px; }
+  /* (Live) the sound edited since it was loaded: the device's orange dot after its name */
+  .now.edited .n #name::after { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--fav); margin-left: 8px; vertical-align: middle; }
+  .meta .edtx { color: var(--fav); font-weight: 600; }

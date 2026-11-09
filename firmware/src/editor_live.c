@@ -13,10 +13,13 @@
  *  102 LIST start count -> total, start, n, then n x (engine, preset or user slot, kind, name): the list PRESETS walks
  *                        (every factory sound by kind, then the user presets; no FAV rows). start and total: 2 x 7 bits
  *  103 LIST_GO n      -> n (2 x 7 bits), rc (0 loaded, 1 no such entry). Loads entry n of LIST
+ *  104 EDITED         (push) edited (1) or as loaded (0): the sound changed since it was loaded (ui_synth.c hist_edited, not
+ *                        while COMPARE shows the original). PAGE ends with the same byte
  * Included by editor.c after ui.c (fav_list, preset_go, fav_toggle). */
-enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO };
+enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO, ED_EDITED };
+#define ED_LV_EDITED ((uint8_t)(hist_edited && !hist_cmp_on))
 static struct {
-    uint8_t home, page;
+    uint8_t home, page, edited;
     uint32_t fsig;
 } ed_lv;
 
@@ -51,6 +54,7 @@ UI_SMALL static void ed_lv_page(void)
         else
             home_param(k, &vp), ed_b((uint32_t)(vp - TSEL->p));
     }
+    ed_b(ED_LV_EDITED);
 }
 UI_SMALL static void ed_lv_entry(uint32_t n)                   /* base list entry n: engine, preset or slot, kind, name */
 {
@@ -70,6 +74,7 @@ UI_SMALL static void ed_lv_shadow(void)                            /* WATCH: in 
     ed_lv.home = ui.home;
     ed_lv.page = ui.page;
     ed_lv.fsig = ed_lv_fsig();
+    ed_lv.edited = ED_LV_EDITED;
 }
 UI_SMALL static int ed_lv_sync(void)                               /* while watched: 1 = a push went out */
 {
@@ -79,6 +84,13 @@ UI_SMALL static int ed_lv_sync(void)                               /* while watc
         ed_lv.page = ui.page;
         ed_begin(ED_PAGE);
         ed_lv_page();
+        ed_send();
+        return 1;
+    }
+    if (ED_LV_EDITED != ed_lv.edited) {
+        ed_lv.edited = ED_LV_EDITED;
+        ed_begin(ED_EDITED);
+        ed_b(ed_lv.edited);
         ed_send();
         return 1;
     }

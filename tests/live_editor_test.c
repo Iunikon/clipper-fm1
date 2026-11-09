@@ -174,6 +174,20 @@ int main(void)
         }
         go_home(); ui_frame();
     }
+    /* EDITED: pushed when the sound turns edited and when it is as loaded again; PAGE ends with it */
+    {
+        uint8_t q[2];
+        int16_t v0;
+        q[0] = 10; q[1] = 0; ed(ED_LIST_GO, q, 2);
+        frames_pushing(80, 0, 0);                            /* (the load settles: the history's rest) */
+        v0 = TSEL->p[P_E0 + 4];
+        TSEL->p[P_E0 + 4] = (int16_t)(v0 > 60 ? v0 - 30 : v0 + 30);
+        check(frames_pushing(80, ED_EDITED, 0) == 1u && hist_edited, "a knob turned: EDITED (1) pushed once");
+        ed(ED_PAGE, a, 0);
+        check(rx_last[rx_n - 2] == 1u, "PAGE ends with the edited byte (1)");
+        TSEL->p[P_E0 + 4] = v0;
+        check(frames_pushing(80, ED_EDITED, 0) == 1u && !hist_edited, "back as loaded: EDITED (0) pushed");
+    }
     printf("live: %s\n", fails ? "FAILED" : "all passed");
     return fails != 0;
 }

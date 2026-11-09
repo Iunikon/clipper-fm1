@@ -300,6 +300,9 @@
   .tl.panic button.tg:active { background: rgba(255, 98, 26, .18); }
   .quick { gap: 12px; }
   .tl { min-height: 112px; }
+  /* (Live) the sound edited since it was loaded: the device's orange dot after its name */
+  .now.edited .n #name::after { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--fav); margin-left: 8px; vertical-align: middle; }
+  .meta .edtx { color: var(--fav); font-weight: 600; }
 
 </style>
 </head>
@@ -446,8 +449,8 @@ function fmtValue(d, v) {
 /* ---------------------------------------------------------------- protocol --- */
 const HDR = [0x7D, 0x46, 0x4C];
 const C = { INFO: 1, GET: 2, SET: 3, DUMP: 4, DESC: 5, WATCH: 22, CHANGED: 23, RELOAD: 24, PING: 25, STEP_CHANGED: 26, TRACK_CHANGED: 32,
-  PAGE: 97, FAVS: 98, FAV_GO: 99, FAV_SET: 100, FAVS_CHANGED: 101, LIST: 102, LIST_GO: 103 };
-const PUSH = new Set([C.CHANGED, C.RELOAD, C.STEP_CHANGED, C.TRACK_CHANGED, C.FAVS_CHANGED]);
+  PAGE: 97, FAVS: 98, FAV_GO: 99, FAV_SET: 100, FAVS_CHANGED: 101, LIST: 102, LIST_GO: 103, EDITED: 104 };
+const PUSH = new Set([C.CHANGED, C.RELOAD, C.STEP_CHANGED, C.TRACK_CHANGED, C.FAVS_CHANGED, C.EDITED]);
 const v14 = (v) => { const u = Math.max(-8192, Math.min(8191, Math.round(v))) + 8192; return [u & 127, (u >> 7) & 127]; };
 const u14 = (n) => [n & 127, (n >> 7) & 127];
 const frame = (cmd, args) => [0xF0, ...HDR, cmd & 127, ...args, 0xF7];
@@ -472,7 +475,7 @@ const P = {
     for (let i = 0; i < info.pcount; i++) o.p.push(r.v()); for (let i = 0; i < info.gcount; i++) o.g.push(r.v()); return o; },
   set(a) { const r = new Reader(a); return { scope: r.b(), id: r.b(), value: r.v() }; },
   page(a) { const r = new Reader(a), o = { home: r.b(), fam: r.b(), page: r.b(), title: r.s(), scope: r.b(), ids: [r.b(), r.b(), r.b(), r.b()] };
-    o.homeIds = r.more ? [r.b(), r.b(), r.b(), r.b()] : null; return o; },
+    o.homeIds = r.more ? [r.b(), r.b(), r.b(), r.b()] : null; o.edited = r.more ? r.b() : 0; return o; },
   entry(r) { return { e: r.b(), k: r.b(), kind: r.s(), name: r.s() }; },
   favs(a) { const r = new Reader(a), n = r.b(), cur = r.b(), list = []; for (let i = 0; i < n; i++) list.push(P.entry(r)); return { cur: cur === 127 ? -1 : cur, list }; },
   list(a) { const r = new Reader(a), total = r.u(), start = r.u(), n = r.b(), items = []; for (let i = 0; i < n; i++) items.push(P.entry(r)); return { total, start, items }; },
@@ -514,13 +517,13 @@ class Link {
 function makeMock(onFrame) {
   const D = JSON.parse($("mockdata").textContent), info = D.info, pe0 = info.pe0;
   const m = { p: D.dump.p.slice(), g: D.dump.g.slice(), engine: D.dump.engine, preset: D.dump.preset, n: 0, favs: [0, 6, 64, 120, 200, 290],
-    page: { home: 1, fam: 0, page: 0, title: "HOME", scope: 0, ids: [] }, watch: false };
+    page: { home: 1, fam: 0, page: 0, title: "HOME", scope: 0, ids: [] }, watch: false, edited: 0 };
   const enc = { s: (t) => [...[...t].map((c) => c.charCodeAt(0) & 127), 0], entry: (n) => { const x = D.list[n]; return [x[0], x[1], ...enc.s(x[2]), ...enc.s(x[3])]; } };
   const homeIds = () => D.homeIds[m.engine] || [127, 127, 127, 127];
-  const pageArgs = () => { const ids = m.page.home ? homeIds() : m.page.ids; return [m.page.home, m.page.fam, m.page.page, ...enc.s(m.page.title), m.page.scope, ...ids, ...homeIds()]; };
+  const pageArgs = () => { const ids = m.page.home ? homeIds() : m.page.ids; return [m.page.home, m.page.fam, m.page.page, ...enc.s(m.page.title), m.page.scope, ...ids, ...homeIds(), m.edited]; };
   const descOf = (s, id) => (s ? D.gdesc[id] : id >= pe0 && id < pe0 + 8 && D.engineDesc[m.engine] ? D.engineDesc[m.engine][id - pe0] : D.pdesc[id]);
   const push = (cmd, a) => setTimeout(() => onFrame(frame(cmd, a)), 4);
-  const load = (n) => { m.n = n; m.engine = D.list[n][0]; m.preset = D.list[n][1];
+  const load = (n) => { m.n = n; m.engine = D.list[n][0]; m.preset = D.list[n][1]; if (m.edited && m.watch) push(C.EDITED, [0]); m.edited = 0;
     (D.engineDesc[m.engine] || []).forEach((d, k) => { m.p[pe0 + k] = d.def; }); if (m.watch) push(C.RELOAD, [m.engine, m.preset, 0]); };
   const FAMS = { ENV: 1, LFO: 2, FX: 3, SEL: 4, EDIT: 5, GLO: 6, ARP: 8 };
   function answer(cmd, a) {
@@ -529,7 +532,8 @@ function makeMock(onFrame) {
       case C.DESC: { const d = descOf(a[0], a[1]); if (!d) return null;
         return [a[0], a[1], d.fmt, ...v14(d.min), ...v14(d.max), ...v14(d.def), ...enc.s(d.label), ...enc.s(d.unit), ...(d.fmt === F.ENUM ? d.names.flatMap(enc.s) : [])]; }
       case C.DUMP: return [m.engine, m.preset, ...m.p.flatMap(v14), ...m.g.flatMap(v14)];
-      case C.SET: { const v = (a[2] | (a[3] << 7)) - 8192, d = descOf(a[0], a[1]), c = d ? Math.max(d.min, Math.min(d.max, v)) : v; (a[0] ? m.g : m.p)[a[1]] = c; return [a[0], a[1], ...v14(c)]; }
+      case C.SET: { const v = (a[2] | (a[3] << 7)) - 8192, d = descOf(a[0], a[1]), c = d ? Math.max(d.min, Math.min(d.max, v)) : v; (a[0] ? m.g : m.p)[a[1]] = c;
+        if (!a[0] && !m.edited) { m.edited = 1; if (m.watch) push(C.EDITED, [1]); } return [a[0], a[1], ...v14(c)]; }
       case C.WATCH: m.watch = !!(a[0] & 1); return [a[0] & 3];
       case C.PING: return [0];
       case C.PAGE: return pageArgs();
@@ -554,6 +558,7 @@ function makeMock(onFrame) {
       if (!d) return;
       const step = Math.max(1, Math.round((d.max - d.min) / 9)), v = arr[id] + step > d.max ? d.min : arr[id] + step;
       arr[id] = v; push(C.CHANGED, [pg.scope, id, ...v14(v)]);
+      if (!pg.scope && !m.edited) { m.edited = 1; push(C.EDITED, [1]); }
     }, 1400);
   }, 7000);
   return { send: (bytes) => { const f = unframe(bytes); if (!f) return; const r = answer(f.cmd, f.a); if (r) setTimeout(() => onFrame(frame(f.cmd, r)), 6); }, name: "FM-1 (ejemplo)" };
@@ -561,15 +566,15 @@ function makeMock(onFrame) {
 
 /* ----------------------------------------------------------- the state --- */
 /* M: what the FM-1 says. S: what this screen shows */
-const M = { link: null, info: null, pdesc: [], gdesc: [], p: [], g: [], engine: 0, preset: 0, list: [], favs: [], favCur: -1, page: null, homeIds: [127, 127, 127, 127], mock: false };
+const M = { edited: false, link: null, info: null, pdesc: [], gdesc: [], p: [], g: [], engine: 0, preset: 0, list: [], favs: [], favCur: -1, page: null, homeIds: [127, 127, 127, 127], mock: false };
 const S = { folder: "HOME", mode: "quick", follow: true, hot: new Map() };
 const FAM = { 0: "HOME", 1: "ENV", 2: "LFO", 3: "FX", 4: "SEL", 5: "EDIT", 6: "GLO", 7: "SAVE", 8: "ARP", 9: "SEQ" };
 const NAV = [["HOME", "home"], ["EDIT", "edit"], ["ENV", "env"], ["LFO", "lfo"], ["FX", "fx"], ["SEL", "sel"], ["ARP", "arp"], ["SEQ", "seq"], ["GLO", "glo"], ["SAVE", "save"], ["ESTUDIO", "studio"]];
 const ICON = { HOME: "home", EDIT: "edit", ENV: "env", LFO: "lfo", FX: "fx", SEL: "sel", ARP: "arp", SEQ: "seq", GLO: "glo", SAVE: "save" };
 const LAYOUT = JSON.parse($("mockdata").textContent).pages;     /* the device's pages (params.c PAGES), as the firmware lays them out */
 /* HOME's rack: a row a page, the device's HOME first */
-const HOME_ROWS = [["Home", "Las perillas en HOME", "HOME", 0, null, "home"], ["Envolvente", "ENV", "ENV", 0, [1, 2, 3, 4], "env"],
-  ["LFO", "LFO", "LFO", 0, [9, 10, 11, 12], "lfo"], ["Efectos", "FX", "FX", 0, [33, 34, 35, 36], "bars"], ["Macros", "MACROS", "EDIT", 0, [96, 97, 98, 99], "faders"]];
+const HOME_ROWS = [["HOME", "HOME", "HOME", 0, null, "home"], ["ENV", "ENV", "ENV", 0, [1, 2, 3, 4], "env"],
+  ["LFO", "LFO", "LFO", 0, [9, 10, 11, 12], "lfo"], ["FX", "FX", "FX", 0, [33, 34, 35, 36], "bars"], ["MACROS", "MACROS", "EDIT", 0, [96, 97, 98, 99], "faders"]];
 const desc = (s, id) => (s ? M.gdesc[id] : M.pdesc[id]);
 const val = (s, id) => (s ? M.g[id] : M.p[id]);
 const keyOf = (s, id) => s + ":" + id;
@@ -659,6 +664,7 @@ async function readSound(full) {
   if (full || d.engine !== was) for (let k = 0; k < 8; k++) M.pdesc[pe0 + k] = await descOrNull(0, pe0 + k);
   M.page = P.page(await rq(C.PAGE));
   if (M.page.homeIds) M.homeIds = M.page.homeIds;
+  M.edited = !!M.page.edited;
 }
 async function readFavs() { const r = P.favs(await rq(C.FAVS)); M.favs = r.list; M.favCur = r.cur; }
 let alive = 0;
@@ -682,6 +688,7 @@ function onPush(f) {
       fromDevice(s, id, old, v);
     } else if (f.cmd === C.RELOAD) reloadSoon();
     else if (f.cmd === C.FAVS_CHANGED) readFavs().then(renderBar).catch(() => {});
+    else if (f.cmd === C.EDITED) { M.edited = !!f.a[0]; renderBar(); }
     else if (f.cmd === C.PAGE) {
       M.page = P.page(f.a);
       if (M.page.homeIds) M.homeIds = M.page.homeIds;
@@ -775,7 +782,7 @@ function row(title, sub, folder, s, ids, kind) {
   const live = M.page && (M.page.home ? dt === "HOME" : M.page.title === dt && FAM[M.page.fam] === folder);
   const go = S.folder === "HOME" ? (folder === "HOME" ? "" : `<button class="go" data-f="${folder}">Abrir ${esc(folder)}<svg class="i"><use href="#i-open"/></svg></button>`) : "";
   return `<section class="row${live ? " dev" : ""}" data-title="${esc(dt)}" data-shape="${kind}" data-s="${s}" data-ids="${JSON.stringify(ids)}">
-    <div class="rh"><div><h3><svg class="i"><use href="#i-${ICON[folder] || "edit"}"/></svg>${esc(title)}</h3><span class="pg">${esc(sub)}</span></div>
+    <div class="rh"><div><h3><svg class="i"><use href="#i-${ICON[folder] || "edit"}"/></svg>${esc(title)}</h3></div>
     ${live ? `<span class="live">En el sinte</span>` : go}</div>
     ${ids.map((id, i) => knob(s, id, i)).join("")}<div class="shape">${shape(kind, s, ids)}</div></section>`;
 }
@@ -783,12 +790,6 @@ function awayRow(title, dt, folder) {
   return `<section class="row away" data-title="${esc(dt)}"><div class="rh"><div><h3><svg class="i"><use href="#i-${ICON[folder] || "edit"}"/></svg>${esc(title)}</h3></div></div>
     <div class="awt"><span>Esta página se edita en el sinte o en Estudio.</span><a class="btn" href="${STUDIO_URL}">Abrir Estudio</a></div></section>`;
 }
-const PAGE_NAME = { "ENV": "Envolvente", "ENV DEST": "Destinos de envolvente", "ENV 2": "Envolvente 2", "ENV 2 LOOP": "Envolvente 2: bucle", "LFO": "LFO",
-  "LFO DEST": "Destinos del LFO", "MOD": "Modulación", "LFO 2": "LFO 2", "LFO 3": "LFO 3", "MATRIX": "Matriz", "MOD SEQ": "Mod seq", "MOD SEQ 2": "Mod seq 2",
-  "FX": "Efectos", "FILTER": "Filtro", "INSERT": "Insert", "INSERT 2": "Insert 2", "DLY": "Delay", "DLY 2": "Delay 2", "REVERB": "Reverb", "CHORUS": "Chorus",
-  "EQ+COMP": "EQ y compresor", "SEL": "Escala", "SEL 2": "Acordes", "EDIT 1": "Motor 1", "EDIT 2": "Motor 2", "VOICE": "Voces", "VOICE 2": "Voces 2",
-  "VOICE 3": "Voces 3", "MACROS": "Macros", "GLOBAL": "Global", "MASTER": "Master", "SYSTEM": "Sistema", "ARP": "Arpegiador", "ARP 2": "Arpegiador 2",
-  "SPICE": "Spice", "PATTERN": "Patrón", "NOTES": "Notas" };
 /* RÁPIDO: what a player reaches for. Each tile's colour: the knob that turns it on its page of the FM-1. s: 0 the sound, 1 global.
    kind: toggle (its off value <-> the last value it had), amount (0 <-> the last level; a bar), bipolar (0 <-> the last; a bar from
    the centre), nudge (buttons that add; 0 <-> the last), choice (arrows only), tempo (- TAP +), panic (all notes off) */
@@ -890,8 +891,8 @@ function renderWork() {
     h = HOME_ROWS.map(([t, sub, folder, s, ids, kind]) => row(t, sub, folder, s, ids || M.homeIds, kind)).join("");
   } else {
     const pages = LAYOUT.filter((x) => x.folder === S.folder);
-    h = pages.map((x) => (x.scope === 2 || x.title === "TOOLS" || !x.ids.some((i) => i < 127) ? awayRow(PAGE_NAME[x.title] || x.title, x.title, S.folder)
-      : row(PAGE_NAME[x.title] || x.title, x.title, S.folder, x.scope, x.ids, x.title.startsWith("ENV") && !x.title.includes("DEST") && !x.title.includes("LOOP") ? "env" : x.title === "LFO" ? "lfo" : x.title === "MACROS" ? "faders" : "bars"))).join("");
+    h = pages.map((x) => (x.scope === 2 || x.title === "TOOLS" || !x.ids.some((i) => i < 127) ? awayRow(x.title, x.title, S.folder)
+      : row(x.title, x.title, S.folder, x.scope, x.ids, x.title.startsWith("ENV") && !x.title.includes("DEST") && !x.title.includes("LOOP") ? "env" : x.title === "LFO" ? "lfo" : x.title === "MACROS" ? "faders" : "bars"))).join("");
     if (S.folder === "SEQ") h += `<p class="note">Las notas del patrón se editan en Estudio, en el secuenciador.</p>`;
   }
   $("edit").innerHTML = h;
@@ -906,11 +907,13 @@ function renderNav() {
 function renderMeta() {
   const n = entryNow(), x = M.list[n], d = (s, id) => (desc(s, id) ? fmtValue(desc(s, id), val(s, id))[0] : "--"), fav = M.favCur >= 0;
   $("metal").innerHTML = `<dt>Motor</dt><dd>${esc(M.info.engines[M.engine] || "--")}</dd><dt>Tipo</dt><dd><span class="${fav ? "k" : ""}">${esc(x ? x.kind : "--")}</span></dd>
-    <dt>En la lista</dt><dd class="num">${n >= 0 ? n + 1 : "--"}/${M.list.length}</dd><dt>Tonalidad</dt><dd>${esc(d(0, 25))} ${esc(d(0, 26))}</dd><dt>Tempo</dt><dd class="num">${esc(d(1, 0))} BPM</dd>`;
+    <dt>En la lista</dt><dd class="num">${n >= 0 ? n + 1 : "--"}/${M.list.length}</dd><dt>Tonalidad</dt><dd>${esc(d(0, 25))} ${esc(d(0, 26))}</dd><dt>Tempo</dt><dd class="num">${esc(d(1, 0))} BPM</dd><dt>Estado</dt><dd>${M.edited ? '<span class="edtx">Editado</span>' : "Como se cargó"}</dd>`;
 }
 function renderBar() {
   const n = entryNow(), x = M.list[n], fav = M.favCur >= 0;
   $("name").textContent = x ? x.name : (M.info.engines[M.engine] || "") + " " + (M.preset + 1);
+  $("now").classList.toggle("edited", M.edited);
+  $("now").setAttribute("aria-label", `${$("name").textContent}${M.edited ? ", editado" : ""}: abrir sonidos`);
   $("meta").innerHTML = `<span class="${fav ? "k" : ""}">${esc(x ? x.kind : "USER")}</span><span>${esc(M.info.engines[M.engine] || "")}</span><span class="num">${n >= 0 ? n + 1 : "--"}/${M.list.length}</span>`;
   $("favt").classList.toggle("fav", fav); $("favt").setAttribute("aria-pressed", fav);
   $("favb").classList.toggle("on", fav);
