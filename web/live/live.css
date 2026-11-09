@@ -282,3 +282,11 @@
   .tl.on .amt b { opacity: .85; }
   .amt i { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--tx); }
   .quick .row { min-height: 104px; }
+  .amt.bi::after { content: ""; position: absolute; left: 50%; top: 4px; bottom: 4px; width: 1px; background: var(--line-2); }
+  .stp button { font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; color: var(--tx); }
+  .stp .tap { flex: 1.6 !important; font-family: var(--sans); font-weight: 700; font-size: 12px; letter-spacing: .08em; background: var(--line-2); }
+  .tl.panic .tg { justify-content: flex-start; }
+  .tl.panic .v { color: var(--k4); }
+  .tl.panic button.tg:active { background: rgba(255, 98, 26, .18); }
+  .quick { gap: 12px; }
+  .tl { min-height: 112px; }

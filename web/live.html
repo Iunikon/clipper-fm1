@@ -292,6 +292,14 @@
   .tl.on .amt b { opacity: .85; }
   .amt i { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--tx); }
   .quick .row { min-height: 104px; }
+  .amt.bi::after { content: ""; position: absolute; left: 50%; top: 4px; bottom: 4px; width: 1px; background: var(--line-2); }
+  .stp button { font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; color: var(--tx); }
+  .stp .tap { flex: 1.6 !important; font-family: var(--sans); font-weight: 700; font-size: 12px; letter-spacing: .08em; background: var(--line-2); }
+  .tl.panic .tg { justify-content: flex-start; }
+  .tl.panic .v { color: var(--k4); }
+  .tl.panic button.tg:active { background: rgba(255, 98, 26, .18); }
+  .quick { gap: 12px; }
+  .tl { min-height: 112px; }
 
 </style>
 </head>
@@ -588,6 +596,7 @@ async function connectMidi() {
     M.link = link;
     try { await rq(C.INFO, [], { timeout: 600, retries: 3, quiet: true }); }
     catch (e) { link.close(); pr.input.onmidimessage = null; continue; }
+    M.midiOut = pr.output;                           /* (the panic's all notes off: plain MIDI on the same port) */
     access.onstatechange = (e) => { if (e.port === pr.input && e.port.state === "disconnected") lost(); };
     $("cname").textContent = pr.input.name.replace(/ MIDI.*$/, "") || "FM-1";
     return load();
@@ -704,7 +713,7 @@ function fromDevice(s, id, old, v) {
   const pg = M.page, k = pg && !pg.home && pg.scope === s ? pg.ids.indexOf(id) : pg && pg.home && !s ? M.homeIds.indexOf(id) : -1;
   const a = fmtValue(d, old), b = fmtValue(d, v);
   toast(k, `${k >= 0 ? `<b>KNOB ${k + 1}</b> ` : ""}${esc(d.label)} <span class="num">${esc(a[0] + a[1])} → ${esc(b[0] + b[1])}</span>`);
-  document.querySelectorAll(`.kn[data-k="${keyOf(s, id)}"]${s ? "" : `,.tl[data-tl="${id}"]`}`).forEach((el) => { el.classList.add("hot"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("hot"), 1600); });
+  document.querySelectorAll(`.kn[data-k="${keyOf(s, id)}"],.tl[data-tl="${keyOf(s, id)}"]`).forEach((el) => { el.classList.add("hot"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("hot"), 1600); });
 }
 
 /* ------------------------------------------------------------ what we send --- */
@@ -746,7 +755,7 @@ function paintValue(s, id) {
     const row = el.closest(".row"); if (row) { const sh = row.querySelector(".shape"); if (sh) sh.innerHTML = shape(row.dataset.shape, +row.dataset.s, JSON.parse(row.dataset.ids)); }
   });
   if (S.mode === "play") { drawXY(); drawFaders(); }
-  if (!s) paintTile(id);
+  paintTile(s, id);
   if (id === 0 || id === 25 || id === 26) renderMeta();
 }
 /* a page's shape, from its values */
@@ -780,69 +789,98 @@ const PAGE_NAME = { "ENV": "Envolvente", "ENV DEST": "Destinos de envolvente", "
   "EQ+COMP": "EQ y compresor", "SEL": "Escala", "SEL 2": "Acordes", "EDIT 1": "Motor 1", "EDIT 2": "Motor 2", "VOICE": "Voces", "VOICE 2": "Voces 2",
   "VOICE 3": "Voces 3", "MACROS": "Macros", "GLOBAL": "Global", "MASTER": "Master", "SYSTEM": "Sistema", "ARP": "Arpegiador", "ARP 2": "Arpegiador 2",
   "SPICE": "Spice", "PATTERN": "Patrón", "NOTES": "Notas" };
-/* RÁPIDO: the switches a player reaches for. Each one's colour: the knob that turns it on its page of the FM-1.
-   kind: toggle (off value <-> the last value it had, or on), amount (0 <-> the last level, a bar to set it), choice (a stepper) */
+/* RÁPIDO: what a player reaches for. Each tile's colour: the knob that turns it on its page of the FM-1. s: 0 the sound, 1 global.
+   kind: toggle (its off value <-> the last value it had), amount (0 <-> the last level; a bar), bipolar (0 <-> the last; a bar from
+   the centre), nudge (buttons that add; 0 <-> the last), choice (arrows only), tempo (- TAP +), panic (all notes off) */
 const QUICK = [
   ["Interpretación", [
-    { id: 17, name: "Arpegiador", kind: "toggle", on: 1, k: 0, sub: { id: 18, k: 1 }, page: "ARP" },
-    { id: 23, name: "Latch", kind: "toggle", on: 1, k: 2, note: (on) => (val(0, 17) ? "Mantiene el arpegio" : "Mantiene las notas"), page: "ARP 2" },
+    { id: 17, name: "Arpegiador", kind: "toggle", on: 1, k: 0, step: true, page: "ARP" },
+    { id: 18, name: "Velocidad", kind: "choice", k: 1, note: () => "Del arpegio" },
+    { id: 23, name: "Latch", kind: "toggle", on: 1, k: 2, note: () => (val(0, 17) ? "Mantiene el arpegio" : "Mantiene las notas") },
     { id: 49, name: "Acordes", kind: "toggle", on: 1, k: 3, step: true, page: "SEL" },
-    { id: 27, name: "Escala", kind: "toggle", on: 2, k: 2, step: true, note: () => `${fmtValue(desc(0, 25), val(0, 25))[0]} ${fmtValue(desc(0, 26), val(0, 26))[0]}`, page: "SEL" },
-    { id: 37, name: "Voces", kind: "choice", k: 0, page: "VOICE" },
-    { id: 38, name: "Glide", kind: "amount", on: 40, k: 1, page: "VOICE" }]],
-  ["Efectos", [
+    { id: 27, name: "Escala", kind: "toggle", on: 2, k: 2, step: true, note: () => `${fmtValue(desc(0, 25), val(0, 25))[0]} ${fmtValue(desc(0, 26), val(0, 26))[0]}` },
+    { id: 28, name: "Transponer", kind: "nudge", on: 12, k: 0, steps: [-12, -1, 1, 12], note: () => "Octava y semitono" }]],
+  ["Sonido y efectos", [
+    { id: 50, name: "Filtro", kind: "bipolar", on: -24, k: 0, note: () => "LP ← OFF → HP" },
     { id: 33, name: "Distorsión", kind: "amount", on: 40, k: 0, page: "FX" },
     { id: 34, name: "Chorus", kind: "amount", on: 50, k: 1, page: "FX" },
     { id: 35, name: "Delay", kind: "amount", on: 40, k: 2, page: "FX" },
     { id: 36, name: "Reverb", kind: "amount", on: 50, k: 3, page: "FX" },
     { id: 78, name: "Insert", kind: "toggle", on: 1, k: 0, step: true, page: "INSERT" }]],
+  ["Global", [
+    { id: 37, name: "Voces", kind: "choice", k: 0, page: "VOICE" },
+    { id: 38, name: "Glide", kind: "amount", on: 40, k: 1, page: "VOICE" },
+    { id: 0, s: 1, name: "Tempo", kind: "tempo", k: 0, note: () => "Toca TAP al pulso" },
+    { id: -1, name: "Pánico", kind: "panic", k: 3, note: () => "Corta las notas colgadas" }]],
 ];
-const QSPEC = new Map(QUICK.flatMap(([, items]) => items.map((q) => [q.id, q])));
-const remember = new Map();                         /* id -> the value it had before it was switched off */
-const qOn = (q) => val(0, q.id) !== (desc(0, q.id) ? (q.kind === "amount" ? 0 : desc(0, q.id).min) : 0);
+const qkey = (q) => keyOf(q.s || 0, q.id);
+const QSPEC = new Map(QUICK.flatMap(([, items]) => items.map((q) => [qkey(q), q])));
+const remember = new Map();                          /* key -> the value it had before it was switched off */
+const qd = (q) => desc(q.s || 0, q.id), qv = (q) => val(q.s || 0, q.id);
+const qRest = (q) => (q.kind === "amount" || q.kind === "bipolar" || q.kind === "nudge" ? 0 : qd(q).min);
+const qOn = (q) => q.kind === "choice" || q.kind === "tempo" || (q.kind !== "panic" && qd(q) && qv(q) !== qRest(q));
 function tileInner(q) {
-  const d = desc(0, q.id); if (!d) return "";
-  const v = val(0, q.id), on = q.kind === "choice" || qOn(q), [t, u] = fmtValue(d, v);
-  const sub = q.sub && desc(0, q.sub.id) ? fmtValue(desc(0, q.sub.id), val(0, q.sub.id)) : null;
-  const note = q.note ? q.note(on) : sub ? `${desc(0, q.sub.id).label} ${sub[0]}` : q.page;
+  if (q.kind === "panic") return `<button class="tg" data-panic="1" aria-label="Pánico: cortar todas las notas"><span class="t"><b>${esc(q.name)}</b></span>
+    <span class="v">STOP</span><span class="s">${esc(q.note())}</span></button>`;
+  const d = qd(q); if (!d) return "";
+  const v = qv(q), on = qOn(q), [t, u] = fmtValue(d, v), key = qkey(q), note = q.note ? q.note(on) : q.page || "";
   let foot = "";
-  if (q.kind === "amount") { const f = frac(d, v); foot = `<div class="amt" data-amt="${q.id}" role="slider" aria-label="${esc(q.name)}: nivel" aria-valuenow="${v}" aria-valuemin="${d.min}" aria-valuemax="${d.max}" tabindex="0"><b style="width:${f * 100}%"></b><i style="left:calc(${f * 100}% - 1px)"></i></div>`; }
-  else if (q.kind === "choice" || q.step || q.sub) {
-    foot = `<div class="stp"><button data-qstep="${q.id}" data-d="-1" aria-label="${esc(q.name)}: anterior"><svg class="i"><use href="#i-prev"/></svg></button>
-      <button data-qstep="${q.id}" data-d="1" aria-label="${esc(q.name)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div>`;
+  if (q.kind === "amount" || q.kind === "bipolar") {
+    const f = frac(d, v), z = q.kind === "bipolar" ? frac(d, 0) : 0, lo = Math.min(f, z), hi = Math.max(f, z);
+    foot = `<div class="amt${q.kind === "bipolar" ? " bi" : ""}" data-amt="${key}" role="slider" aria-label="${esc(q.name)}: nivel" aria-valuenow="${v}" aria-valuemin="${d.min}" aria-valuemax="${d.max}" tabindex="0">
+      <b style="left:${lo * 100}%;width:${(hi - lo) * 100}%"></b><i style="left:calc(${f * 100}% - 1px)"></i></div>`;
+  } else if (q.kind === "nudge") {
+    foot = `<div class="stp">${q.steps.map((n) => `<button data-qn="${key}" data-d="${n}" aria-label="${esc(q.name)} ${n > 0 ? "+" : ""}${n}">${n > 0 ? "+" : "−"}${Math.abs(n)}</button>`).join("")}</div>`;
+  } else if (q.kind === "tempo") {
+    foot = `<div class="stp"><button data-qn="${key}" data-d="-1" aria-label="Tempo −1">−</button><button class="tap" data-tap="1">TAP</button><button data-qn="${key}" data-d="1" aria-label="Tempo +1">+</button></div>`;
+  } else if (q.kind === "choice" || q.step) {
+    foot = `<div class="stp"><button data-qstep="${key}" data-d="-1" aria-label="${esc(q.name)}: anterior"><svg class="i"><use href="#i-prev"/></svg></button>
+      <button data-qstep="${key}" data-d="1" aria-label="${esc(q.name)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div>`;
   }
-  /* the tile's top is its switch (a choice has none: its arrows are all it does) */
-  const top = `<span class="t"><b>${esc(q.name)}</b>${q.kind === "choice" ? "" : `<i class="led" aria-hidden="true"></i>`}</span>
-    <span class="v">${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}</span><span class="s">${esc(note || "")}</span>`;
-  return (q.kind === "choice" ? `<div class="tg">${top}</div>` : `<button class="tg" role="switch" aria-checked="${on}" data-qtog="${q.id}" aria-label="${esc(q.name)}: ${on ? "encendido" : "apagado"}">${top}</button>`) + foot;
+  const top = `<span class="t"><b>${esc(q.name)}</b>${q.kind === "choice" || q.kind === "tempo" ? "" : `<i class="led" aria-hidden="true"></i>`}</span>
+    <span class="v">${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}</span><span class="s">${esc(note)}</span>`;
+  return (q.kind === "choice" || q.kind === "tempo" ? `<div class="tg">${top}</div>` : `<button class="tg" role="switch" aria-checked="${on}" data-qtog="${key}" aria-label="${esc(q.name)}: ${on ? "encendido" : "apagado"}">${top}</button>`) + foot;
 }
-const tile = (q) => `<section class="tl${q.kind === "choice" || qOn(q) ? " on" : ""}" style="--c:${KC[q.k]}" data-tl="${q.id}">${tileInner(q)}</section>`;
-function paintTile(id) {
-  const ids = [id, ...QUICK.flatMap(([, it]) => it.filter((q) => q.sub && q.sub.id === id).map((q) => q.id))];
-  if (id === 17) ids.push(23);
-  if (id === 25 || id === 26) ids.push(27);
-  ids.forEach((i) => { const el = document.querySelector(`.tl[data-tl="${i}"]`), q = QSPEC.get(i); if (!el || !q || (amtOn && el.contains(amtOn))) return;
-    el.classList.toggle("on", q.kind === "choice" || qOn(q)); el.innerHTML = tileInner(q); });
+const tile = (q) => `<section class="tl${qOn(q) ? " on" : ""}${q.kind === "panic" ? " panic" : ""}" style="--c:${KC[q.k]}" data-tl="${qkey(q)}">${tileInner(q)}</section>`;
+function paintTile(s, id) {
+  const keys = [keyOf(s, id)];
+  if (!s && id === 17) keys.push(keyOf(0, 23));
+  if (!s && (id === 25 || id === 26)) keys.push(keyOf(0, 27));
+  keys.forEach((k) => { const el = document.querySelector(`.tl[data-tl="${k}"]`), q = QSPEC.get(k); if (!el || !q || (amtOn && el.contains(amtOn))) return;
+    el.classList.toggle("on", qOn(q)); el.innerHTML = tileInner(q); });
 }
-function quickToggle(id) {
-  const q = QSPEC.get(id), d = desc(0, id); if (!q || !d) return;
-  const off = q.kind === "amount" ? 0 : d.min;
-  if (qOn(q)) { remember.set(id, val(0, id)); setVal(0, id, off); }
-  else setVal(0, id, remember.get(id) ?? q.on);
-  paintTile(id);
+const qset = (q, v) => { setVal(q.s || 0, q.id, v); paintTile(q.s || 0, q.id); };
+function quickToggle(key) {
+  const q = QSPEC.get(key); if (!q || !qd(q)) return;
+  if (qOn(q)) { remember.set(key, qv(q)); qset(q, qRest(q)); } else qset(q, remember.get(key) ?? q.on);
 }
-function quickStep(id, dir) {
-  const d = desc(0, id), q = QSPEC.get(id); if (!d) return;
-  const lo = q && q.kind === "toggle" ? d.min + 1 : d.min;          /* (a switch's choices: never its OFF) */
-  let v = val(0, id);
+function quickStep(key, dir) {
+  const q = QSPEC.get(key), d = q && qd(q); if (!d) return;
+  const lo = q.kind === "toggle" ? d.min + 1 : d.min;              /* (a switch's choices: never its OFF) */
+  let v = qv(q);
   v = v < lo ? lo : v + dir > d.max ? lo : v + dir < lo ? d.max : v + dir;
-  setVal(0, id, v);
-  paintTile(id);
+  qset(q, v);
+}
+function quickNudge(key, n) { const q = QSPEC.get(key); if (q && qd(q)) qset(q, qv(q) + n); }
+/* tap tempo: the mean of the last taps (a pause of 2 s starts over) */
+const taps = [];
+function tapTempo() {
+  const now = performance.now();
+  if (taps.length && now - taps[taps.length - 1] > 2000) taps.length = 0;
+  taps.push(now); if (taps.length > 5) taps.shift();
+  if (taps.length < 2) { toast(-1, "Sigue tocando TAP al pulso"); return; }
+  const bpm = Math.round(60000 / ((taps[taps.length - 1] - taps[0]) / (taps.length - 1)));
+  const q = QSPEC.get(keyOf(1, 0)); qset(q, bpm);
+  toast(-1, `<b>Tempo</b> <span class="num">${qv(q)} BPM</span>`);
+}
+/* all notes off on every channel (MIDI, not the editor's SysEx): what a stuck note needs */
+function panic() {
+  if (M.midiOut) for (let ch = 0; ch < 16; ch++) { M.midiOut.send([0xB0 | ch, 123, 0]); M.midiOut.send([0xB0 | ch, 120, 0]); }
+  toast(-1, "<b>Pánico</b> todas las notas cortadas");
 }
 function quickView() {
   return `<div class="quick">${QUICK.map(([title, items], i) => `<div class="qh"><h2>${esc(title)}</h2>${i ? "" : `<button class="more" data-mode-go="edit">Editar más<svg class="i"><use href="#i-next"/></svg></button>`}</div>
-    <div class="tiles">${items.map(tile).join("")}</div>`).join("")}
-    ${row("Home", "Las perillas en HOME", "HOME", 0, M.homeIds, "home")}</div>`;
+    <div class="tiles">${items.map(tile).join("")}</div>`).join("")}</div>`;   /* (HOME's four knobs: EDITAR's first row) */
 }
 
 function renderWork() {
@@ -974,7 +1012,7 @@ async function favToggle() {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && B.open) { openBrowser(false); $("now").focus(); } });
 $("scrim").addEventListener("click", () => openBrowser(false));
 document.addEventListener("click", (e) => {
-  const b = e.target.closest("#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-mode],[data-mode-go],[data-qtog],[data-qstep],#prev,#next,#favt,#favb,#usb,#follow,[data-f]");
+  const b = e.target.closest("#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-mode],[data-mode-go],[data-qtog],[data-qstep],[data-qn],[data-tap],[data-panic],#prev,#next,#favt,#favb,#usb,#follow,[data-f]");
   if (!b) return;
   if (b.id === "now") openBrowser(!B.open);
   else if (b.id === "brx") openBrowser(false);
@@ -983,8 +1021,11 @@ document.addEventListener("click", (e) => {
   else if (b.dataset.load) listGo(+b.dataset.load);
   else if (b.dataset.favgo) favGo(+b.dataset.favgo);
   else if (b.dataset.mode || b.dataset.modeGo) setMode(b.dataset.mode || b.dataset.modeGo);
-  else if (b.dataset.qtog) quickToggle(+b.dataset.qtog);
-  else if (b.dataset.qstep) quickStep(+b.dataset.qstep, +b.dataset.d);
+  else if (b.dataset.qtog) quickToggle(b.dataset.qtog);
+  else if (b.dataset.qstep) quickStep(b.dataset.qstep, +b.dataset.d);
+  else if (b.dataset.qn) quickNudge(b.dataset.qn, +b.dataset.d);
+  else if (b.dataset.tap) tapTempo();
+  else if (b.dataset.panic) panic();
   else if (b.id === "prev" || b.id === "next") {           /* (not a favourite now: next is the first, previous the last) */
     const n = M.favs.length, d = b.id === "next" ? 1 : -1;
     if (n) favGo(M.favCur < 0 ? (d > 0 ? 0 : n - 1) : (M.favCur + d + n) % n);
@@ -1011,15 +1052,16 @@ $("edit").addEventListener("pointermove", (e) => { if (amtOn) amtAt(e); });
 $("edit").addEventListener("pointerup", () => { amtOn = null; });
 $("edit").addEventListener("pointercancel", () => { amtOn = null; });
 function amtAt(e) {
-  const id = +amtOn.dataset.amt, d = desc(0, id), r = amtOn.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-  setVal(0, id, d.min + f * (d.max - d.min));
-  const b = amtOn.querySelector("b"), i = amtOn.querySelector("i"), g = frac(d, val(0, id));      /* (in place: the drag keeps its element) */
-  b.style.width = g * 100 + "%"; i.style.left = `calc(${g * 100}% - 1px)`;
-  const tl = amtOn.closest(".tl"), q = QSPEC.get(id), [t, u] = fmtValue(d, val(0, id));
-  tl.classList.toggle("on", qOn(q)); tl.querySelector(".tg")?.setAttribute("aria-checked", qOn(q)); tl.querySelector(".v").innerHTML = `${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}`;
+  const q = QSPEC.get(amtOn.dataset.amt), d = qd(q), r = amtOn.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+  setVal(q.s || 0, q.id, d.min + f * (d.max - d.min));
+  const v = qv(q), g = frac(d, v), z = q.kind === "bipolar" ? frac(d, 0) : 0, [t, u] = fmtValue(d, v);   /* (in place: the drag keeps its element) */
+  const bar = amtOn.querySelector("b"); bar.style.left = Math.min(g, z) * 100 + "%"; bar.style.width = Math.abs(g - z) * 100 + "%";
+  amtOn.querySelector("i").style.left = `calc(${g * 100}% - 1px)`;
+  const tl = amtOn.closest(".tl"); tl.classList.toggle("on", qOn(q)); tl.querySelector(".tg")?.setAttribute("aria-checked", qOn(q));
+  tl.querySelector(".v").innerHTML = `${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}`;
 }
 $("edit").addEventListener("keydown", (e) => { const a = e.target.closest("[data-amt]"), st = { ArrowRight: 4, ArrowUp: 4, ArrowLeft: -4, ArrowDown: -4 }[e.key];
-  if (a && st) { e.preventDefault(); const id = +a.dataset.amt; setVal(0, id, val(0, id) + st); paintTile(id); document.querySelector(`[data-amt="${id}"]`)?.focus(); } });
+  if (a && st) { e.preventDefault(); const k = a.dataset.amt, q = QSPEC.get(k); qset(q, qv(q) + st); document.querySelector(`[data-amt="${k}"]`)?.focus(); } });
 
 /* ---------------------------------------------------------------- toasts --- */
 let tt = 0;
