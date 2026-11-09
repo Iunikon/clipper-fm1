@@ -18,6 +18,7 @@ __CSS__
   <symbol id="i-open" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-undo" viewBox="0 0 24 24"><path d="M4 5v5h5M5 10a8 8 0 1 1 1.5 7"/></symbol>
+  <symbol id="i-disk" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></symbol>
   <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v14M12 3l-2.5 3M12 3l2.5 3M12 13l-4-2.5V8M12 15l4-2.5V10"/><circle cx="12" cy="19" r="2"/></symbol>
@@ -53,6 +54,7 @@ __CSS__
       <button class="now" id="now" aria-haspopup="dialog" aria-expanded="false" aria-controls="br"><span class="n"><span id="name"></span><svg class="i cv"><use href="#i-down"/></svg></span><span class="m" id="meta"></span></button>
       <button class="ib" id="next" aria-label="Favorito siguiente"><svg class="i"><use href="#i-next"/></svg></button>
       <button class="ib" id="favt" aria-pressed="false" aria-label="Favorito"><svg class="i"><use href="#i-star"/></svg></button>
+      <button class="svb" id="saveb" data-save="1"><svg class="i"><use href="#i-disk"/></svg><span>Guardar</span></button>
     </div>
     <div class="right">
       <div class="where">En el sinte <b id="where"></b></div>
@@ -99,6 +101,16 @@ __CSS__
   <div class="brb"><nav class="kinds" id="kinds" aria-label="Carpetas de sonidos"></nav><div class="snds" id="snds" role="list"></div></div>
   <div class="brf"><span>Toca un sonido para escucharlo en el FM-1; el panel queda abierto.</span>
     <div class="alg"><button class="btn" data-kstep="-1"><svg class="i"><use href="#i-prev"/></svg>Carpeta anterior</button><button class="btn" data-kstep="1">Carpeta siguiente<svg class="i"><use href="#i-next"/></svg></button></div></div>
+</section>
+<section class="sh" id="sh" role="dialog" aria-modal="true" aria-labelledby="sht">
+  <div class="shh"><h2 id="sht">Guardar el sonido</h2><button class="ib" id="shx" aria-label="Cerrar"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="shb">
+    <label class="nmf"><span>Nombre</span><input id="shn" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done"></label>
+    <p class="hl" id="shl"></p>
+    <h3>Ranura de usuario</h3>
+    <div class="slots" id="slots" role="radiogroup" aria-label="Ranura de usuario"></div>
+  </div>
+  <div class="shf"><span class="w" id="shw" role="status"></span><button class="btn" id="shc">Cancelar</button><button class="btn pri" id="shgo">Guardar</button></div>
 </section>
 <div class="toast" id="toast" role="status" aria-live="polite"><i id="tq"></i><span id="tt"></span></div>
 

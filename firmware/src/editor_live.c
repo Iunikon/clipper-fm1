@@ -14,7 +14,8 @@
  *                        (every factory sound by kind, then the user presets; no FAV rows). start and total: 2 x 7 bits
  *  103 LIST_GO n      -> n (2 x 7 bits), rc (0 loaded, 1 no such entry). Loads entry n of LIST
  *  104 EDITED         (push) edited (1) or as loaded (0): the sound changed since it was loaded (ui_synth.c hist_edited, not
- *                        while COMPARE shows the original). PAGE ends with the same byte
+ *                        while COMPARE shows the original). PAGE has the same byte after HOME's four, then the LIST entry
+ *                        the selected part plays (2 x 7 bits; 16383: none: the drum track, a sound the list does not have)
  * Included by editor.c after ui.c (fav_list, preset_go, fav_toggle). */
 enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO, ED_EDITED };
 #define ED_LV_EDITED ((uint8_t)(hist_edited && !hist_cmp_on))
@@ -29,6 +30,19 @@ UI_SMALL static uint32_t ed_lv_fsig(void)                          /* the favour
     for (i = 0; i < FAV_N; i++)
         h = h * 31u + fav[i];
     return h;
+}
+UI_SMALL static uint32_t ed_lv_cur(void)                           /* the LIST entry playing; 16383: none */
+{
+    uint32_t total, k, n, e;
+    if (is_drum(TSEL))
+        return 16383u;
+    n = base_pos(&total);
+    if (n >= total)
+        return 16383u;
+    e = base_at(n, &k);
+    if (e == NENGINES ? user_of(TSEL) == k : user_of(TSEL) >= UP_SLOTS && e == TSEL->eng_req && k == TSEL->preset)
+        return n;
+    return 16383u;
 }
 UI_SMALL static void ed_lv_page(void)
 {
@@ -55,6 +69,9 @@ UI_SMALL static void ed_lv_page(void)
             home_param(k, &vp), ed_b((uint32_t)(vp - TSEL->p));
     }
     ed_b(ED_LV_EDITED);
+    k = ed_lv_cur();
+    ed_b(k & 127u);
+    ed_b(k >> 7);
 }
 UI_SMALL static void ed_lv_entry(uint32_t n)                   /* base list entry n: engine, preset or slot, kind, name */
 {

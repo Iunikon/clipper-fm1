@@ -135,6 +135,11 @@ int main(void)
 
     a[0] = 0; ed(ED_FAV_SET, a, 1);
     check(arg()[0] == 2u && !fav_has(fav_key()), "FAV_SET 0: the sound playing out again");
+    ed(ED_PAGE, a, 0);
+    {
+        const uint8_t *x = arg() + 3 + strlen((const char *)arg() + 3) + 1 + 1 + 4 + 4 + 1;   /* after the edited byte */
+        check((uint32_t)(x[0] | x[1] << 7) == base_pos(&total), "PAGE ends with the LIST entry playing");
+    }
 
     while (fav_list(b)) { preset_go(0); fav_toggle(0); }
 
@@ -184,7 +189,7 @@ int main(void)
         TSEL->p[P_E0 + 4] = (int16_t)(v0 > 60 ? v0 - 30 : v0 + 30);
         check(frames_pushing(80, ED_EDITED, 0) == 1u && hist_edited, "a knob turned: EDITED (1) pushed once");
         ed(ED_PAGE, a, 0);
-        check(rx_last[rx_n - 2] == 1u, "PAGE ends with the edited byte (1)");
+        check(rx_last[rx_n - 4] == 1u, "PAGE: the edited byte (1) before the entry playing");
         TSEL->p[P_E0 + 4] = v0;
         check(frames_pushing(80, ED_EDITED, 0) == 1u && !hist_edited, "back as loaded: EDITED (0) pushed");
     }

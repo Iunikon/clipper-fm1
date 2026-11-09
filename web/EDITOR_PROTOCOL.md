@@ -537,7 +537,7 @@ INFO ends with 15. Five commands (firmware/src/editor_live.c) for an editor that
 | 101 FAVS_CHANGED (push) | — | — : the favourites changed on the device; read `FAVS` again. Not after the editor's own `FAV_SET` |
 | 102 LIST | start (2 × 7 bits), count (1..16) | total (2 × 7 bits), start (2 × 7 bits), n, then n × (engine, preset or user slot, kind string, name string): the list PRESETS walks, every factory sound by kind then the user presets, without the FAV rows |
 | 103 LIST_GO | n (2 × 7 bits) | n (2 × 7 bits), rc (0 loaded, 1 no such entry). Loads entry n of `LIST` (a `RELOAD` push follows) |
-| 104 EDITED (push) | — | edited (1) or as loaded (0): the sound changed since it was loaded (not while COMPARE shows the original). `PAGE` ends with the same byte |
+| 104 EDITED (push) | — | edited (1) or as loaded (0): the sound changed since it was loaded (not while COMPARE shows the original). `PAGE` has the same byte after HOME's four, then the `LIST` entry the selected part plays (2 × 7 bits; 16383: none, the drum track or a sound the list does not have) |
 
 `PAGE` and `FAVS_CHANGED` are pushed before `RELOAD` / `CHANGED`, one per pass. The family numbers are params.c's `FAM_*`
 (0 HOME, 1 ENV, 2 LFO, 3 FX, 4 SEL, 5 EDIT, 6 GLO, 7 SAVE, 8 ARP, 9 SEQ, 10 TRACKS).
