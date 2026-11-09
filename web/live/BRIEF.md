@@ -44,19 +44,19 @@ Es un solo archivo HTML, sin librerías, que funciona **sin conexión** abierto 
 |---|---|---|
 | Plantilla | `web/live/live.html` | El HTML con los huecos `__CSS__`, `__MOCK__` y `__JS__`. |
 | Estilos | `web/live/live.css` | Tokens en `:root` y todos los estilos. |
-| Lógica | `web/live/live.js` | Protocolo, estado, vistas, RÁPIDO, TOCAR, SAVE, Guardar y el FM-1 de ejemplo (mock). |
+| Lógica | `web/live/live.js` | Protocolo, estado, vistas, RÁPIDO, SAVE, Guardar, el osciloscopio y el FM-1 de ejemplo (mock). |
 | Bento | `web/live/bento.js` | Las carpetas en bloques, las gráficas, las baldosas y los gestos táctiles. |
 | Build | `tools/live_build.py` | Junta todo en `web/live.html` con la fuente Terminus y los datos de ejemplo dentro. `--site DIR` prepara la carpeta para Vercel. |
 | Datos de ejemplo | `tools/live_dump.py` | Lee el firmware real en el PC y produce `build/live-mock.json`. |
 | Firmware | `firmware/src/editor_live.c` | Comandos SysEx 97–104 (PAGE, FAVS, FAV_GO, FAV_SET, FAVS_CHANGED, LIST, LIST_GO, EDITED). PAGE incluye además la entrada de la lista que suena. |
 
-Al abrirla, la app aparece vacía y en el centro está «Conectar el FM-1»; los rieles explican qué saldrá en ellos. Para verla sin el sinte: `web/live.html?mock=1` (un FM-1 de ejemplo, solo para desarrollo). Parámetros: `&folder=FX|ENV|LFO|EDIT|ARP|SEL|SEQ|GLO|SAVE`, `&mode=edit|play`, `&save=1` (abre Guardar) y `&br=1` (abre el popup de sonidos).
+Al abrirla, la app aparece vacía y en el centro está «Conectar el FM-1»; los rieles explican qué saldrá en ellos. Para verla sin el sinte: `web/live.html?mock=1` (un FM-1 de ejemplo, solo para desarrollo). Parámetros: `&folder=FX|ENV|LFO|EDIT|ARP|SEL|SEQ|GLO|SAVE`, `&mode=edit`, `&save=1` (abre Guardar) y `&br=1` (abre el popup de sonidos).
 
 ## 3. Estructura de la pantalla
 
 ```
 ┌─────────────── barra (64) ──────────────────────────────────────────────┐
-│ FM-1 conectado │ ‹  NOMBRE ● ⌄  › ★ [Guardar] │ En el sinte X · Seguir · RÁPIDO|EDITAR|TOCAR │
+│ FM-1 conectado │ ‹  NOMBRE ● ⌄  › ★ [Guardar] │ En el sinte X · Seguir · RÁPIDO|EDITAR │
 ├─ riel izq (232) ┬──────────── trabajo ───────────────┬─ riel der (216) ─┤
 │ Salida (scope)  │  RÁPIDO (HOME)                      │ Favoritos 01–16  │
 │ En el sinte:    │  o una carpeta en bloques           │                  │
@@ -73,7 +73,6 @@ Al abrirla, la app aparece vacía y en el centro está «Conectar el FM-1»; los
 - **Carpetas** (EDIT, ENV, LFO, FX, SEL, ARP, SEQ, GLO): **bloques**, uno por efecto, LFO o envolvente. Cada bloque lleva el nombre de la página del sinte y pone su gráfica a la izquierda y sus baldosas a la derecha.
 - **SAVE:** una vista propia. A la izquierda las carpetas (Favoritos x/16, Todos, BASS, KEYS…, USER). Arriba el sonido que suena con sus acciones (Guardar, favorito, Descartar lo editado, anterior/siguiente). Debajo, las tarjetas de sonidos. En Favoritos se ven las 16 posiciones, también las libres.
 - **Guardar:** una ventana con el nombre (12 caracteres, mayúsculas, tipografía Terminus grande) y las 32 ranuras U01–U32. Una ranura ocupada cambia el botón a «Reemplazar» en naranja.
-- **TOCAR:** un pad XY con la entrada de audio de fondo y 4 faders de macros.
 - **ESTUDIO:** abre el editor clásico completo (`clipper-editor-1.3.1.html`), destacado en violeta.
 
 ## 4. Sistema visual
@@ -110,7 +109,13 @@ Al abrirla, la app aparece vacía y en el centro está «Conectar el FM-1»; los
 - **2 opciones con nombre:** dos botones grandes, uno encima del otro.
 - **3–4 opciones:** el valor grande y los botones de las opciones en fila.
 - **Más de 4 opciones:** flechas y la posición («3/6»).
-- **Gráficas:** envolvente (4 tiradores cuadrados de 36 px), LFO (arrastre horizontal y un punto que recorre la onda), filtro (LP ← OFF → HP), medidores verticales, diales. Fondo con una rejilla tenue, como un instrumento.
+- **Gráficas: como las dibuja el sinte** (`firmware/src/ui_draw.c`), con su misma matemática sobre su franja de 240 × 100 estirada: una línea fina del color de la curva, sin relleno, y una regla al pie.
+  - **Envolvente:** ataque lineal, decay y release exponenciales (como `graph_adsr` y `voice.c`). Tiene 4 tiradores pequeños (12 px, con un área táctil de 44 px).
+  - **LFO:** dos ciclos a lo ancho, desde su fase. Arrastrarlo en horizontal cambia la fase (PHS).
+  - **FX:** una barra fina por envío, con una marca en su nivel (`graph_fx`).
+  - **Osciloscopio:** 240 muestras a 22,05 kHz desde un cruce por cero, con escala automática (`graph_scope`).
+  - **Filtro, delay, reverb y EQ:** el sinte no los dibuja (muestra valores grandes); la web los dibuja con el mismo estilo.
+  - El fondo lleva una rejilla tenue, como un instrumento.
 
 ## 5. Decisiones tomadas y por qué
 
@@ -139,6 +144,8 @@ Las decisiones vienen del feedback del usuario, en orden aproximado. **Una audit
 - **El protocolo manda.** Lo que la web muestra sale del firmware (descriptores, páginas, lista). Los nombres, rangos y unidades no se inventan en la web.
 - **Contraste:** todo el texto ≥ 4.5:1 sobre su fondo.
 - **`prefers-reduced-motion`** quita las transiciones.
+- **Es una app, no una página:** el texto no se puede seleccionar (solo el campo del nombre en Guardar).
+- **El sinte no se adorna desde la web:** editar desde la tablet no debe redibujar toda la pantalla del FM-1 ni mostrar nada de más. El aviso del cambio se ve solo en la web. El recuadro grande del valor tocado en el sinte es la opción MENU > ZOOM del FM-1.
 - **Sin teclado en pantalla propio:** solo el nativo de Android, en el campo del nombre de Guardar.
 
 ## 7. Estado y pendientes conocidos
@@ -150,7 +157,8 @@ Las decisiones vienen del feedback del usuario, en orden aproximado. **Una audit
   - `cramped-padding` en el osciloscopio: la onda llega al borde.
   - `repeating-stripes-gradient`: es la rejilla de las gráficas.
   - `flat-type-hierarchy` en la plantilla: es un falso positivo, porque la plantilla aún no tiene el CSS; está silenciado solo para ese archivo.
-- La vista de TOCAR y el popup de sonidos (al tocar el nombre) son anteriores al bento y no se han repasado con el sistema nuevo.
+- El popup de sonidos (al tocar el nombre) es anterior al bento y no se ha repasado con el sistema nuevo.
+- **TOCAR se quitó** (pad XY y faders): no aportaba frente a RÁPIDO. Si vuelve, que sea con algo concreto.
 
 ## 8. Qué pedir en la auditoría
 
@@ -161,7 +169,7 @@ Sugerencias para Claude Design o Impeccable (`/impeccable critique web/live`, `/
 3. **Estados:** pulsado, arrastrando (`held`), cambiado desde el sinte (`hot`), «En el sinte» (`dev`), favorito y editado. ¿Se leen bien y no se confunden?
 4. **Táctil:** tamaños de objetivo, el arrastre horizontal frente al scroll, los tiradores de la envolvente en los bordes.
 5. **Contraste y legibilidad en penumbra:** sobre todo `--tx-3`, las etiquetas de 11 px y el texto negro sobre los colores de los knobs.
-6. **Coherencia de TOCAR y del popup de sonidos** con el sistema nuevo (cuadrado, bloques, Terminus).
+6. **Coherencia del popup de sonidos** con el sistema nuevo (cuadrado, bloques, Terminus).
 7. **Tamaños:** solo la tablet en horizontal, a 1400 × 830 y 1600 × 950 (desde 1500 px los rieles se ensanchan). Ni móvil, ni PC, ni vertical: no pedir ni proponer esas versiones.
 8. **Accesibilidad:** roles (`slider`, `switch`, `radiogroup`), `aria-valuenow`, el foco visible y el teclado en los faders.
 9. **Microcopy en español:** que esté claro, sea breve y nombre las acciones igual en todas partes («Guardar», «Descartar lo editado»).

@@ -809,10 +809,12 @@ UI_SMALL static void ed_handle(const uint8_t *f, uint32_t n)   /* f: the bytes b
         if (cmd == ED_SET && na >= 4u) {
             if (a[0] == 1 && a[1] == G_ENGSEL) {          /* engine change: the safe path */
                 set_engine((uint32_t)clamp(ed_rv(a + 2), 0, NENGINES - 1));
+                ui.force = 1;
             } else if (d->max > d->min) {
                 *vp = (int16_t)clamp(ed_rv(a + 2), d->min, d->max);
-            }
-            ui.force = 1;
+            }                                             /* (Live: no whole redraw for a value: the screen flickered
+                                                           * under a finger on the tablet; the columns, the graph and
+                                                           * the foot see the change by their signatures) */
             ed_w.v[a[0] ? P_COUNT + a[1] : a[1]] = *vp;   /* the editor's own change: no push */
         }
         ed_b(a[0]);

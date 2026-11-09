@@ -18,6 +18,8 @@
   html, body { height: 100%; background: var(--page); }
   body { font: 400 14px/1.35 var(--sans); color: var(--tx); overflow: hidden; -webkit-tap-highlight-color: transparent;
     font-feature-settings: "tnum"; }
+  body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }   /* an app: no text picked up by a finger */
+  input, textarea { -webkit-user-select: text; user-select: text; }
   ::selection { background: var(--tx); color: var(--page); }
   * { scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
   button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
@@ -128,62 +130,8 @@
   .fv.empty .n { color: var(--tx-3); font-weight: 400; }
   .fv.empty:hover { background: none; }
 
-  /* ---- EDITAR: the rack. A row a page of the FM-1, its four knobs in their colours, the page's shape at the end */
+  /* ---- the work: the folder shown */
   .work { min-height: 0; overflow-y: auto; padding: 16px; display: grid; gap: 12px; align-content: start; background: var(--page); }
-  .row { display: grid; grid-template-columns: 164px repeat(4, minmax(0, 1fr)) 112px; background: var(--panel); border: 1px solid var(--line);
-    border-radius: 0; min-height: 112px; overflow: hidden; }
-  .row.dev { border-color: var(--line-2); box-shadow: inset 2px 0 0 var(--tx); }
-  .rh { padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid var(--line); }
-  .rh h3 { font-size: 18px; line-height: 1.2; font-weight: 600; letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; }
-  .rh h3 svg { width: 18px; height: 18px; color: var(--tx-2); }
-  .rh .pg { font-size: 12px; color: var(--tx-3); }
-  .rh .go { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--tx-2); margin-left: -4px; padding: 4px; border-radius: 0; width: max-content; }
-  .rh .go:hover { color: var(--tx); background: var(--raised); }
-  .rh .go svg { width: 14px; height: 14px; }
-  .rh .live { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--tx); }
-  .rh .live::before { content: ""; width: 6px; height: 6px; border-radius: 0; background: var(--tx); }
-  .kn { display: grid; grid-template-columns: minmax(0, 1fr) 32px; grid-template-areas: "l a" "v v"; align-content: center; gap: 10px 8px; padding: 14px;
-    border-right: 1px solid var(--line); touch-action: none; cursor: ns-resize; min-width: 0; transition: background .15s var(--ease); }
-  .kn:hover { background: #111114; }
-  .kn.drag, .kn.hot { background: var(--raised); }
-  .kn svg { grid-area: a; width: 32px; height: 32px; }
-  .kn .tx { display: contents; }
-  .kn .l { grid-area: l; min-width: 0; font-size: 12px; color: var(--tx-2); font-weight: 600; letter-spacing: .02em; display: flex; align-items: center; gap: 6px; }
-  .kn .l i { width: 6px; height: 6px; border-radius: 0; background: var(--c); }
-  .kn .v { grid-area: v; font-family: var(--num); font-size: 32px; line-height: 32px; color: var(--tx); white-space: nowrap; -webkit-font-smoothing: none; }
-  .kn .v small { font-size: 16px; color: var(--tx-3); margin-left: 4px; }
-  .kn.hot .v { color: var(--c); }
-  .kn.none { cursor: default; }
-  .kn.none .l, .kn.none .v { color: var(--line-2); }
-  .shape { padding: 12px; display: flex; align-items: center; }
-  .shape svg { width: 100%; height: 72px; overflow: visible; }
-
-  /* ---- TOCAR: two parameters under one finger, the macros as faders */
-  .play { min-height: 0; padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; background: var(--page); }
-  .xyw { background: var(--panel); border: 1px solid var(--line); border-radius: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
-  .xyh { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); gap: 12px; }
-  .pick { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--tx-2); }
-  .pick select { font: 600 13px var(--sans); color: var(--tx); background: var(--raised); border: 1px solid var(--line); border-radius: 0; height: 36px; padding: 0 8px; }
-  .pick .ax { width: 8px; height: 8px; border-radius: 0; }
-  .xy { position: relative; margin: 12px; border-radius: 0; touch-action: none; cursor: crosshair; min-height: 0;
-    background: var(--page) repeating-linear-gradient(0deg, transparent 0 calc(25% - 1px), var(--line) calc(25% - 1px) 25%),
-      repeating-linear-gradient(90deg, transparent 0 calc(25% - 1px), var(--line) calc(25% - 1px) 25%); border: 1px solid var(--line); }
-  .xy canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .18; }
-  .xy .cx, .xy .cy { position: absolute; background: var(--tx); opacity: .25; pointer-events: none; }
-  .xy .cx { top: 0; bottom: 0; width: 1px; } .xy .cy { left: 0; right: 0; height: 1px; }
-  .xy .dot { position: absolute; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 0; border: 2px solid var(--tx);
-    background: rgba(242, 242, 243, .12); pointer-events: none; transition: transform .15s var(--ease); }
-  .xy.on .dot { transform: scale(1.25); }
-  .xy .rd { position: absolute; font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; pointer-events: none; }
-  .xy .rd.x { right: 12px; bottom: 10px; } .xy .rd.y { left: 12px; top: 10px; }
-  .fds { background: var(--panel); border: 1px solid var(--line); border-radius: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
-  .fdr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 12px; gap: 8px; min-height: 0; }
-  .fd { display: flex; flex-direction: column; align-items: center; gap: 10px; touch-action: none; cursor: ns-resize; min-height: 0; }
-  .fd .v { font-family: var(--num); font-size: 32px; line-height: 32px; -webkit-font-smoothing: none; }
-  .fd .tr { flex: 1; width: 52px; border-radius: 0; background: var(--page); border: 1px solid var(--line); position: relative; overflow: hidden; min-height: 0; }
-  .fd .tr b { position: absolute; left: 0; right: 0; bottom: 0; background: var(--c); opacity: .85; }
-  .fd .tr i { position: absolute; left: 0; right: 0; height: 3px; background: var(--tx); }
-  .fd .l { font-size: 12px; font-weight: 600; color: var(--tx-2); letter-spacing: .02em; }
 
   /* ---- the families: the device's buttons */
   .nav { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)) minmax(0, 1.3fr); background: var(--panel); border-top: 1px solid var(--line); padding: 6px 8px; gap: 4px; }
@@ -241,12 +189,12 @@
   .brf { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; border-top: 1px solid var(--line); color: var(--tx-3); font-size: 12px; }
   .brf .alg { display: flex; gap: 6px; }
   .brf .btn { height: 36px; padding: 0 12px; }
-  @media (max-width: 1100px) { .body { grid-template-columns: 0 minmax(0, 1fr) 220px; } .rail.l { display: none; } .row { grid-template-columns: 112px repeat(4, minmax(0, 1fr)) 0; } .shape { display: none; } .bar { grid-template-columns: auto minmax(0, 1fr) auto; } .where { display: none; } }
+  @media (max-width: 1100px) { .body { grid-template-columns: 0 minmax(0, 1fr) 220px; } .rail.l { display: none; } .bar { grid-template-columns: auto minmax(0, 1fr) auto; } .where { display: none; } }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
   /* ---- Live: connecting, a folder's pages, what only the device edits */
   .gate { grid-column: 2; grid-row: 1; z-index: 3; background: var(--page); display: grid; place-items: center; padding: 24px; }
-  .rail.l { grid-column: 1; grid-row: 1; } .work, .play { grid-column: 2; grid-row: 1; } .rail.r { grid-column: 3; grid-row: 1; }
+  .rail.l { grid-column: 1; grid-row: 1; } .work { grid-column: 2; grid-row: 1; } .rail.r { grid-column: 3; grid-row: 1; }
   /* not connected: the app is there, empty; what needs the FM-1 waits */
   .ib[hidden] { display: none; }
   .off .snd, .off .right .where, .off .follow, .off #modes, .off .nav .nb:not(.est), .off .rail .act { opacity: .35; pointer-events: none; }
@@ -265,10 +213,6 @@
   .gate .msg.err { color: var(--k4); }
   .gate .bar2 { height: 4px; border-radius: 0; background: var(--raised); overflow: hidden; }
   .gate .bar2 b { display: block; height: 100%; width: 0; background: var(--tx); transition: width .15s var(--ease); }
-  .row.away { grid-template-columns: 164px minmax(0, 1fr); }
-  .row.away .awt { padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--tx-2); }
-  .row.away .awt .btn { height: 40px; padding: 0 14px; color: var(--studio); border-color: rgba(157, 140, 255, .35); }
-  .row.flash { animation: flash 1.2s var(--ease); }
   @keyframes flash { 0% { box-shadow: inset 0 0 0 2px var(--tx); } 100% { box-shadow: inset 0 0 0 0 transparent; } }
   .follow { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border-radius: 0; color: var(--tx-2); font-size: 12px; font-weight: 600; }
   .follow i { width: 28px; height: 16px; border-radius: 0; background: var(--line-2); position: relative; transition: background .15s var(--ease); }
@@ -276,11 +220,10 @@
   .follow[aria-pressed="true"] { color: var(--tx); }
   .follow[aria-pressed="true"] i { background: var(--ok); }
   .follow[aria-pressed="true"] i::after { transform: translateX(12px); }
-  .kn.ro { cursor: default; }
   .work .note { color: var(--tx-3); font-size: 12px; padding: 4px 4px 0; }
   .favs:empty::after { content: "Sin favoritos todavía. Marca el sonido con la estrella."; display: block; padding: 12px 8px; color: var(--tx-3); font-size: 13px; line-height: 1.4; }
   .conn button { color: var(--tx-2); font-size: 12px; text-decoration: underline; text-underline-offset: 2px; }
-  @media (prefers-reduced-motion: reduce) { .row.flash { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .bx.flash, .tp.flash { animation: none; } }
 
   /* ---- RÁPIDO: HOME as a control panel. A tile a switch: on / off, what it is set to, its amount or its choice */
   .quick { display: grid; gap: 16px; align-content: start; }
@@ -321,7 +264,6 @@
   .amt b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--c); opacity: .35; }
   .tl.on .amt b { opacity: .85; }
   .amt i { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--tx); }
-  .quick .row { min-height: 104px; }
   .amt.bi::after { content: ""; position: absolute; left: 50%; top: 4px; bottom: 4px; width: 1px; background: var(--line-2); }
   .stp button { font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; color: var(--tx); }
   .stp .tap { flex: 1.6 !important; font-family: var(--sans); font-weight: 700; font-size: 12px; letter-spacing: .08em; background: var(--line-2); }
@@ -355,15 +297,13 @@
     background-size: 100% 25%, 12.5% 100%; background-position: 0 -1px, -1px 0; }
   .gin { position: absolute; inset: 20px; }
   .gs { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-  .gs .line { fill: none; stroke: var(--gc, var(--k1)); stroke-width: 3; vector-effect: non-scaling-stroke; stroke-linejoin: miter; stroke-linecap: square; }
-  .gs .fill { fill: var(--gc, var(--k1)); opacity: .2; }
+  .gs .line { fill: none; stroke: var(--gc, var(--k1)); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: miter; stroke-linecap: square; }
   .gs .axis { stroke: var(--line-2); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 4 4; }
-  .gs .bar { fill: var(--gc); opacity: .45; } .gs .bar0 { fill: var(--gc); }
   .g-echo .gs, .g-verb .gs, .g-eq .gs { --gc: var(--k2); }
-  .hd { position: absolute; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 0; background: var(--page); border: 3px solid var(--c); cursor: grab; touch-action: none; }
-  .hd::after { content: ""; position: absolute; inset: 7px; border-radius: 0; background: var(--c); }
+  .hd { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; background: var(--c); box-shadow: 0 0 0 2px var(--page); cursor: grab; touch-action: none; transition: transform .1s var(--ease); }
+  .hd::after { content: ""; position: absolute; inset: -16px; }   /* (the finger's reach: 44 px) */
+  .hd:active, .gr.held .hd { transform: scale(1.35); }
   .g-filt .gr, .g-lfo .gr { cursor: ew-resize; }
-  .lfoph { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 0; background: var(--tx); box-shadow: 0 0 0 6px rgba(242, 242, 243, .16); pointer-events: none; }
 
   /* a graph's readouts: a value slides sideways (its level a line at the foot), a choice steps on a tap */
   .ros { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; padding: 10px 12px 12px; }
@@ -385,14 +325,16 @@
   .mt { display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 0; min-width: 0; }
   .mv { font-family: var(--num); font-size: 32px; line-height: 32px; color: var(--tx); -webkit-font-smoothing: none; white-space: nowrap; }
   .mv small { font-size: 16px; color: var(--tx-3); margin-left: 2px; }
-  .mtr { flex: 1; width: 100%; max-width: 84px; border-radius: 0; background: var(--page); position: relative; overflow: hidden; cursor: ns-resize; touch-action: none; border: 1px solid var(--line); min-height: 40px; }
-  .mtr b { position: absolute; left: 0; right: 0; bottom: 0; background: var(--c); }
-  .mtr.bi::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed var(--line-2); }
-  .mt.off .mtr b { opacity: .22; } .mt.off .mv { color: var(--tx-3); }
+  .mtr { flex: 1; width: 100%; position: relative; cursor: ns-resize; touch-action: none; min-height: 40px; }
+  .mtr i { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--line-2); }
+  .mtr b { position: absolute; left: calc(50% - 1px); width: 3px; bottom: calc(var(--lo) * 100%); height: calc((var(--hi) - var(--lo)) * 100%); background: var(--c); }
+  .mtr s { position: absolute; left: calc(50% - 14px); width: 28px; height: 3px; bottom: calc(var(--f) * 100% - 1px); background: var(--c); }
+  .mtr.bi::before { content: ""; position: absolute; left: calc(50% - 10px); width: 20px; top: 50%; border-top: 1px dashed var(--line-2); }
+  .mt.off .mtr b, .mt.off .mtr s { opacity: .25; } .mt.off .mv { color: var(--tx-3); }
   .ml { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); padding: 8px 12px; border-radius: 0; white-space: nowrap; }
   button.ml { border: 1px solid var(--line-2); }
   button.ml[aria-checked="true"] { background: var(--c); color: #000; border-color: var(--c); }
-  .mt.hot .mtr { border-color: var(--tx); }
+  .mt.hot .mtr s { background: var(--tx); }
   /* arcs (HOME's four): large dials */
   .arcs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; height: 100%; align-items: center; }
   .arc { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: ns-resize; touch-action: none; min-width: 0; }
@@ -543,7 +485,6 @@
   .bb .bx { min-height: clamp(300px, 38dvh, 440px); }
   .bb.solo .bx { height: clamp(300px, 38dvh, 440px); }
   .bb.side:has(> .tz.one) { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
-  .mtr { max-width: 120px; }
   @media (min-width: 1500px) { .body { grid-template-columns: 264px minmax(0, 1fr) 248px; } }
   @media (max-width: 1100px) {
     .conn > div { display: none; }

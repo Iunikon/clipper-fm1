@@ -177,9 +177,6 @@ const FAM = { 0: "HOME", 1: "ENV", 2: "LFO", 3: "FX", 4: "SEL", 5: "EDIT", 6: "G
 const NAV = [["HOME", "home"], ["EDIT", "edit"], ["ENV", "env"], ["LFO", "lfo"], ["FX", "fx"], ["SEL", "sel"], ["ARP", "arp"], ["SEQ", "seq"], ["GLO", "glo"], ["SAVE", "save"], ["ESTUDIO", "studio"]];
 const ICON = { HOME: "home", EDIT: "edit", ENV: "env", LFO: "lfo", FX: "fx", SEL: "sel", ARP: "arp", SEQ: "seq", GLO: "glo", SAVE: "save" };
 const LAYOUT = JSON.parse($("mockdata").textContent).pages;     /* the device's pages (params.c PAGES), as the firmware lays them out */
-/* HOME's rack: a row a page, the device's HOME first */
-const HOME_ROWS = [["HOME", "HOME", "HOME", 0, null, "home"], ["ENV", "ENV", "ENV", 0, [1, 2, 3, 4], "env"],
-  ["LFO", "LFO", "LFO", 0, [9, 10, 11, 12], "lfo"], ["FX", "FX", "FX", 0, [33, 34, 35, 36], "bars"], ["MACROS", "MACROS", "EDIT", 0, [96, 97, 98, 99], "faders"]];
 const desc = (s, id) => (s ? M.gdesc[id] : M.pdesc[id]);
 const val = (s, id) => (s ? M.g[id] : M.p[id]);
 const keyOf = (s, id) => s + ":" + id;
@@ -252,9 +249,9 @@ async function load() {
     $("cstate").textContent = M.mock ? "Datos de ejemplo" : "Conectado  USB MIDI";
     $("conn").classList.remove("off");
     keepAlive();
-    if (NAV.some(([n]) => n === QS.get("folder"))) S.folder = QS.get("folder");   /* (?folder= ?mode=play ?br=1 ?save=1: to open a view straight away) */
+    if (NAV.some(([n]) => n === QS.get("folder"))) S.folder = QS.get("folder");   /* (?folder= ?mode=edit ?br=1 ?save=1: to open a view straight away) */
     renderAll();
-    if (["edit", "play"].includes(QS.get("mode"))) setMode(QS.get("mode"));
+    if (QS.get("mode") === "edit") setMode("edit");
     if (QS.get("br") === "1") openBrowser(true);
     if (QS.get("save") === "1") openSave(true);
   } catch (e) {
@@ -314,7 +311,7 @@ function followPage() {
   const pg = M.page;
   if (pg.home) { if (S.folder !== "HOME") { S.folder = "HOME"; renderAll(); } flashRow("HOME"); return; }
   const folder = FAM[pg.fam];
-  if (folder === "SAVE") { const k = pg.title === "FAVS" ? "FAVS" : pg.title === "USER" ? "USER" : null; if (k) SV.kind = k; if (S.folder !== "SAVE") { S.folder = "SAVE"; if (S.mode === "play") setMode("edit"); else renderAll(); } else renderWork(); return; }
+  if (folder === "SAVE") { const k = pg.title === "FAVS" ? "FAVS" : pg.title === "USER" ? "USER" : null; if (k) SV.kind = k; if (S.folder !== "SAVE") { S.folder = "SAVE"; renderAll(); } else renderWork(); return; }
   if (!folder || folder === "HOME") return;
   if (S.folder !== folder) { S.folder = folder; renderAll(); } else renderNav();
   flashRow(pg.title);
@@ -331,7 +328,7 @@ function fromDevice(s, id, old, v) {
   const pg = M.page, k = pg && !pg.home && pg.scope === s ? pg.ids.indexOf(id) : pg && pg.home && !s ? M.homeIds.indexOf(id) : -1;
   const a = fmtValue(d, old), b = fmtValue(d, v);
   toast(k, `${k >= 0 ? `<b>KNOB ${k + 1}</b> ` : ""}${esc(d.label)} <span class="num">${esc(a[0] + a[1])} → ${esc(b[0] + b[1])}</span>`);
-  document.querySelectorAll(`.kn[data-k="${keyOf(s, id)}"],.tl[data-tl="${keyOf(s, id)}"],[data-cell="${keyOf(s, id)}"],.mt[data-mt="${keyOf(s, id)}"],.arc[data-k="${keyOf(s, id)}"]`).forEach((el) => { el.classList.add("hot"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("hot"), 1600); });
+  document.querySelectorAll(`.tl[data-tl="${keyOf(s, id)}"],[data-cell="${keyOf(s, id)}"],.mt[data-mt="${keyOf(s, id)}"],.arc[data-k="${keyOf(s, id)}"]`).forEach((el) => { el.classList.add("hot"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("hot"), 1600); });
 }
 
 /* ------------------------------------------------------------ what we send --- */
@@ -352,57 +349,11 @@ function setVal(s, id, v) {
 }
 
 /* ----------------------------------------------------------------- views --- */
-function knobSvg(d, v, i) {
-  const r = 20, c = 2 * Math.PI * r, s = c * .75, a = frac(d, v), z = d.min < 0 && d.max > 0 ? -d.min / (d.max - d.min) : 0, lo = Math.min(a, z), hi = Math.max(a, z);
-  return `<svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="${r}" fill="none" stroke="#232327" stroke-width="6" stroke-linecap="butt" stroke-dasharray="${s} ${c}" transform="rotate(135 26 26)"/>
-    <circle cx="26" cy="26" r="${r}" fill="none" stroke="${KH[i]}" stroke-width="6" stroke-linecap="butt" stroke-dasharray="${Math.max(.1, (hi - lo) * s)} ${c}" stroke-dashoffset="${-lo * s}" transform="rotate(135 26 26)"/></svg>`;
-}
-function knob(s, id, i) {
-  const d = id < 127 ? desc(s, id) : null;
-  if (!d) return `<div class="kn none"><span class="l"><i style="background:var(--line-2)"></i>--</span><span class="v">--</span></div>`;
-  const v = val(s, id), [t, u] = fmtValue(d, v);
-  return `<div class="kn" style="--c:${KC[i]}" data-k="${keyOf(s, id)}" data-s="${s}" data-id="${id}" data-i="${i}" tabindex="0" role="slider" aria-label="${esc(d.label)}"
-    aria-valuemin="${d.min}" aria-valuemax="${d.max}" aria-valuenow="${v}" aria-valuetext="${esc(t + " " + u)}">${knobSvg(d, v, i)}
-    <div class="tx"><span class="l"><i></i>${esc(d.label)}</span><span class="v">${esc(t)}<small>${esc(u)}</small></span></div></div>`;
-}
 function paintValue(s, id) {
-  document.querySelectorAll(`.kn[data-k="${keyOf(s, id)}"]`).forEach((el) => {
-    const d = desc(s, id), v = val(s, id), [t, u] = fmtValue(d, v);
-    el.querySelector("svg").outerHTML = knobSvg(d, v, +el.dataset.i);
-    el.querySelector(".v").innerHTML = `${esc(t)}<small>${esc(u)}</small>`;
-    el.setAttribute("aria-valuenow", v); el.setAttribute("aria-valuetext", t + " " + u);
-    const row = el.closest(".row"); if (row) { const sh = row.querySelector(".shape"); if (sh) sh.innerHTML = shape(row.dataset.shape, +row.dataset.s, JSON.parse(row.dataset.ids)); }
-  });
-  if (S.mode === "play") { drawXY(); drawFaders(); }
   paintTile(s, id);
   paintCards(s, id);
   renderDev();
   if (id === 0 || id === 25 || id === 26) renderMeta();
-}
-/* a page's shape, from its values */
-function shape(kind, s, ids) {
-  const W = 160, H = 72, f = (k) => { const id = ids[k]; return id < 127 && desc(s, id) ? frac(desc(s, id), val(s, id)) : 0; };
-  if (kind === "env") { const a = f(0) * 40, d = a + f(1) * 40, y = H - 4 - f(2) * (H - 8), r = 120 + f(3) * 38;
-    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="M0 ${H - 4} L${a} 4 L${d} ${y} L120 ${y} L${r} ${H - 4}" fill="none" stroke="#287cff" stroke-width="2" stroke-linejoin="miter"/></svg>`; }
-  if (kind === "lfo") { const w = ids[1] < 127 ? val(s, ids[1]) : 1, cyc = 1 + Math.round(f(0) * 5); let p = "";
-    for (let i = 0; i <= 120; i++) { const t = (i / 120 * cyc) % 1, y = w === 0 ? Math.sin(t * 2 * Math.PI) : w === 1 ? (t < .5 ? t * 4 - 1 : 3 - t * 4) : w === 2 ? 1 - t * 2 : w === 3 ? (t < .5 ? 1 : -1) : [.6, -.2, .9, -.7, .3][Math.floor(i / 120 * cyc * 2) % 5]; p += `${i ? "L" : "M"}${i / 120 * W} ${H / 2 - y * (H / 2 - 6)}`; }
-    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="${p}" fill="none" stroke="#ffc618" stroke-width="2" stroke-linejoin="miter"/></svg>`; }
-  if (kind === "faders") return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${[0, 1, 2, 3].map((i) => `<rect x="${i * 42}" y="4" width="34" height="${H - 8}" rx="4" fill="#17171a"/><rect x="${i * 42}" y="${4 + (1 - f(i)) * (H - 8)}" width="34" height="${f(i) * (H - 8)}" rx="4" fill="${KH[i]}" opacity=".85"/>`).join("")}</svg>`;
-  return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${[0, 1, 2, 3].map((i) => ids[i] < 127 ? `<rect x="0" y="${i * 18 + 2}" width="${W}" height="10" rx="3" fill="#17171a"/><rect x="0" y="${i * 18 + 2}" width="${Math.max(4, f(i) * W)}" height="10" rx="3" fill="${KH[i]}"/>` : "").join("")}</svg>`;
-}
-/* a row: its title here, sub the device's page title (what PAGE says), folder the device's family */
-function row(title, sub, folder, s, ids, kind) {
-  const dt = folder === "HOME" ? "HOME" : sub;
-  const live = M.page && (M.page.home ? dt === "HOME" : M.page.title === dt && FAM[M.page.fam] === folder);
-  const go = S.folder === "HOME" ? (folder === "HOME" ? "" : `<button class="go" data-f="${folder}">Abrir ${esc(folder)}<svg class="i"><use href="#i-open"/></svg></button>`) : "";
-  return `<section class="row${live ? " dev" : ""}" data-title="${esc(dt)}" data-shape="${kind}" data-s="${s}" data-ids="${JSON.stringify(ids)}">
-    <div class="rh"><div><h3><svg class="i"><use href="#i-${ICON[folder] || "edit"}"/></svg>${esc(title)}</h3></div>
-    ${live ? `<span class="live">En el sinte</span>` : go}</div>
-    ${ids.map((id, i) => knob(s, id, i)).join("")}<div class="shape">${shape(kind, s, ids)}</div></section>`;
-}
-function awayRow(title, dt, folder) {
-  return `<section class="row away" data-title="${esc(dt)}"><div class="rh"><div><h3><svg class="i"><use href="#i-${ICON[folder] || "edit"}"/></svg>${esc(title)}</h3></div></div>
-    <div class="awt"><span>Esta página se edita en el sinte o en Estudio.</span><a class="btn" href="${STUDIO_URL}">Abrir Estudio</a></div></section>`;
 }
 /* RÁPIDO: what a player reaches for. Each tile's colour: the knob that turns it on its page of the FM-1. s: 0 the sound, 1 global.
    kind: toggle (its off value <-> the last value it had), amount (0 <-> the last level; a bar), bipolar (0 <-> the last; a bar from
@@ -493,10 +444,6 @@ function panic() {
   if (M.midiOut) for (let ch = 0; ch < 16; ch++) { M.midiOut.send([0xB0 | ch, 123, 0]); M.midiOut.send([0xB0 | ch, 120, 0]); }
   toast(-1, "<b>Pánico</b> todas las notas cortadas");
 }
-function quickView() {
-  return `<div class="quick">${QUICK.map(([title, items], i) => `<div class="qh"><h2>${esc(title)}</h2>${i ? "" : `<button class="more" data-mode-go="edit">Editar más<svg class="i"><use href="#i-next"/></svg></button>`}</div>
-    <div class="tiles">${items.map(tile).join("")}</div>`).join("")}</div>`;   /* (HOME's four knobs: EDITAR's first row) */
-}
 
 function renderWork() {
   $("edit").innerHTML = S.folder === "SAVE" ? soundsView() : S.folder === "HOME" && S.mode === "quick" ? quickBento() : bentoView(S.folder);
@@ -524,9 +471,9 @@ function renderBar() {
     <span class="n">${esc(f.name)}</span><span class="k">${esc(f.kind)} <span>${esc(M.info.engines[f.e] || "USER")}</span></span></button>`).join("");
   renderMeta(); renderLog();
   if (B.open) renderBrowser();
-  if (S.folder === "SAVE" && S.mode !== "play") renderWork();
+  if (S.folder === "SAVE") renderWork();
 }
-function renderAll() { renderBar(); renderWhere(); renderWork(); if (S.mode === "play") renderPlay(); }
+function renderAll() { renderBar(); renderWhere(); renderWork(); }
 
 /* ------------------------------------------------------------- the browser --- */
 const KINDS = ["BASS", "KEYS", "ORGN", "PAD", "LEAD", "PLCK", "STAB", "FX", "USER"];
@@ -690,59 +637,7 @@ document.addEventListener("click", (e) => {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && SVE.open) openSave(false); });
 $("scrim").addEventListener("click", () => { if (SVE.open) openSave(false); });
 
-/* ---------------------------------------------------------------- TOCAR --- */
-const playParams = () => HOME_ROWS.flatMap(([t, , , s, ids]) => (ids || M.homeIds).filter((id) => id < 127 && desc(s, id) && desc(s, id).fmt !== F.ENUM).map((id) => ({ s, id, name: `${t}  ${desc(s, id).label}` })));
-function renderPlay() {
-  const ps = playParams(), opts = ps.map((x, j) => `<option value="${j}">${esc(x.name)}</option>`).join("");
-  const kx = $("xsel").value, ky = $("ysel").value;
-  $("xsel").innerHTML = opts; $("ysel").innerHTML = opts;
-  $("xsel").value = kx && +kx < ps.length ? kx : 0; $("ysel").value = ky && +ky < ps.length ? ky : Math.min(1, ps.length - 1);
-  drawXY(); drawFaders();
-}
-const axis = (sel) => playParams()[+$(sel).value];
-function drawXY() {
-  const X = axis("xsel"), Y = axis("ysel"); if (!X || !Y) return;
-  const fx = frac(desc(X.s, X.id), val(X.s, X.id)), fy = frac(desc(Y.s, Y.id), val(Y.s, Y.id));
-  $("dot").style.left = $("cx").style.left = fx * 100 + "%"; $("dot").style.top = $("cy").style.top = (1 - fy) * 100 + "%";
-  const a = fmtValue(desc(X.s, X.id), val(X.s, X.id)), b = fmtValue(desc(Y.s, Y.id), val(Y.s, Y.id));
-  $("xr").innerHTML = `<span style="color:var(--k1)">${esc(desc(X.s, X.id).label)}</span> ${esc(a[0] + a[1])}`;
-  $("yr").innerHTML = `<span style="color:var(--k2)">${esc(desc(Y.s, Y.id).label)}</span> ${esc(b[0] + b[1])}`;
-}
-const MACRO_IDS = [96, 97, 98, 99];
-function drawFaders() {
-  $("fdr").innerHTML = MACRO_IDS.map((id, i) => { const d = desc(0, id); if (!d) return ""; const f = frac(d, val(0, id)), [t] = fmtValue(d, val(0, id));
-    return `<div class="fd" style="--c:${KC[i]}" data-i="${i}" role="slider" aria-label="${esc(d.label)}" aria-valuenow="${val(0, id)}"><span class="v">${esc(t)}</span>
-      <div class="tr"><b style="height:${f * 100}%"></b><i style="bottom:calc(${f * 100}% - 1px)"></i></div><span class="l">${esc(d.label)}</span></div>`; }).join("");
-}
-
 /* ----------------------------------------------------------------- input --- */
-let drag = null;
-$("edit").addEventListener("pointerdown", (e) => {
-  const k = e.target.closest(".kn[data-k]"); if (!k) return;
-  const s = +k.dataset.s, id = +k.dataset.id, d = desc(s, id);
-  drag = { k, s, id, d, y0: e.clientY, v0: val(s, id) }; k.setPointerCapture(e.pointerId); k.classList.add("drag");
-});
-$("edit").addEventListener("pointermove", (e) => { if (drag) setVal(drag.s, drag.id, drag.v0 + (drag.y0 - e.clientY) * (drag.d.max - drag.d.min) / 240); });
-const endDrag = () => { if (drag) { drag.k.classList.remove("drag"); drag = null; } };
-$("edit").addEventListener("pointerup", endDrag); $("edit").addEventListener("pointercancel", endDrag);
-$("edit").addEventListener("dblclick", (e) => { const k = e.target.closest(".kn[data-k]"); if (k) { const s = +k.dataset.s, id = +k.dataset.id; setVal(s, id, desc(s, id).def); } });
-$("edit").addEventListener("keydown", (e) => { const k = e.target.closest(".kn[data-k]"), st = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 8, PageDown: -8 }[e.key];
-  if (k && st) { e.preventDefault(); const s = +k.dataset.s, id = +k.dataset.id; setVal(s, id, val(s, id) + st); } });
-let xyOn = false;
-const xyAt = (e) => { const r = $("xy").getBoundingClientRect(), X = axis("xsel"), Y = axis("ysel"); if (!X || !Y) return;
-  const dx = desc(X.s, X.id), dy = desc(Y.s, Y.id);
-  setVal(X.s, X.id, dx.min + Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * (dx.max - dx.min));
-  setVal(Y.s, Y.id, dy.min + Math.max(0, Math.min(1, 1 - (e.clientY - r.top) / r.height)) * (dy.max - dy.min)); drawXY(); };
-$("xy").addEventListener("pointerdown", (e) => { xyOn = true; $("xy").classList.add("on"); $("xy").setPointerCapture(e.pointerId); xyAt(e); });
-$("xy").addEventListener("pointermove", (e) => { if (xyOn) xyAt(e); });
-$("xy").addEventListener("pointerup", () => { xyOn = false; $("xy").classList.remove("on"); });
-$("xsel").onchange = $("ysel").onchange = drawXY;
-let fdOn = null;
-$("fdr").addEventListener("pointerdown", (e) => { const f = e.target.closest(".fd"); if (!f) return; fdOn = +f.dataset.i; $("fdr").setPointerCapture(e.pointerId); fdAt(e); });
-$("fdr").addEventListener("pointermove", (e) => { if (fdOn != null) fdAt(e); });
-$("fdr").addEventListener("pointerup", () => { fdOn = null; });
-function fdAt(e) { const tr = $("fdr").querySelectorAll(".tr")[fdOn]; if (!tr) return; const r = tr.getBoundingClientRect(), id = MACRO_IDS[fdOn], d = desc(0, id);
-  setVal(0, id, d.min + Math.max(0, Math.min(1, 1 - (e.clientY - r.top) / r.height)) * (d.max - d.min)); drawFaders(); }
 
 async function favGo(i) { try { await rq(C.FAV_GO, [i]); } catch (e) { /* RELOAD brings the rest */ } }
 async function listGo(n) { try { await rq(C.LIST_GO, u14(n)); } catch (e) { /* RELOAD brings the rest */ } }
@@ -776,14 +671,13 @@ document.addEventListener("click", (e) => {
   else if (b.id === "usb") usbAudio();
   else if (b.id === "follow") { S.follow = !S.follow; b.setAttribute("aria-pressed", S.follow); if (S.follow && M.page) followPage(); }
   else if (b.dataset.f === "ESTUDIO") location.href = STUDIO_URL;
-  else if (b.dataset.f) { S.folder = b.dataset.f; if (S.mode === "play") setMode(S.folder === "HOME" ? "quick" : "edit"); else { renderNav(); renderWork(); } $("edit").scrollTop = 0; }
+  else if (b.dataset.f) { S.folder = b.dataset.f; renderNav(); renderWork(); $("edit").scrollTop = 0; }
 });
 
 function setMode(m) {
   S.mode = m;
   document.querySelectorAll("[data-mode]").forEach((x) => x.setAttribute("aria-pressed", x.dataset.mode === m));
-  $("edit").classList.toggle("hide", m === "play"); $("play").classList.toggle("hide", m !== "play");
-  if (m === "play") renderPlay(); else { renderNav(); renderWork(); $("edit").scrollTop = 0; }
+  renderNav(); renderWork(); $("edit").scrollTop = 0;
 }
 
 /* the quick panel's level bars: drag (or tap) along them */
@@ -826,17 +720,23 @@ async function usbAudio() {
     l.textContent = (fm1 ? "" : "No encontré el FM-1: ") + (st.getAudioTracks()[0].label || "entrada");
   } catch (err) { l.textContent = err.name === "NotAllowedError" ? "Permiso de audio negado" : "No se pudo abrir el audio"; }
 }
+/* as the FM-1 draws it (ui_draw.c graph_scope): the output at 22.05 kHz (audio.c keeps every other sample), 240 of them
+   from a rising zero crossing, scaled to the loudest (never above 1500 / 32768), a thin line in the curve's colour */
 function drawScope(cv) {
   if (!cv || !an) return; const r = cv.getBoundingClientRect(); if (!r.width) return;
   const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
   if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
   an.getFloatTimeDomainData(buf);
-  let t = 0; for (let i = 1; i < buf.length - 240; i++) if (buf[i - 1] < 0 && buf[i] >= 0) { t = i; break; }
-  const g = cv.getContext("2d"); g.clearRect(0, 0, w, h); g.fillStyle = "#232327"; g.fillRect(0, h >> 1, w, dpr);
-  g.strokeStyle = "#f2f2f3"; g.lineWidth = 1.5 * dpr; g.lineJoin = "round"; g.beginPath();
-  for (let i = 0; i < 240; i++) g.lineTo(i / 239 * w, h / 2 - (buf[t + i] || 0) * h * .85); g.stroke();
+  const step = an.context.sampleRate / 22050, at = (i) => buf[Math.round(i * step)] || 0, n = Math.floor(buf.length / step);
+  let peak = 1500 / 32768, t = 0;
+  for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(at(i)));
+  for (let i = 1; i < n - 240; i++) if (at(i - 1) < 0 && at(i) >= 0) { t = i; break; }
+  const g = cv.getContext("2d"); g.clearRect(0, 0, w, h); g.fillStyle = "#34343a"; g.fillRect(0, h >> 1, w, dpr);
+  g.strokeStyle = KH[0]; g.lineWidth = 1.5 * dpr; g.lineJoin = "miter"; g.beginPath();
+  for (let x = 0; x < 240; x++) g.lineTo(x / 239 * w, h / 2 - at(t + x) / peak * h * .44);
+  g.stroke();
 }
-(function loop() { drawScope($("scope")); if (S.mode === "play") drawScope($("xyscope")); requestAnimationFrame(loop); })();
+(function loop() { drawScope($("scope")); requestAnimationFrame(loop); })();
 
 /* ------------------------------------------------------------------ start --- */
 $("connect").onclick = () => connectMidi();
