@@ -258,6 +258,7 @@
   .gate { grid-column: 2; grid-row: 1; z-index: 3; background: var(--page); display: grid; place-items: center; padding: 24px; }
   .rail.l { grid-column: 1; grid-row: 1; } .work, .play { grid-column: 2; grid-row: 1; } .rail.r { grid-column: 3; grid-row: 1; }
   /* not connected: the app is there, empty; what needs the FM-1 waits */
+  .ib[hidden] { display: none; }
   .off .snd, .off .right .where, .off .follow, .off #modes, .off .nav .nb:not(.est), .off .rail .act { opacity: .35; pointer-events: none; }
   .off .rail .meta { display: none; }
   .favs > .dvn { margin: 0 12px; border: 1px dashed var(--line-2); }
@@ -546,6 +547,21 @@
   .btn.pri.warn { background: var(--fav); border-color: var(--fav); color: #000; }
   .btn:disabled { opacity: .5; }
 
+  /* ==== the tablet: an 11.5" 2800 x 1840 LCD (3:2), in Chrome about 1400 x 830 CSS px landscape (DPR 2), more with a
+     smaller DPR, 920 x 1330 upright. The rails grow on a wide screen, RÁPIDO takes the height there is, the graphs too ==== */
+  .quick2 { grid-auto-rows: clamp(44px, calc((100dvh - 324px) / 11), 72px); }
+  .bb .bx { min-height: clamp(300px, 38dvh, 440px); }
+  .bb.solo .bx { height: clamp(300px, 38dvh, 440px); }
+  .bb.side:has(> .tz.one) { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .mtr { max-width: 120px; }
+  @media (min-width: 1500px) { .body { grid-template-columns: 264px minmax(0, 1fr) 248px; } }
+  @media (max-width: 1100px) {
+    .conn > div { display: none; }
+    .svb { padding: 0 10px; } .svb span { display: none; }
+    .now { min-width: 0; }
+    .right { gap: 8px; }
+  }
+
 </style>
 </head>
 <body class="off">
@@ -557,6 +573,7 @@
   <symbol id="i-undo" viewBox="0 0 24 24"><path d="M4 5v5h5M5 10a8 8 0 1 1 1.5 7"/></symbol>
   <symbol id="i-disk" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6"/></symbol>
   <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+  <symbol id="i-fs" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></symbol>
   <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v14M12 3l-2.5 3M12 3l2.5 3M12 13l-4-2.5V8M12 15l4-2.5V10"/><circle cx="12" cy="19" r="2"/></symbol>
@@ -584,6 +601,7 @@
       <button class="svb" id="saveb" data-save="1"><svg class="i"><use href="#i-disk"/></svg><span>Guardar</span></button>
     </div>
     <div class="right">
+      <button class="ib" id="fs" hidden aria-label="Pantalla completa"><svg class="i"><use href="#i-fs"/></svg></button>
       <div class="where">En el sinte <b id="where"></b></div>
       <button class="follow" id="follow" aria-pressed="true"><i></i>Seguir</button>
       <div class="seg" role="group" aria-label="Modo" id="modes"><button aria-pressed="true" data-mode="quick">RÁPIDO</button><button aria-pressed="false" data-mode="edit">EDITAR</button><button aria-pressed="false" data-mode="play">TOCAR</button></div>
@@ -1766,7 +1784,11 @@ $("edit").addEventListener("keydown", (e) => {
 
 /* ------------------------------------------------------------------ start --- */
 $("connect").onclick = () => connectMidi();
-if (/^https?:$/.test(location.protocol)) $("dl").hidden = false;   /* (served, as on Vercel: the same file to keep offline) */
+if (/^https?:$/.test(location.protocol)) $("dl").hidden = false;
+/* full screen: the tablet's whole 3:2 screen, without Chrome's bars */
+if (document.fullscreenEnabled) $("fs").hidden = false;
+$("fs").onclick = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {});
+document.addEventListener("fullscreenchange", () => $("fs").setAttribute("aria-pressed", !!document.fullscreenElement));   /* (served, as on Vercel: the same file to keep offline) */
 $("conn").classList.add("off");
 renderNav();                                        /* (empty until the FM-1 is connected: Conectar in the middle) */
 if (QS.get("mock") === "1") connectMock();

@@ -248,6 +248,7 @@
   .gate { grid-column: 2; grid-row: 1; z-index: 3; background: var(--page); display: grid; place-items: center; padding: 24px; }
   .rail.l { grid-column: 1; grid-row: 1; } .work, .play { grid-column: 2; grid-row: 1; } .rail.r { grid-column: 3; grid-row: 1; }
   /* not connected: the app is there, empty; what needs the FM-1 waits */
+  .ib[hidden] { display: none; }
   .off .snd, .off .right .where, .off .follow, .off #modes, .off .nav .nb:not(.est), .off .rail .act { opacity: .35; pointer-events: none; }
   .off .rail .meta { display: none; }
   .favs > .dvn { margin: 0 12px; border: 1px dashed var(--line-2); }
@@ -535,3 +536,18 @@
   .btn.pri { background: var(--tx); color: var(--page); border-color: var(--tx); }
   .btn.pri.warn { background: var(--fav); border-color: var(--fav); color: #000; }
   .btn:disabled { opacity: .5; }
+
+  /* ==== the tablet: an 11.5" 2800 x 1840 LCD (3:2), in Chrome about 1400 x 830 CSS px landscape (DPR 2), more with a
+     smaller DPR, 920 x 1330 upright. The rails grow on a wide screen, RÁPIDO takes the height there is, the graphs too ==== */
+  .quick2 { grid-auto-rows: clamp(44px, calc((100dvh - 324px) / 11), 72px); }
+  .bb .bx { min-height: clamp(300px, 38dvh, 440px); }
+  .bb.solo .bx { height: clamp(300px, 38dvh, 440px); }
+  .bb.side:has(> .tz.one) { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .mtr { max-width: 120px; }
+  @media (min-width: 1500px) { .body { grid-template-columns: 264px minmax(0, 1fr) 248px; } }
+  @media (max-width: 1100px) {
+    .conn > div { display: none; }
+    .svb { padding: 0 10px; } .svb span { display: none; }
+    .now { min-width: 0; }
+    .right { gap: 8px; }
+  }

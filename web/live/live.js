@@ -840,7 +840,11 @@ function drawScope(cv) {
 
 /* ------------------------------------------------------------------ start --- */
 $("connect").onclick = () => connectMidi();
-if (/^https?:$/.test(location.protocol)) $("dl").hidden = false;   /* (served, as on Vercel: the same file to keep offline) */
+if (/^https?:$/.test(location.protocol)) $("dl").hidden = false;
+/* full screen: the tablet's whole 3:2 screen, without Chrome's bars */
+if (document.fullscreenEnabled) $("fs").hidden = false;
+$("fs").onclick = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {});
+document.addEventListener("fullscreenchange", () => $("fs").setAttribute("aria-pressed", !!document.fullscreenElement));   /* (served, as on Vercel: the same file to keep offline) */
 $("conn").classList.add("off");
 renderNav();                                        /* (empty until the FM-1 is connected: Conectar in the middle) */
 if (QS.get("mock") === "1") connectMock();
