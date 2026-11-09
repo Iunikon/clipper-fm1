@@ -163,7 +163,7 @@ function makeMock(onFrame) {
 /* ----------------------------------------------------------- the state --- */
 /* M: what the FM-1 says. S: what this screen shows */
 const M = { link: null, info: null, pdesc: [], gdesc: [], p: [], g: [], engine: 0, preset: 0, list: [], favs: [], favCur: -1, page: null, homeIds: [127, 127, 127, 127], mock: false };
-const S = { folder: "HOME", mode: "edit", follow: true, hot: new Map() };
+const S = { folder: "HOME", mode: "quick", follow: true, hot: new Map() };
 const FAM = { 0: "HOME", 1: "ENV", 2: "LFO", 3: "FX", 4: "SEL", 5: "EDIT", 6: "GLO", 7: "SAVE", 8: "ARP", 9: "SEQ" };
 const NAV = [["HOME", "home"], ["EDIT", "edit"], ["ENV", "env"], ["LFO", "lfo"], ["FX", "fx"], ["SEL", "sel"], ["ARP", "arp"], ["SEQ", "seq"], ["GLO", "glo"], ["SAVE", "save"], ["ESTUDIO", "studio"]];
 const ICON = { HOME: "home", EDIT: "edit", ENV: "env", LFO: "lfo", FX: "fx", SEL: "sel", ARP: "arp", SEQ: "seq", GLO: "glo", SAVE: "save" };
@@ -245,7 +245,7 @@ async function load() {
     keepAlive();
     if (NAV.some(([n]) => n === QS.get("folder"))) S.folder = QS.get("folder");   /* (?folder= ?mode=play ?br=1: to open a view straight away) */
     renderAll();
-    if (QS.get("mode") === "play") document.querySelector('[data-mode="play"]').click();
+    if (["edit", "play"].includes(QS.get("mode"))) setMode(QS.get("mode"));
     if (QS.get("br") === "1") openBrowser(true);
   } catch (e) {
     console.error(e);
@@ -313,7 +313,7 @@ function fromDevice(s, id, old, v) {
   const pg = M.page, k = pg && !pg.home && pg.scope === s ? pg.ids.indexOf(id) : pg && pg.home && !s ? M.homeIds.indexOf(id) : -1;
   const a = fmtValue(d, old), b = fmtValue(d, v);
   toast(k, `${k >= 0 ? `<b>KNOB ${k + 1}</b> ` : ""}${esc(d.label)} <span class="num">${esc(a[0] + a[1])} → ${esc(b[0] + b[1])}</span>`);
-  document.querySelectorAll(`.kn[data-k="${keyOf(s, id)}"]`).forEach((el) => { el.classList.add("hot"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("hot"), 1600); });
+  document.querySelectorAll(`.kn[data-k="${keyOf(s, id)}"]${s ? "" : `,.tl[data-tl="${id}"]`}`).forEach((el) => { el.classList.add("hot"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("hot"), 1600); });
 }
 
 /* ------------------------------------------------------------ what we send --- */
@@ -355,6 +355,7 @@ function paintValue(s, id) {
     const row = el.closest(".row"); if (row) { const sh = row.querySelector(".shape"); if (sh) sh.innerHTML = shape(row.dataset.shape, +row.dataset.s, JSON.parse(row.dataset.ids)); }
   });
   if (S.mode === "play") { drawXY(); drawFaders(); }
+  if (!s) paintTile(id);
   if (id === 0 || id === 25 || id === 26) renderMeta();
 }
 /* a page's shape, from its values */
@@ -388,9 +389,75 @@ const PAGE_NAME = { "ENV": "Envolvente", "ENV DEST": "Destinos de envolvente", "
   "EQ+COMP": "EQ y compresor", "SEL": "Escala", "SEL 2": "Acordes", "EDIT 1": "Motor 1", "EDIT 2": "Motor 2", "VOICE": "Voces", "VOICE 2": "Voces 2",
   "VOICE 3": "Voces 3", "MACROS": "Macros", "GLOBAL": "Global", "MASTER": "Master", "SYSTEM": "Sistema", "ARP": "Arpegiador", "ARP 2": "Arpegiador 2",
   "SPICE": "Spice", "PATTERN": "Patrón", "NOTES": "Notas" };
+/* RÁPIDO: the switches a player reaches for. Each one's colour: the knob that turns it on its page of the FM-1.
+   kind: toggle (off value <-> the last value it had, or on), amount (0 <-> the last level, a bar to set it), choice (a stepper) */
+const QUICK = [
+  ["Interpretación", [
+    { id: 17, name: "Arpegiador", kind: "toggle", on: 1, k: 0, sub: { id: 18, k: 1 }, page: "ARP" },
+    { id: 23, name: "Latch", kind: "toggle", on: 1, k: 2, note: (on) => (val(0, 17) ? "Mantiene el arpegio" : "Mantiene las notas"), page: "ARP 2" },
+    { id: 49, name: "Acordes", kind: "toggle", on: 1, k: 3, step: true, page: "SEL" },
+    { id: 27, name: "Escala", kind: "toggle", on: 2, k: 2, step: true, note: () => `${fmtValue(desc(0, 25), val(0, 25))[0]} ${fmtValue(desc(0, 26), val(0, 26))[0]}`, page: "SEL" },
+    { id: 37, name: "Voces", kind: "choice", k: 0, page: "VOICE" },
+    { id: 38, name: "Glide", kind: "amount", on: 40, k: 1, page: "VOICE" }]],
+  ["Efectos", [
+    { id: 33, name: "Distorsión", kind: "amount", on: 40, k: 0, page: "FX" },
+    { id: 34, name: "Chorus", kind: "amount", on: 50, k: 1, page: "FX" },
+    { id: 35, name: "Delay", kind: "amount", on: 40, k: 2, page: "FX" },
+    { id: 36, name: "Reverb", kind: "amount", on: 50, k: 3, page: "FX" },
+    { id: 78, name: "Insert", kind: "toggle", on: 1, k: 0, step: true, page: "INSERT" }]],
+];
+const QSPEC = new Map(QUICK.flatMap(([, items]) => items.map((q) => [q.id, q])));
+const remember = new Map();                         /* id -> the value it had before it was switched off */
+const qOn = (q) => val(0, q.id) !== (desc(0, q.id) ? (q.kind === "amount" ? 0 : desc(0, q.id).min) : 0);
+function tileInner(q) {
+  const d = desc(0, q.id); if (!d) return "";
+  const v = val(0, q.id), on = q.kind === "choice" || qOn(q), [t, u] = fmtValue(d, v);
+  const sub = q.sub && desc(0, q.sub.id) ? fmtValue(desc(0, q.sub.id), val(0, q.sub.id)) : null;
+  const note = q.note ? q.note(on) : sub ? `${desc(0, q.sub.id).label} ${sub[0]}` : q.page;
+  let foot = "";
+  if (q.kind === "amount") { const f = frac(d, v); foot = `<div class="amt" data-amt="${q.id}" role="slider" aria-label="${esc(q.name)}: nivel" aria-valuenow="${v}" aria-valuemin="${d.min}" aria-valuemax="${d.max}" tabindex="0"><b style="width:${f * 100}%"></b><i style="left:calc(${f * 100}% - 1px)"></i></div>`; }
+  else if (q.kind === "choice" || q.step || q.sub) {
+    foot = `<div class="stp"><button data-qstep="${q.id}" data-d="-1" aria-label="${esc(q.name)}: anterior"><svg class="i"><use href="#i-prev"/></svg></button>
+      <button data-qstep="${q.id}" data-d="1" aria-label="${esc(q.name)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div>`;
+  }
+  /* the tile's top is its switch (a choice has none: its arrows are all it does) */
+  const top = `<span class="t"><b>${esc(q.name)}</b>${q.kind === "choice" ? "" : `<i class="led" aria-hidden="true"></i>`}</span>
+    <span class="v">${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}</span><span class="s">${esc(note || "")}</span>`;
+  return (q.kind === "choice" ? `<div class="tg">${top}</div>` : `<button class="tg" role="switch" aria-checked="${on}" data-qtog="${q.id}" aria-label="${esc(q.name)}: ${on ? "encendido" : "apagado"}">${top}</button>`) + foot;
+}
+const tile = (q) => `<section class="tl${q.kind === "choice" || qOn(q) ? " on" : ""}" style="--c:${KC[q.k]}" data-tl="${q.id}">${tileInner(q)}</section>`;
+function paintTile(id) {
+  const ids = [id, ...QUICK.flatMap(([, it]) => it.filter((q) => q.sub && q.sub.id === id).map((q) => q.id))];
+  if (id === 17) ids.push(23);
+  if (id === 25 || id === 26) ids.push(27);
+  ids.forEach((i) => { const el = document.querySelector(`.tl[data-tl="${i}"]`), q = QSPEC.get(i); if (!el || !q || (amtOn && el.contains(amtOn))) return;
+    el.classList.toggle("on", q.kind === "choice" || qOn(q)); el.innerHTML = tileInner(q); });
+}
+function quickToggle(id) {
+  const q = QSPEC.get(id), d = desc(0, id); if (!q || !d) return;
+  const off = q.kind === "amount" ? 0 : d.min;
+  if (qOn(q)) { remember.set(id, val(0, id)); setVal(0, id, off); }
+  else setVal(0, id, remember.get(id) ?? q.on);
+  paintTile(id);
+}
+function quickStep(id, dir) {
+  const d = desc(0, id), q = QSPEC.get(id); if (!d) return;
+  const lo = q && q.kind === "toggle" ? d.min + 1 : d.min;          /* (a switch's choices: never its OFF) */
+  let v = val(0, id);
+  v = v < lo ? lo : v + dir > d.max ? lo : v + dir < lo ? d.max : v + dir;
+  setVal(0, id, v);
+  paintTile(id);
+}
+function quickView() {
+  return `<div class="quick">${QUICK.map(([title, items], i) => `<div class="qh"><h2>${esc(title)}</h2>${i ? "" : `<button class="more" data-mode-go="edit">Editar más<svg class="i"><use href="#i-next"/></svg></button>`}</div>
+    <div class="tiles">${items.map(tile).join("")}</div>`).join("")}
+    ${row("Home", "Las perillas en HOME", "HOME", 0, M.homeIds, "home")}</div>`;
+}
+
 function renderWork() {
   let h = "";
-  if (S.folder === "HOME") {
+  if (S.folder === "HOME" && S.mode === "quick") h = quickView();
+  else if (S.folder === "HOME") {
     h = HOME_ROWS.map(([t, sub, folder, s, ids, kind]) => row(t, sub, folder, s, ids || M.homeIds, kind)).join("");
   } else {
     const pages = LAYOUT.filter((x) => x.folder === S.folder);
@@ -516,7 +583,7 @@ async function favToggle() {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && B.open) { openBrowser(false); $("now").focus(); } });
 $("scrim").addEventListener("click", () => openBrowser(false));
 document.addEventListener("click", (e) => {
-  const b = e.target.closest("#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-mode],#prev,#next,#favt,#favb,#usb,#follow,[data-f]");
+  const b = e.target.closest("#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-mode],[data-mode-go],[data-qtog],[data-qstep],#prev,#next,#favt,#favb,#usb,#follow,[data-f]");
   if (!b) return;
   if (b.id === "now") openBrowser(!B.open);
   else if (b.id === "brx") openBrowser(false);
@@ -524,7 +591,9 @@ document.addEventListener("click", (e) => {
   else if (b.dataset.kstep) { const all = ["FAVS", "ALL", ...KINDS.filter((k) => M.list.some((x) => x.kind === k))], i = all.indexOf(B.kind); B.kind = all[(i + +b.dataset.kstep + all.length) % all.length]; renderBrowser(); }
   else if (b.dataset.load) listGo(+b.dataset.load);
   else if (b.dataset.favgo) favGo(+b.dataset.favgo);
-  else if (b.dataset.mode) { S.mode = b.dataset.mode; document.querySelectorAll("[data-mode]").forEach((x) => x.setAttribute("aria-pressed", x === b)); $("edit").classList.toggle("hide", S.mode !== "edit"); $("play").classList.toggle("hide", S.mode !== "play"); if (S.mode === "play") renderPlay(); }
+  else if (b.dataset.mode || b.dataset.modeGo) setMode(b.dataset.mode || b.dataset.modeGo);
+  else if (b.dataset.qtog) quickToggle(+b.dataset.qtog);
+  else if (b.dataset.qstep) quickStep(+b.dataset.qstep, +b.dataset.d);
   else if (b.id === "prev" || b.id === "next") {           /* (not a favourite now: next is the first, previous the last) */
     const n = M.favs.length, d = b.id === "next" ? 1 : -1;
     if (n) favGo(M.favCur < 0 ? (d > 0 ? 0 : n - 1) : (M.favCur + d + n) % n);
@@ -534,8 +603,32 @@ document.addEventListener("click", (e) => {
   else if (b.id === "follow") { S.follow = !S.follow; b.setAttribute("aria-pressed", S.follow); if (S.follow && M.page) followPage(); }
   else if (b.dataset.f === "ESTUDIO") location.href = STUDIO_URL;
   else if (b.dataset.f === "SAVE") openBrowser(true);
-  else if (b.dataset.f) { S.folder = b.dataset.f; renderNav(); renderWork(); $("edit").scrollTop = 0; if (S.mode === "play") { S.mode = "edit"; document.querySelector('[data-mode="edit"]').click(); } }
+  else if (b.dataset.f) { S.folder = b.dataset.f; if (S.mode === "play") setMode(S.folder === "HOME" ? "quick" : "edit"); else { renderNav(); renderWork(); } $("edit").scrollTop = 0; }
 });
+
+function setMode(m) {
+  S.mode = m;
+  document.querySelectorAll("[data-mode]").forEach((x) => x.setAttribute("aria-pressed", x.dataset.mode === m));
+  $("edit").classList.toggle("hide", m === "play"); $("play").classList.toggle("hide", m !== "play");
+  if (m === "play") renderPlay(); else { renderNav(); renderWork(); $("edit").scrollTop = 0; }
+}
+
+/* the quick panel's level bars: drag (or tap) along them */
+let amtOn = null;
+$("edit").addEventListener("pointerdown", (e) => { const a = e.target.closest("[data-amt]"); if (!a) return; amtOn = a; a.setPointerCapture(e.pointerId); amtAt(e); });
+$("edit").addEventListener("pointermove", (e) => { if (amtOn) amtAt(e); });
+$("edit").addEventListener("pointerup", () => { amtOn = null; });
+$("edit").addEventListener("pointercancel", () => { amtOn = null; });
+function amtAt(e) {
+  const id = +amtOn.dataset.amt, d = desc(0, id), r = amtOn.getBoundingClientRect(), f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+  setVal(0, id, d.min + f * (d.max - d.min));
+  const b = amtOn.querySelector("b"), i = amtOn.querySelector("i"), g = frac(d, val(0, id));      /* (in place: the drag keeps its element) */
+  b.style.width = g * 100 + "%"; i.style.left = `calc(${g * 100}% - 1px)`;
+  const tl = amtOn.closest(".tl"), q = QSPEC.get(id), [t, u] = fmtValue(d, val(0, id));
+  tl.classList.toggle("on", qOn(q)); tl.querySelector(".tg")?.setAttribute("aria-checked", qOn(q)); tl.querySelector(".v").innerHTML = `${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}`;
+}
+$("edit").addEventListener("keydown", (e) => { const a = e.target.closest("[data-amt]"), st = { ArrowRight: 4, ArrowUp: 4, ArrowLeft: -4, ArrowDown: -4 }[e.key];
+  if (a && st) { e.preventDefault(); const id = +a.dataset.amt; setVal(0, id, val(0, id) + st); paintTile(id); document.querySelector(`[data-amt="${id}"]`)?.focus(); } });
 
 /* ---------------------------------------------------------------- toasts --- */
 let tt = 0;
