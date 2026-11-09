@@ -32,7 +32,7 @@ Es un solo archivo HTML, sin librerías, que funciona **sin conexión** abierto 
 | Datos de ejemplo | `tools/live_dump.py` | Lee el firmware real en el PC y produce `build/live-mock.json`. |
 | Firmware | `firmware/src/editor_live.c` | Comandos SysEx 97–104 (PAGE, FAVS, FAV_GO, FAV_SET, FAVS_CHANGED, LIST, LIST_GO, EDITED). PAGE incluye además la entrada de la lista que suena. |
 
-Para verlo sin el sinte: `web/live.html?mock=1`, o el botón «Ver con datos de ejemplo». Parámetros: `&folder=FX|ENV|LFO|EDIT|ARP|SEL|SEQ|GLO|SAVE`, `&mode=edit|play`, `&save=1` (abre Guardar) y `&br=1` (abre el popup de sonidos).
+Al abrirla, la app aparece vacía y en el centro está «Conectar el FM-1»; los rieles explican qué saldrá en ellos. Para verla sin el sinte: `web/live.html?mock=1` (un FM-1 de ejemplo, solo para desarrollo). Parámetros: `&folder=FX|ENV|LFO|EDIT|ARP|SEL|SEQ|GLO|SAVE`, `&mode=edit|play`, `&save=1` (abre Guardar) y `&br=1` (abre el popup de sonidos).
 
 ## 3. Estructura de la pantalla
 

@@ -226,7 +226,7 @@ function connectMock() {
 function lost() {
   if (M.link) M.link.close();
   M.link = null;
-  $("gate").classList.remove("hide");
+  $("gate").classList.remove("hide"); document.body.classList.add("off"); $("cstate").textContent = "Sin conectar";
   say("Se perdió la conexión con el FM-1.", true);
   progress(0);
 }
@@ -248,7 +248,7 @@ async function load() {
     await readFavs();
     await rq(C.WATCH, [3]);
     progress(1);
-    $("gate").classList.add("hide");
+    $("gate").classList.add("hide"); document.body.classList.remove("off");
     $("cstate").textContent = M.mock ? "Datos de ejemplo" : "Conectado  USB MIDI";
     $("conn").classList.remove("off");
     keepAlive();
@@ -840,7 +840,7 @@ function drawScope(cv) {
 
 /* ------------------------------------------------------------------ start --- */
 $("connect").onclick = () => connectMidi();
-$("demo").onclick = () => connectMock();
 if (/^https?:$/.test(location.protocol)) $("dl").hidden = false;   /* (served, as on Vercel: the same file to keep offline) */
 $("conn").classList.add("off");
+renderNav();                                        /* (empty until the FM-1 is connected: Conectar in the middle) */
 if (QS.get("mock") === "1") connectMock();

@@ -245,10 +245,16 @@
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
   /* ---- Live: connecting, a folder's pages, what only the device edits */
-  .gate { position: fixed; inset: 0; z-index: 20; background: var(--page); display: grid; place-items: center; padding: 24px; }
+  .gate { grid-column: 2; grid-row: 1; z-index: 3; background: var(--page); display: grid; place-items: center; padding: 24px; }
+  .rail.l { grid-column: 1; grid-row: 1; } .work, .play { grid-column: 2; grid-row: 1; } .rail.r { grid-column: 3; grid-row: 1; }
+  /* not connected: the app is there, empty; what needs the FM-1 waits */
+  .off .snd, .off .right .where, .off .follow, .off #modes, .off .nav .nb:not(.est), .off .rail .act { opacity: .35; pointer-events: none; }
+  .off .rail .meta { display: none; }
+  .favs > .dvn { margin: 0 12px; border: 1px dashed var(--line-2); }
+  .dvp > .dvn:first-child { border: 1px dashed var(--line-2); }
   .gate.hide { display: none; }
   .gate .box { width: min(520px, 100%); display: flex; flex-direction: column; gap: 16px; }
-  .gate h1 { font-size: 28px; font-weight: 700; letter-spacing: -.02em; }
+  .gate h1 { font-size: 32px; font-weight: 800; letter-spacing: -.01em; }
   .gate p { color: var(--tx-2); font-size: 15px; line-height: 1.5; }
   .gate .btn { height: 52px; font-size: 15px; }
   .gate .btn.pri { background: var(--tx); color: var(--page); border-color: var(--tx); }

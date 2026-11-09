@@ -11,7 +11,7 @@
 __CSS__
 </style>
 </head>
-<body>
+<body class="off">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
   <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
@@ -36,24 +36,12 @@ __CSS__
   <symbol id="i-studio" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/><path d="M4 9h16M9 9v11"/></symbol>
 </svg>
 
-<div class="gate" id="gate">
-  <div class="box">
-    <h1>Clipper Live</h1>
-    <p>Conecta el FM-1 por USB a esta tablet y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.</p>
-    <button class="btn pri" id="connect">Conectar el FM-1</button>
-    <button class="btn" id="demo">Ver con datos de ejemplo</button>
-    <a class="btn dl" id="dl" href="clipper-live.html" download="clipper-live.html" hidden><svg class="i"><use href="#i-dl"/></svg>Descargar para usar sin internet</a>
-    <div class="bar2" aria-hidden="true"><b id="prog"></b></div>
-    <div class="msg" id="msg" role="status" aria-live="polite"></div>
-  </div>
-</div>
-
 <div class="app">
   <header class="bar">
-    <div class="conn" id="conn"><span class="dot"></span><div><b id="cname">FM-1</b><span id="cstate"></span></div></div>
+    <div class="conn" id="conn"><span class="dot"></span><div><b id="cname">FM-1</b><span id="cstate">Sin conectar</span></div></div>
     <div class="snd">
       <button class="ib" id="prev" aria-label="Favorito anterior"><svg class="i"><use href="#i-prev"/></svg></button>
-      <button class="now" id="now" aria-haspopup="dialog" aria-expanded="false" aria-controls="br"><span class="n"><span id="name"></span><svg class="i cv"><use href="#i-down"/></svg></span><span class="m" id="meta"></span></button>
+      <button class="now" id="now" aria-haspopup="dialog" aria-expanded="false" aria-controls="br"><span class="n"><span id="name">Sin conectar</span><svg class="i cv"><use href="#i-down"/></svg></span><span class="m" id="meta"></span></button>
       <button class="ib" id="next" aria-label="Favorito siguiente"><svg class="i"><use href="#i-next"/></svg></button>
       <button class="ib" id="favt" aria-pressed="false" aria-label="Favorito"><svg class="i"><use href="#i-star"/></svg></button>
       <button class="svb" id="saveb" data-save="1"><svg class="i"><use href="#i-disk"/></svg><span>Guardar</span></button>
@@ -69,11 +57,21 @@ __CSS__
     <aside class="rail l">
       <div class="ph"><h2>Salida</h2><span class="c">AUDIO USB</span></div>
       <div class="scope"><canvas id="scope"></canvas><button class="src" id="usb"><svg class="i"><use href="#i-usb"/></svg><span id="src">Usar audio USB del FM-1</span></button></div>
-      <section class="dvp" id="dvp" aria-label="La página del sinte"></section>
-      <section class="chg"><div class="ph"><h2>Cambios</h2><button class="clr" id="chgx" hidden>Borrar</button></div><div class="chl" id="chl" role="list"></div></section>
+      <section class="dvp" id="dvp" aria-label="La página del sinte"><p class="dvn">Aquí sale la página que el sinte tiene abierta, con sus 4 knobs.</p></section>
+      <section class="chg"><div class="ph"><h2>Cambios</h2><button class="clr" id="chgx" hidden>Borrar</button></div><div class="chl" id="chl" role="list"><p class="dvn">Aquí sale lo que cambies, en el sinte o aquí.</p></div></section>
       <dl class="meta" id="metal"></dl>
     </aside>
 
+    <section class="gate" id="gate" aria-labelledby="gt">
+      <div class="box">
+        <h1 id="gt">Conecta el FM-1</h1>
+        <p>Conéctalo por USB a esta tablet y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.</p>
+        <button class="btn pri" id="connect">Conectar el FM-1</button>
+        <div class="bar2" aria-hidden="true"><b id="prog"></b></div>
+        <div class="msg" id="msg" role="status" aria-live="polite"></div>
+        <a class="btn dl" id="dl" href="clipper-live.html" download="clipper-live.html" hidden><svg class="i"><use href="#i-dl"/></svg>Descargar para usar sin internet</a>
+      </div>
+    </section>
     <main class="work" id="edit"></main>
     <main class="play hide" id="play">
       <section class="xyw">
@@ -89,7 +87,7 @@ __CSS__
 
     <aside class="rail r">
       <div class="ph"><h2>Favoritos</h2><span class="c num" id="fcount"></span></div>
-      <div class="favs" id="favs" role="list"></div>
+      <div class="favs" id="favs" role="list"><p class="dvn">Tus favoritos del sinte salen aquí.</p></div>
     </aside>
   </div>
 

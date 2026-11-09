@@ -255,10 +255,16 @@
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
   /* ---- Live: connecting, a folder's pages, what only the device edits */
-  .gate { position: fixed; inset: 0; z-index: 20; background: var(--page); display: grid; place-items: center; padding: 24px; }
+  .gate { grid-column: 2; grid-row: 1; z-index: 3; background: var(--page); display: grid; place-items: center; padding: 24px; }
+  .rail.l { grid-column: 1; grid-row: 1; } .work, .play { grid-column: 2; grid-row: 1; } .rail.r { grid-column: 3; grid-row: 1; }
+  /* not connected: the app is there, empty; what needs the FM-1 waits */
+  .off .snd, .off .right .where, .off .follow, .off #modes, .off .nav .nb:not(.est), .off .rail .act { opacity: .35; pointer-events: none; }
+  .off .rail .meta { display: none; }
+  .favs > .dvn { margin: 0 12px; border: 1px dashed var(--line-2); }
+  .dvp > .dvn:first-child { border: 1px dashed var(--line-2); }
   .gate.hide { display: none; }
   .gate .box { width: min(520px, 100%); display: flex; flex-direction: column; gap: 16px; }
-  .gate h1 { font-size: 28px; font-weight: 700; letter-spacing: -.02em; }
+  .gate h1 { font-size: 32px; font-weight: 800; letter-spacing: -.01em; }
   .gate p { color: var(--tx-2); font-size: 15px; line-height: 1.5; }
   .gate .btn { height: 52px; font-size: 15px; }
   .gate .btn.pri { background: var(--tx); color: var(--page); border-color: var(--tx); }
@@ -542,7 +548,7 @@
 
 </style>
 </head>
-<body>
+<body class="off">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
   <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
@@ -567,24 +573,12 @@
   <symbol id="i-studio" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/><path d="M4 9h16M9 9v11"/></symbol>
 </svg>
 
-<div class="gate" id="gate">
-  <div class="box">
-    <h1>Clipper Live</h1>
-    <p>Conecta el FM-1 por USB a esta tablet y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.</p>
-    <button class="btn pri" id="connect">Conectar el FM-1</button>
-    <button class="btn" id="demo">Ver con datos de ejemplo</button>
-    <a class="btn dl" id="dl" href="clipper-live.html" download="clipper-live.html" hidden><svg class="i"><use href="#i-dl"/></svg>Descargar para usar sin internet</a>
-    <div class="bar2" aria-hidden="true"><b id="prog"></b></div>
-    <div class="msg" id="msg" role="status" aria-live="polite"></div>
-  </div>
-</div>
-
 <div class="app">
   <header class="bar">
-    <div class="conn" id="conn"><span class="dot"></span><div><b id="cname">FM-1</b><span id="cstate"></span></div></div>
+    <div class="conn" id="conn"><span class="dot"></span><div><b id="cname">FM-1</b><span id="cstate">Sin conectar</span></div></div>
     <div class="snd">
       <button class="ib" id="prev" aria-label="Favorito anterior"><svg class="i"><use href="#i-prev"/></svg></button>
-      <button class="now" id="now" aria-haspopup="dialog" aria-expanded="false" aria-controls="br"><span class="n"><span id="name"></span><svg class="i cv"><use href="#i-down"/></svg></span><span class="m" id="meta"></span></button>
+      <button class="now" id="now" aria-haspopup="dialog" aria-expanded="false" aria-controls="br"><span class="n"><span id="name">Sin conectar</span><svg class="i cv"><use href="#i-down"/></svg></span><span class="m" id="meta"></span></button>
       <button class="ib" id="next" aria-label="Favorito siguiente"><svg class="i"><use href="#i-next"/></svg></button>
       <button class="ib" id="favt" aria-pressed="false" aria-label="Favorito"><svg class="i"><use href="#i-star"/></svg></button>
       <button class="svb" id="saveb" data-save="1"><svg class="i"><use href="#i-disk"/></svg><span>Guardar</span></button>
@@ -600,11 +594,21 @@
     <aside class="rail l">
       <div class="ph"><h2>Salida</h2><span class="c">AUDIO USB</span></div>
       <div class="scope"><canvas id="scope"></canvas><button class="src" id="usb"><svg class="i"><use href="#i-usb"/></svg><span id="src">Usar audio USB del FM-1</span></button></div>
-      <section class="dvp" id="dvp" aria-label="La página del sinte"></section>
-      <section class="chg"><div class="ph"><h2>Cambios</h2><button class="clr" id="chgx" hidden>Borrar</button></div><div class="chl" id="chl" role="list"></div></section>
+      <section class="dvp" id="dvp" aria-label="La página del sinte"><p class="dvn">Aquí sale la página que el sinte tiene abierta, con sus 4 knobs.</p></section>
+      <section class="chg"><div class="ph"><h2>Cambios</h2><button class="clr" id="chgx" hidden>Borrar</button></div><div class="chl" id="chl" role="list"><p class="dvn">Aquí sale lo que cambies, en el sinte o aquí.</p></div></section>
       <dl class="meta" id="metal"></dl>
     </aside>
 
+    <section class="gate" id="gate" aria-labelledby="gt">
+      <div class="box">
+        <h1 id="gt">Conecta el FM-1</h1>
+        <p>Conéctalo por USB a esta tablet y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.</p>
+        <button class="btn pri" id="connect">Conectar el FM-1</button>
+        <div class="bar2" aria-hidden="true"><b id="prog"></b></div>
+        <div class="msg" id="msg" role="status" aria-live="polite"></div>
+        <a class="btn dl" id="dl" href="clipper-live.html" download="clipper-live.html" hidden><svg class="i"><use href="#i-dl"/></svg>Descargar para usar sin internet</a>
+      </div>
+    </section>
     <main class="work" id="edit"></main>
     <main class="play hide" id="play">
       <section class="xyw">
@@ -620,7 +624,7 @@
 
     <aside class="rail r">
       <div class="ph"><h2>Favoritos</h2><span class="c num" id="fcount"></span></div>
-      <div class="favs" id="favs" role="list"></div>
+      <div class="favs" id="favs" role="list"><p class="dvn">Tus favoritos del sinte salen aquí.</p></div>
     </aside>
   </div>
 
@@ -877,7 +881,7 @@ function connectMock() {
 function lost() {
   if (M.link) M.link.close();
   M.link = null;
-  $("gate").classList.remove("hide");
+  $("gate").classList.remove("hide"); document.body.classList.add("off"); $("cstate").textContent = "Sin conectar";
   say("Se perdió la conexión con el FM-1.", true);
   progress(0);
 }
@@ -899,7 +903,7 @@ async function load() {
     await readFavs();
     await rq(C.WATCH, [3]);
     progress(1);
-    $("gate").classList.add("hide");
+    $("gate").classList.add("hide"); document.body.classList.remove("off");
     $("cstate").textContent = M.mock ? "Datos de ejemplo" : "Conectado  USB MIDI";
     $("conn").classList.remove("off");
     keepAlive();
@@ -1762,9 +1766,9 @@ $("edit").addEventListener("keydown", (e) => {
 
 /* ------------------------------------------------------------------ start --- */
 $("connect").onclick = () => connectMidi();
-$("demo").onclick = () => connectMock();
 if (/^https?:$/.test(location.protocol)) $("dl").hidden = false;   /* (served, as on Vercel: the same file to keep offline) */
 $("conn").classList.add("off");
+renderNav();                                        /* (empty until the FM-1 is connected: Conectar in the middle) */
 if (QS.get("mock") === "1") connectMock();
 
 </script>
