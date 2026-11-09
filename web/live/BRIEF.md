@@ -17,7 +17,8 @@ Clipper Live es una **web app para tablet** que va al lado del sintetizador **FM
 Es un solo archivo HTML, sin librerías, que funciona **sin conexión** abierto desde las Descargas de la tablet en Chrome. También se puede publicar en Vercel, con un botón para descargar ese mismo archivo.
 
 - **Usuario:** un músico tocando o programando sonidos, con el sinte delante. Muchas veces en penumbra (estudio o escenario).
-- **Dispositivo:** tablet Android Huawei, **LCD de 11.5" a 2.8K (2800 × 1840 px, 3:2)**, en Chrome. Con densidad 2 son unos **1400 × 920 px CSS**, alrededor de 1400 × 830 de ventana en horizontal con las barras de Chrome, o 920 × 1330 en vertical; con menos densidad hay más espacio, por ejemplo 1600 × 950. Hay un botón de pantalla completa para quitar las barras de Chrome. Se usa con el dedo, no con ratón.
+- **Dispositivo (el único):** tablet Android Huawei, **LCD de 11.5" a 2.8K (2800 × 1840 px, 3:2)**, en Chrome, **siempre en horizontal**. Con densidad 2 son unos **1400 × 920 px CSS**, alrededor de **1400 × 830** de ventana con las barras de Chrome; con menos densidad hay más espacio, por ejemplo **1600 × 950**. Hay un botón de pantalla completa que quita las barras de Chrome y fija el horizontal. Se usa con el dedo, no con ratón.
+- **Sin otras versiones responsive.** No se diseña para móvil, PC ni la tablet en vertical: no se van a usar. Una auditoría revisa solo 1400 × 830 y 1600 × 950 en horizontal y no propone layouts para otras pantallas.
 - **Modo (según Impeccable):** **Operate**. La interfaz es una herramienta: importan la lectura rápida, la consistencia y que todo responda al dedo, por encima de la expresión.
 
 ## 2. Arquitectura (lo que una auditoría debe saber)
@@ -144,8 +145,8 @@ Sugerencias para Claude Design o Impeccable (`/impeccable critique web/live`, `/
 4. **Táctil:** tamaños de objetivo, el arrastre horizontal frente al scroll, los tiradores de la envolvente en los bordes.
 5. **Contraste y legibilidad en penumbra:** sobre todo `--tx-3`, las etiquetas de 11 px y el texto negro sobre los colores de los knobs.
 6. **Coherencia de TOCAR y del popup de sonidos** con el sistema nuevo (cuadrado, bloques, Terminus).
-7. **Responsive:** la tablet en vertical (920 × 1330: sin riel izquierdo, barra compacta), y &ge; 1500 px (rieles más anchos).
+7. **Tamaños:** solo la tablet en horizontal, a 1400 × 830 y 1600 × 950 (desde 1500 px los rieles se ensanchan). Ni móvil, ni PC, ni vertical: no pedir ni proponer esas versiones.
 8. **Accesibilidad:** roles (`slider`, `switch`, `radiogroup`), `aria-valuenow`, el foco visible y el teclado en los faders.
 9. **Microcopy en español:** que esté claro, sea breve y nombre las acciones igual en todas partes («Guardar», «Descartar lo editado»).
 
-**Al proponer cambios, conservar:** los nombres del sinte en inglés, los colores por knob, el cuadrado, la Terminus para los valores, el negro y el archivo único sin conexión.
+**Al proponer cambios, conservar:** los nombres del sinte en inglés, los colores por knob, el cuadrado, la Terminus para los valores, el negro, el archivo único sin conexión y una sola pantalla de destino (la tablet en horizontal).
