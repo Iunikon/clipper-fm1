@@ -841,5 +841,6 @@ function drawScope(cv) {
 /* ------------------------------------------------------------------ start --- */
 $("connect").onclick = () => connectMidi();
 $("demo").onclick = () => connectMock();
+if (/^https?:$/.test(location.protocol)) $("dl").hidden = false;   /* (served, as on Vercel: the same file to keep offline) */
 $("conn").classList.add("off");
 if (QS.get("mock") === "1") connectMock();

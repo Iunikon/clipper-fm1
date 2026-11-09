@@ -252,6 +252,8 @@
   .gate p { color: var(--tx-2); font-size: 15px; line-height: 1.5; }
   .gate .btn { height: 52px; font-size: 15px; }
   .gate .btn.pri { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .gate .btn.dl { background: none; border-style: dashed; border-color: var(--line-2); color: var(--tx-2); text-decoration: none; }
+  .gate .btn.dl[hidden] { display: none; }
   .gate .msg { min-height: 20px; color: var(--tx-2); font-size: 13px; }
   .gate .msg.err { color: var(--k4); }
   .gate .bar2 { height: 4px; border-radius: 0; background: var(--raised); overflow: hidden; }

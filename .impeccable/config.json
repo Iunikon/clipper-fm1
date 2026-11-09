@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "web/live/live.html"
+        ],
+        "createdAt": "2026-11-09T04:33:45.112Z",
+        "reason": "template: its CSS is the __CSS__ placeholder until tools/live_build.py inlines live.css; the built web/live.html is checked instead"
+      }
+    ]
+  }
+}

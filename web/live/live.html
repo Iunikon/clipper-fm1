@@ -19,6 +19,7 @@ __CSS__
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-undo" viewBox="0 0 24 24"><path d="M4 5v5h5M5 10a8 8 0 1 1 1.5 7"/></symbol>
   <symbol id="i-disk" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></symbol>
   <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v14M12 3l-2.5 3M12 3l2.5 3M12 13l-4-2.5V8M12 15l4-2.5V10"/><circle cx="12" cy="19" r="2"/></symbol>
@@ -41,6 +42,7 @@ __CSS__
     <p>Conecta el FM-1 por USB a esta tablet y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.</p>
     <button class="btn pri" id="connect">Conectar el FM-1</button>
     <button class="btn" id="demo">Ver con datos de ejemplo</button>
+    <a class="btn dl" id="dl" href="clipper-live.html" download="clipper-live.html" hidden><svg class="i"><use href="#i-dl"/></svg>Descargar para usar sin internet</a>
     <div class="bar2" aria-hidden="true"><b id="prog"></b></div>
     <div class="msg" id="msg" role="status" aria-live="polite"></div>
   </div>
