@@ -530,11 +530,13 @@ INFO ends with 15. Five commands (firmware/src/editor_live.c) for an editor that
 
 | cmd | Request args | Reply args |
 | --- | --- | --- |
-| 97 PAGE | — | home (0/1), family, page (index in params.c `PAGES`), title string, then what the 4 knobs edit: scope (0 the sound's `P_*`, 1 the globals `G_*`, 2 nothing `SET` reaches) and 4 ids (127: none). On HOME the engine's four. Also a push while watched, when the page shown or HOME changes |
+| 97 PAGE | — | home (0/1), family, page (index in params.c `PAGES`), title string, then what the 4 knobs edit: scope (0 the sound's `P_*`, 1 the globals `G_*`, 2 nothing `SET` reaches) and 4 ids (127: none). On HOME the engine's four. Then HOME's four ids whatever the page (127: the drum track). Also a push while watched, when the page shown or HOME changes |
 | 98 FAVS | — | n, the favourite playing (127: none), then n × (engine (NENGINES: a user preset), preset or user slot, kind string, name string) |
 | 99 FAV_GO | index | index, rc (0 loaded, 1 no such favourite). Loads it as SAVE > FAVS does (a `RELOAD` push follows) |
 | 100 FAV_SET | add (1) / remove (0) | n. The sound playing becomes a favourite or stops being one, as KNOB 4 on PRESETS |
 | 101 FAVS_CHANGED (push) | — | — : the favourites changed on the device; read `FAVS` again. Not after the editor's own `FAV_SET` |
+| 102 LIST | start (2 × 7 bits), count (1..16) | total (2 × 7 bits), start (2 × 7 bits), n, then n × (engine, preset or user slot, kind string, name string): the list PRESETS walks, every factory sound by kind then the user presets, without the FAV rows |
+| 103 LIST_GO | n (2 × 7 bits) | n (2 × 7 bits), rc (0 loaded, 1 no such entry). Loads entry n of `LIST` (a `RELOAD` push follows) |
 
 `PAGE` and `FAVS_CHANGED` are pushed before `RELOAD` / `CHANGED`, one per pass. The family numbers are params.c's `FAM_*`
 (0 HOME, 1 ENV, 2 LFO, 3 FX, 4 SEL, 5 EDIT, 6 GLO, 7 SAVE, 8 ARP, 9 SEQ, 10 TRACKS).

@@ -137,6 +137,43 @@ int main(void)
     check(arg()[0] == 2u && !fav_has(fav_key()), "FAV_SET 0: the sound playing out again");
 
     while (fav_list(b)) { preset_go(0); fav_toggle(0); }
+
+    /* LIST: the list PRESETS walks, 16 at a time; LIST_GO loads an entry; PAGE carries HOME's four on any page */
+    {
+        uint8_t q[3];
+        uint32_t tot, n, i, ok = 1, e, kk;
+        const uint8_t *x;
+        base_pos(&total);
+        q[0] = 0; q[1] = 0; q[2] = 16; ed(ED_LIST, q, 3);
+        tot = arg()[0] | arg()[1] << 7;
+        n = arg()[4];
+        x = arg() + 5;
+        for (i = 0; i < n; i++) {                            /* entry i as base_at(i), its kind and name */
+            e = base_at(i, &kk);
+            ok &= x[0] == e && x[1] == kk && !strcmp((const char *)x + 2, base_kind(i));
+            x += 2 + strlen((const char *)x + 2) + 1;
+            ok &= !strcmp((const char *)x, ENGINES[e]->presets[kk].name);
+            x += strlen((const char *)x) + 1;
+        }
+        check(tot == total && n == 16u && ok, "LIST 0..15: the total and each entry's engine, preset, kind and name");
+        q[0] = (uint8_t)((total - 2u) & 127u); q[1] = (uint8_t)((total - 2u) >> 7); q[2] = 16; ed(ED_LIST, q, 3);
+        check(arg()[4] == 2u && (uint32_t)(arg()[2] | arg()[3] << 7) == total - 2u, "LIST at the end: what is left (2)");
+        q[0] = 37; q[1] = 0; ed(ED_LIST_GO, q, 2);
+        k = arg()[2];
+        frames_pushing(2, 0, 0);
+        check(k == 0u && base_pos(&total) == 37u, "LIST_GO 37: entry 37 loaded");
+        q[0] = 127; q[1] = 127; ed(ED_LIST_GO, q, 2);
+        check(arg()[2] == 1u && base_pos(&total) == 37u, "LIST_GO past the end: refused, nothing loaded");
+        open_family(FAM_ENV); ui_frame();
+        ed(ED_PAGE, a, 0);
+        {
+            const uint8_t *y = arg() + 3 + strlen((const char *)arg() + 3) + 1;   /* scope, 4 ids, then HOME's 4 */
+            int16_t *vp;
+            home_param(0, &vp);
+            check(y[0] == 0u && y[1] == P_ATK && y[5] == (uint32_t)(vp - TSEL->p), "PAGE on ENV: its ids, and HOME's four after them");
+        }
+        go_home(); ui_frame();
+    }
     printf("live: %s\n", fails ? "FAILED" : "all passed");
     return fails != 0;
 }

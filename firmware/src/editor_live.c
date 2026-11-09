@@ -3,14 +3,18 @@
  * not: the page the device shows, and the favourites (SAVE > FAVS) to read, load and mark.
  *   97 PAGE           -> home (0/1), family, page (index in PAGES), title, then what the 4 knobs edit there: a scope
  *                        (0 the sound's p[], 1 song.g[], 2 none the editor can SET) and 4 ids (127: none). On HOME the
- *                        engine's four (home_param). Also pushed while watched: the page shown changed
+ *                        engine's four (home_param). Then HOME's four ids whatever the page (127: none, the drum
+ *                        track). Also pushed while watched: the page shown changed
  *   98 FAVS           -> n, the favourite playing (127: none), then n x (engine (NENGINES: a user preset), preset or
  *                        user slot, kind, name)
  *   99 FAV_GO idx     -> idx, rc (0 loaded, 1 no such favourite). Loads it as SAVE > FAVS does
  *  100 FAV_SET add    -> n. Adds (1) or removes (0) the sound playing, as KNOB 4 on PRESETS
  *  101 FAVS_CHANGED   (push) the favourites changed on the device: read FAVS again
+ *  102 LIST start count -> total, start, n, then n x (engine, preset or user slot, kind, name): the list PRESETS walks
+ *                        (every factory sound by kind, then the user presets; no FAV rows). start and total: 2 x 7 bits
+ *  103 LIST_GO n      -> n (2 x 7 bits), rc (0 loaded, 1 no such entry). Loads entry n of LIST
  * Included by editor.c after ui.c (fav_list, preset_go, fav_toggle). */
-enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED };
+enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO };
 static struct {
     uint8_t home, page;
     uint32_t fsig;
@@ -41,6 +45,25 @@ UI_SMALL static void ed_lv_page(void)
         else
             ed_b(sc == 2u || pg->id[k] == 0xFFu ? 127u : pg->id[k]);
     }
+    for (k = 0; k < 4u; k++) {                       /* (HOME's four, for a view that always shows them) */
+        if (is_drum(TSEL))
+            ed_b(127u);
+        else
+            home_param(k, &vp), ed_b((uint32_t)(vp - TSEL->p));
+    }
+}
+UI_SMALL static void ed_lv_entry(uint32_t n)                   /* base list entry n: engine, preset or slot, kind, name */
+{
+    uint32_t k, e = base_at(n, &k);
+    char nm[13];
+    ed_b(e);
+    ed_b(k);
+    ed_str(base_kind(n), 4);
+    if (e == NENGINES)
+        up_name(k, nm);
+    else
+        str_cpy(nm, ENGINES[e]->presets[k].name, sizeof nm);
+    ed_str(nm, 12);
 }
 UI_SMALL static void ed_lv_shadow(void)                            /* WATCH: in sync */
 {
@@ -70,8 +93,7 @@ UI_SMALL static int ed_lv_sync(void)                               /* while watc
 }
 UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   /* 1: a Live command (reply built) */
 {
-    uint32_t b[FAV_N], nf, i, total, cur, k, e;
-    char nm[13];
+    uint32_t b[FAV_N], nf, i, total, cur, k, n;
     switch (cmd) {
     case ED_PAGE:
         ed_lv_page();
@@ -83,23 +105,42 @@ UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   
         for (i = 0; i < nf && b[i] != cur; i++)
             ;
         ed_b(i < nf && !is_drum(TSEL) ? i : 127u);
-        for (i = 0; i < nf; i++) {
-            e = base_at(b[i], &k);
-            ed_b(e);
-            ed_b(k);
-            ed_str(base_kind(b[i]), 4);
-            if (e == NENGINES)
-                up_name(k, nm);
-            else
-                str_cpy(nm, ENGINES[e]->presets[k].name, sizeof nm);
-            ed_str(nm, 12);
-        }
+        for (i = 0; i < nf; i++)
+            ed_lv_entry(b[i]);
         return 1;
     case ED_FAV_GO:
         i = na ? a[0] : 127u;
         ed_b(i);
         if (i < fav_list(b) && !is_drum(TSEL)) {
             preset_go(i);
+            ed_b(0);
+        } else {
+            ed_b(1);
+        }
+        return 1;
+    case ED_LIST:                                   /* start (2 x 7), count -> total (2 x 7), start (2 x 7), n, entries */
+        base_pos(&total);
+        i = na >= 2u ? (uint32_t)(a[0] | a[1] << 7) : 0u;
+        n = na >= 3u && a[2] && a[2] <= 16u ? a[2] : 16u;
+        if (i > total)
+            i = total;
+        if (n > total - i)
+            n = total - i;
+        ed_b(total);
+        ed_b(total >> 7);
+        ed_b(i);
+        ed_b(i >> 7);
+        ed_b(n);
+        for (k = 0; k < n; k++)
+            ed_lv_entry(i + k);
+        return 1;
+    case ED_LIST_GO:                                /* n (2 x 7) -> n, rc */
+        base_pos(&total);
+        i = na >= 2u ? (uint32_t)(a[0] | a[1] << 7) : 0xFFFFu;
+        ed_b(i);
+        ed_b(i >> 7);
+        if (i < total && !is_drum(TSEL)) {
+            preset_go(fav_list(b) + i);
             ed_b(0);
         } else {
             ed_b(1);
