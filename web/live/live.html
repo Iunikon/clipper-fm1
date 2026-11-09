@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Clipper Live</title>
+<!-- Clipper Live: the tablet beside the FM-1 (a personal build). Built by tools/live_build.py from web/live/: one file,
+     the font and the mock's data inside, so it runs offline from the tablet's downloads. -->
+<style>
+__CSS__
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></symbol>
+  <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v14M12 3l-2.5 3M12 3l2.5 3M12 13l-4-2.5V8M12 15l4-2.5V10"/><circle cx="12" cy="19" r="2"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v8a1 1 0 01-1 1h-4v-6h-6v6H5a1 1 0 01-1-1z"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M5 7h8M17 7h2M5 17h2M11 17h8"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+  <symbol id="i-env" viewBox="0 0 24 24"><path d="M3 19L8 5l4 7h5l4 7"/></symbol>
+  <symbol id="i-lfo" viewBox="0 0 24 24"><path d="M3 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0"/></symbol>
+  <symbol id="i-fx" viewBox="0 0 24 24"><path d="M12 4v4M12 16v4M4 12h4M16 12h4M6.5 6.5l2.5 2.5M15 15l2.5 2.5M6.5 17.5L9 15M15 9l2.5-2.5"/></symbol>
+  <symbol id="i-sel" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="16" r="2"/></symbol>
+  <symbol id="i-arp" viewBox="0 0 24 24"><path d="M4 18h4v-4h4v-4h4V6h4"/></symbol>
+  <symbol id="i-seq" viewBox="0 0 24 24"><rect x="4" y="5" width="4" height="14" rx="1"/><rect x="10" y="5" width="4" height="14" rx="1"/><rect x="16" y="5" width="4" height="14" rx="1"/></symbol>
+  <symbol id="i-glo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.5 2.5 2.5 13.5 0 16M12 4c-2.5 2.5-2.5 13.5 0 16"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M4 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2z"/></symbol>
+  <symbol id="i-studio" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/></symbol>
+</svg>
+
+<div class="gate" id="gate">
+  <div class="box">
+    <h1>Clipper Live</h1>
+    <p>Conecta el FM-1 por USB a esta tablet y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.</p>
+    <button class="btn pri" id="connect">Conectar el FM-1</button>
+    <button class="btn" id="demo">Ver con datos de ejemplo</button>
+    <div class="bar2" aria-hidden="true"><b id="prog"></b></div>
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<div class="app">
+  <header class="bar">
+    <div class="conn" id="conn"><span class="dot"></span><div><b id="cname">FM-1</b><span id="cstate"></span></div></div>
+    <div class="snd">
+      <button class="ib" id="prev" aria-label="Favorito anterior"><svg class="i"><use href="#i-prev"/></svg></button>
+      <button class="now" id="now" aria-haspopup="dialog" aria-expanded="false" aria-controls="br"><span class="n"><span id="name"></span><svg class="i cv"><use href="#i-down"/></svg></span><span class="m" id="meta"></span></button>
+      <button class="ib" id="next" aria-label="Favorito siguiente"><svg class="i"><use href="#i-next"/></svg></button>
+      <button class="ib" id="favt" aria-pressed="false" aria-label="Favorito"><svg class="i"><use href="#i-star"/></svg></button>
+    </div>
+    <div class="right">
+      <div class="where">En el sinte <b id="where"></b></div>
+      <button class="follow" id="follow" aria-pressed="true"><i></i>Seguir</button>
+      <div class="seg" role="group" aria-label="Modo" id="modes"><button aria-pressed="true" data-mode="edit">EDITAR</button><button aria-pressed="false" data-mode="play">TOCAR</button></div>
+    </div>
+  </header>
+
+  <div class="body">
+    <aside class="rail l">
+      <div class="ph"><h2>Salida</h2><span class="c">AUDIO USB</span></div>
+      <div class="scope"><canvas id="scope"></canvas><span class="src" id="src">Sin audio</span></div>
+      <dl class="meta" id="metal"></dl>
+      <div class="act">
+        <button class="btn" id="favb"><svg class="i"><use href="#i-star"/></svg><span>Marcar como favorito</span></button>
+        <button class="btn" id="usb"><svg class="i"><use href="#i-usb"/></svg><span>Usar audio USB del FM-1</span></button>
+      </div>
+    </aside>
+
+    <main class="work" id="edit"></main>
+    <main class="play hide" id="play">
+      <section class="xyw">
+        <div class="xyh">
+          <label class="pick"><span class="ax" style="background:var(--k1)"></span>Horizontal <select id="xsel"></select></label>
+          <label class="pick"><span class="ax" style="background:var(--k2)"></span>Vertical <select id="ysel"></select></label>
+        </div>
+        <div class="xy" id="xy"><canvas id="xyscope"></canvas><span class="cx" id="cx"></span><span class="cy" id="cy"></span><span class="dot" id="dot"></span>
+          <span class="rd x" id="xr"></span><span class="rd y" id="yr"></span></div>
+      </section>
+      <section class="fds"><div class="ph"><h2>Macros</h2><span class="c">EDIT  MACROS</span></div><div class="fdr" id="fdr"></div></section>
+    </main>
+
+    <aside class="rail r">
+      <div class="ph"><h2>Favoritos</h2><span class="c num" id="fcount"></span></div>
+      <div class="favs" id="favs" role="list"></div>
+    </aside>
+  </div>
+
+  <nav class="nav" id="nav" aria-label="Carpetas"></nav>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<section class="br" id="br" role="dialog" aria-modal="false" aria-labelledby="brt">
+  <div class="brh"><h2 id="brt">Sonidos</h2><span class="c" id="brc"></span>
+    <button class="ib" id="brx" aria-label="Cerrar"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="brb"><nav class="kinds" id="kinds" aria-label="Carpetas de sonidos"></nav><div class="snds" id="snds" role="list"></div></div>
+  <div class="brf"><span>Toca un sonido para escucharlo en el FM-1; el panel queda abierto.</span>
+    <div class="alg"><button class="btn" data-kstep="-1"><svg class="i"><use href="#i-prev"/></svg>Carpeta anterior</button><button class="btn" data-kstep="1">Carpeta siguiente<svg class="i"><use href="#i-next"/></svg></button></div></div>
+</section>
+<div class="toast" id="toast" role="status" aria-live="polite"><i id="tq"></i><span id="tt"></span></div>
+
+<script type="application/json" id="mockdata">__MOCK__</script>
+<script>
+__JS__
+</script>
+</body>
+</html>
