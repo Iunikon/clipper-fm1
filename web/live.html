@@ -20,7 +20,7 @@
     --k1: #287cff; --k2: #1ecc70; --k3: #ffc618; --k4: #ff621a; --fav: #ff621a; --ok: #1ecc70; --studio: #9d8cff;
     --sans: system-ui, Roboto, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     --num: "Terminus", ui-monospace, monospace;
-    --r: 10px; --r-s: 6px;
+    --r: 0; --r-s: 0;
     --ease: cubic-bezier(.2, .8, .2, 1);
     color-scheme: dark;
   }
@@ -31,8 +31,8 @@
   ::selection { background: var(--tx); color: var(--page); }
   * { scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
   button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
-  :focus-visible { outline: 2px solid var(--tx); outline-offset: 2px; border-radius: var(--r-s); }
-  svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  :focus-visible { outline: 2px solid var(--tx); outline-offset: 2px; border-radius: 0; }
+  svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: square; stroke-linejoin: miter; flex: none; }
   .num { font-family: var(--num); -webkit-font-smoothing: none; letter-spacing: 0; }
 
   .app { display: grid; grid-template-rows: 64px minmax(0, 1fr) 72px; height: 100dvh; }
@@ -41,12 +41,12 @@
   .bar { display: grid; grid-template-columns: 240px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 0 16px;
     background: var(--panel); border-bottom: 1px solid var(--line); }
   .conn { display: flex; align-items: center; gap: 10px; min-width: 0; }
-  .conn .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px rgba(30, 204, 112, .16); flex: none; }
+  .conn .dot { width: 8px; height: 8px; border-radius: 0; background: var(--ok); box-shadow: 0 0 0 3px rgba(30, 204, 112, .16); flex: none; }
   .conn.off .dot { background: var(--tx-3); box-shadow: none; }
   .conn b { font-weight: 600; }
   .conn span { color: var(--tx-2); font-size: 12px; display: block; }
   .snd { display: flex; align-items: center; gap: 8px; justify-self: center; min-width: 0; }
-  .ib { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--r); color: var(--tx-2);
+  .ib { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 0; color: var(--tx-2);
     transition: background .15s var(--ease), color .15s var(--ease); }
   .ib:hover { background: var(--raised); color: var(--tx); }
   .ib:active { background: var(--press); }
@@ -54,7 +54,7 @@
   .ib.fav svg { fill: currentColor; }
   .now { display: flex; flex-direction: column; align-items: center; min-width: 220px; padding: 0 8px; }
   .now .n { font-size: 20px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
-  .now { border-radius: var(--r); padding: 4px 12px; transition: background .15s var(--ease); }
+  .now { border-radius: 0; padding: 4px 12px; transition: background .15s var(--ease); }
   .now:hover, .now[aria-expanded="true"] { background: var(--raised); }
   .now .cv { width: 16px; height: 16px; color: var(--tx-3); transition: transform .2s var(--ease); }
   .now[aria-expanded="true"] .cv { transform: rotate(180deg); }
@@ -63,8 +63,8 @@
   .right { display: flex; align-items: center; gap: 16px; }
   .where { display: flex; align-items: center; gap: 8px; color: var(--tx-2); font-size: 12px; }
   .where b { color: var(--tx); font-weight: 600; font-size: 13px; }
-  .seg { display: flex; background: var(--page); border: 1px solid var(--line); border-radius: var(--r); padding: 3px; }
-  .seg button { height: 36px; padding: 0 16px; border-radius: 7px; color: var(--tx-2); font-weight: 600; font-size: 13px; letter-spacing: .02em;
+  .seg { display: flex; background: var(--page); border: 1px solid var(--line); border-radius: 0; padding: 3px; }
+  .seg button { height: 36px; padding: 0 16px; border-radius: 0; color: var(--tx-2); font-weight: 600; font-size: 13px; letter-spacing: .02em;
     transition: background .15s var(--ease), color .15s var(--ease); }
   .seg button[aria-pressed="true"] { background: var(--tx); color: var(--page); }
 
@@ -76,7 +76,7 @@
   .ph { display: flex; align-items: center; justify-content: space-between; padding: 16px 16px 8px; }
   .ph h2 { font-size: 13px; font-weight: 600; letter-spacing: .01em; }
   .ph .c { color: var(--tx-3); font-size: 12px; }
-  .scope { margin: 0 16px; height: 152px; border-radius: var(--r); background: var(--page); border: 1px solid var(--line); position: relative; overflow: hidden; }
+  .scope { margin: 0 16px; height: 152px; border-radius: 0; background: var(--page); border: 1px solid var(--line); position: relative; overflow: hidden; }
   .scope canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
   .scope .src { position: absolute; left: 10px; bottom: 8px; font-size: 11px; color: var(--tx-3); }
   .meta { padding: 16px; display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; font-size: 13px; border-bottom: 1px solid var(--line); }
@@ -84,7 +84,7 @@
   .meta dd { text-align: right; }
   .meta dd .k { color: var(--fav); }
   .act { padding: 16px; display: grid; gap: 8px; }
-  .btn { height: 44px; border-radius: var(--r); background: var(--raised); border: 1px solid var(--line); display: flex; align-items: center;
+  .btn { height: 44px; border-radius: 0; background: var(--raised); border: 1px solid var(--line); display: flex; align-items: center;
     justify-content: center; gap: 8px; font-weight: 600; font-size: 13px; transition: background .15s var(--ease), border-color .15s var(--ease); }
   .btn:hover { border-color: var(--line-2); }
   .btn:active { background: var(--press); }
@@ -94,7 +94,7 @@
   /* the favourites: the device's 16, numbered as SAVE > FAVS counts them */
   .favs { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
   .fv { width: 100%; display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 4px 10px; align-items: center; padding: 10px 8px;
-    border-radius: var(--r-s); text-align: left; transition: background .15s var(--ease); }
+    border-radius: 0; text-align: left; transition: background .15s var(--ease); }
   .fv:hover { background: var(--raised); }
   .fv .i { grid-row: span 2; color: var(--tx-3); font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; }
   .fv .n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -110,17 +110,17 @@
   /* ---- EDITAR: the rack. A row a page of the FM-1, its four knobs in their colours, the page's shape at the end */
   .work { min-height: 0; overflow-y: auto; padding: 16px; display: grid; gap: 12px; align-content: start; background: var(--page); }
   .row { display: grid; grid-template-columns: 164px repeat(4, minmax(0, 1fr)) 112px; background: var(--panel); border: 1px solid var(--line);
-    border-radius: var(--r); min-height: 112px; overflow: hidden; }
+    border-radius: 0; min-height: 112px; overflow: hidden; }
   .row.dev { border-color: var(--line-2); box-shadow: inset 2px 0 0 var(--tx); }
   .rh { padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid var(--line); }
   .rh h3 { font-size: 18px; line-height: 1.2; font-weight: 600; letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; }
   .rh h3 svg { width: 18px; height: 18px; color: var(--tx-2); }
   .rh .pg { font-size: 12px; color: var(--tx-3); }
-  .rh .go { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--tx-2); margin-left: -4px; padding: 4px; border-radius: var(--r-s); width: max-content; }
+  .rh .go { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--tx-2); margin-left: -4px; padding: 4px; border-radius: 0; width: max-content; }
   .rh .go:hover { color: var(--tx); background: var(--raised); }
   .rh .go svg { width: 14px; height: 14px; }
   .rh .live { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--tx); }
-  .rh .live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--tx); }
+  .rh .live::before { content: ""; width: 6px; height: 6px; border-radius: 0; background: var(--tx); }
   .kn { display: grid; grid-template-columns: minmax(0, 1fr) 32px; grid-template-areas: "l a" "v v"; align-content: center; gap: 10px 8px; padding: 14px;
     border-right: 1px solid var(--line); touch-action: none; cursor: ns-resize; min-width: 0; transition: background .15s var(--ease); }
   .kn:hover { background: #111114; }
@@ -128,7 +128,7 @@
   .kn svg { grid-area: a; width: 32px; height: 32px; }
   .kn .tx { display: contents; }
   .kn .l { grid-area: l; min-width: 0; font-size: 12px; color: var(--tx-2); font-weight: 600; letter-spacing: .02em; display: flex; align-items: center; gap: 6px; }
-  .kn .l i { width: 6px; height: 6px; border-radius: 2px; background: var(--c); }
+  .kn .l i { width: 6px; height: 6px; border-radius: 0; background: var(--c); }
   .kn .v { grid-area: v; font-family: var(--num); font-size: 32px; line-height: 32px; color: var(--tx); white-space: nowrap; -webkit-font-smoothing: none; }
   .kn .v small { font-size: 16px; color: var(--tx-3); margin-left: 4px; }
   .kn.hot .v { color: var(--c); }
@@ -139,47 +139,47 @@
 
   /* ---- TOCAR: two parameters under one finger, the macros as faders */
   .play { min-height: 0; padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; background: var(--page); }
-  .xyw { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+  .xyw { background: var(--panel); border: 1px solid var(--line); border-radius: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
   .xyh { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); gap: 12px; }
   .pick { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--tx-2); }
-  .pick select { font: 600 13px var(--sans); color: var(--tx); background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-s); height: 36px; padding: 0 8px; }
-  .pick .ax { width: 8px; height: 8px; border-radius: 2px; }
-  .xy { position: relative; margin: 12px; border-radius: var(--r-s); touch-action: none; cursor: crosshair; min-height: 0;
+  .pick select { font: 600 13px var(--sans); color: var(--tx); background: var(--raised); border: 1px solid var(--line); border-radius: 0; height: 36px; padding: 0 8px; }
+  .pick .ax { width: 8px; height: 8px; border-radius: 0; }
+  .xy { position: relative; margin: 12px; border-radius: 0; touch-action: none; cursor: crosshair; min-height: 0;
     background: var(--page) repeating-linear-gradient(0deg, transparent 0 calc(25% - 1px), var(--line) calc(25% - 1px) 25%),
       repeating-linear-gradient(90deg, transparent 0 calc(25% - 1px), var(--line) calc(25% - 1px) 25%); border: 1px solid var(--line); }
   .xy canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .18; }
   .xy .cx, .xy .cy { position: absolute; background: var(--tx); opacity: .25; pointer-events: none; }
   .xy .cx { top: 0; bottom: 0; width: 1px; } .xy .cy { left: 0; right: 0; height: 1px; }
-  .xy .dot { position: absolute; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%; border: 2px solid var(--tx);
+  .xy .dot { position: absolute; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 0; border: 2px solid var(--tx);
     background: rgba(242, 242, 243, .12); pointer-events: none; transition: transform .15s var(--ease); }
   .xy.on .dot { transform: scale(1.25); }
   .xy .rd { position: absolute; font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; pointer-events: none; }
   .xy .rd.x { right: 12px; bottom: 10px; } .xy .rd.y { left: 12px; top: 10px; }
-  .fds { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+  .fds { background: var(--panel); border: 1px solid var(--line); border-radius: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
   .fdr { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 12px; gap: 8px; min-height: 0; }
   .fd { display: flex; flex-direction: column; align-items: center; gap: 10px; touch-action: none; cursor: ns-resize; min-height: 0; }
   .fd .v { font-family: var(--num); font-size: 32px; line-height: 32px; -webkit-font-smoothing: none; }
-  .fd .tr { flex: 1; width: 52px; border-radius: var(--r-s); background: var(--page); border: 1px solid var(--line); position: relative; overflow: hidden; min-height: 0; }
+  .fd .tr { flex: 1; width: 52px; border-radius: 0; background: var(--page); border: 1px solid var(--line); position: relative; overflow: hidden; min-height: 0; }
   .fd .tr b { position: absolute; left: 0; right: 0; bottom: 0; background: var(--c); opacity: .85; }
   .fd .tr i { position: absolute; left: 0; right: 0; height: 3px; background: var(--tx); }
   .fd .l { font-size: 12px; font-weight: 600; color: var(--tx-2); letter-spacing: .02em; }
 
   /* ---- the families: the device's buttons */
   .nav { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)) minmax(0, 1.3fr); background: var(--panel); border-top: 1px solid var(--line); padding: 6px 8px; gap: 4px; }
-  .nb { border-radius: var(--r); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--tx-3);
+  .nb { border-radius: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--tx-3);
     font-size: 11px; font-weight: 600; letter-spacing: .04em; position: relative; transition: background .15s var(--ease), color .15s var(--ease); }
   .nb:hover { color: var(--tx-2); background: var(--raised); }
   .nb[aria-current="page"] { color: var(--tx); background: var(--raised); }
-  .nb.dev::after { content: ""; position: absolute; top: 7px; right: calc(50% - 16px); width: 6px; height: 6px; border-radius: 50%; background: var(--tx); }
+  .nb.dev::after { content: ""; position: absolute; top: 7px; right: calc(50% - 16px); width: 6px; height: 6px; border-radius: 0; background: var(--tx); }
   .nb.est { margin-left: 8px; color: var(--studio); background: rgba(157, 140, 255, .1); box-shadow: inset 0 0 0 1px rgba(157, 140, 255, .35); }
   .nb.est:hover { color: #c4b9ff; background: rgba(157, 140, 255, .18); }
   .nb.est::before { content: ""; position: absolute; left: -6px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
 
   .toast { position: fixed; left: 50%; top: 76px; transform: translate(-50%, -8px); opacity: 0; pointer-events: none; z-index: 9;
-    background: var(--raised); border: 1px solid var(--line-2); border-radius: var(--r); padding: 10px 14px; display: flex; align-items: center; gap: 10px;
+    background: var(--raised); border: 1px solid var(--line-2); border-radius: 0; padding: 10px 14px; display: flex; align-items: center; gap: 10px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, .6), 0 2px 6px rgba(0, 0, 0, .5); transition: opacity .2s var(--ease), transform .2s var(--ease); font-size: 13px; }
   .toast.on { opacity: 1; transform: translate(-50%, 0); }
-  .toast i { width: 8px; height: 8px; border-radius: 2px; }
+  .toast i { width: 8px; height: 8px; border-radius: 0; }
   .toast b { font-weight: 600; }
   .toast .num { font-size: 16px; }
   .hide { display: none !important; }
@@ -188,7 +188,7 @@
   .scrim { position: fixed; inset: 64px 0 0 0; background: rgba(0, 0, 0, .55); z-index: 7; opacity: 0; pointer-events: none; transition: opacity .2s var(--ease); }
   .scrim.on { opacity: 1; pointer-events: auto; }
   .br { position: fixed; top: 72px; left: 50%; width: min(880px, calc(100vw - 32px)); height: min(560px, calc(100dvh - 160px)); transform: translate(-50%, -8px);
-    background: var(--panel); border: 1px solid var(--line-2); border-radius: 14px; z-index: 8; display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+    background: var(--panel); border: 1px solid var(--line-2); border-radius: 0; z-index: 8; display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
     box-shadow: 0 24px 64px rgba(0, 0, 0, .7), 0 4px 12px rgba(0, 0, 0, .5); opacity: 0; pointer-events: none; transition: opacity .2s var(--ease), transform .2s var(--ease); }
   .br.on { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
   .brh { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 20px; border-bottom: 1px solid var(--line); }
@@ -197,7 +197,7 @@
   .brh .ib { margin-left: auto; }
   .brb { display: grid; grid-template-columns: 200px minmax(0, 1fr); min-height: 0; }
   .kinds { border-right: 1px solid var(--line); padding: 8px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
-  .kd { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 44px; padding: 0 12px; border-radius: var(--r-s);
+  .kd { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 44px; padding: 0 12px; border-radius: 0;
     color: var(--tx-2); font-weight: 600; font-size: 13px; letter-spacing: .02em; transition: background .15s var(--ease), color .15s var(--ease); }
   .kd:hover { background: var(--raised); color: var(--tx); }
   .kd .n { font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; font-weight: 400; }
@@ -206,7 +206,7 @@
   .kd.fv-k { color: var(--fav); }
   .kd.sep { margin-top: 8px; }
   .snds { overflow-y: auto; padding: 8px; display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 6px; align-content: start; }
-  .sd { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; gap: 4px 8px; padding: 12px; border-radius: var(--r);
+  .sd { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; gap: 4px 8px; padding: 12px; border-radius: 0;
     background: var(--raised); border: 1px solid transparent; text-align: left; transition: border-color .15s var(--ease), background .15s var(--ease); }
   .sd:hover { border-color: var(--line-2); }
   .sd .n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -233,16 +233,16 @@
   .gate .btn.pri { background: var(--tx); color: var(--page); border-color: var(--tx); }
   .gate .msg { min-height: 20px; color: var(--tx-2); font-size: 13px; }
   .gate .msg.err { color: var(--k4); }
-  .gate .bar2 { height: 4px; border-radius: 2px; background: var(--raised); overflow: hidden; }
+  .gate .bar2 { height: 4px; border-radius: 0; background: var(--raised); overflow: hidden; }
   .gate .bar2 b { display: block; height: 100%; width: 0; background: var(--tx); transition: width .15s var(--ease); }
   .row.away { grid-template-columns: 164px minmax(0, 1fr); }
   .row.away .awt { padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--tx-2); }
   .row.away .awt .btn { height: 40px; padding: 0 14px; color: var(--studio); border-color: rgba(157, 140, 255, .35); }
   .row.flash { animation: flash 1.2s var(--ease); }
   @keyframes flash { 0% { box-shadow: inset 0 0 0 2px var(--tx); } 100% { box-shadow: inset 0 0 0 0 transparent; } }
-  .follow { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border-radius: var(--r); color: var(--tx-2); font-size: 12px; font-weight: 600; }
-  .follow i { width: 28px; height: 16px; border-radius: 8px; background: var(--line-2); position: relative; transition: background .15s var(--ease); }
-  .follow i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--tx); transition: transform .15s var(--ease); }
+  .follow { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border-radius: 0; color: var(--tx-2); font-size: 12px; font-weight: 600; }
+  .follow i { width: 28px; height: 16px; border-radius: 0; background: var(--line-2); position: relative; transition: background .15s var(--ease); }
+  .follow i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 0; background: var(--tx); transition: transform .15s var(--ease); }
   .follow[aria-pressed="true"] { color: var(--tx); }
   .follow[aria-pressed="true"] i { background: var(--ok); }
   .follow[aria-pressed="true"] i::after { transform: translateX(12px); }
@@ -256,26 +256,26 @@
   .quick { display: grid; gap: 16px; align-content: start; }
   .qh { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .qh h2 { font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
-  .qh .more { height: 40px; padding: 0 16px; border-radius: var(--r); background: var(--tx); color: var(--page); font-weight: 700; font-size: 13px;
+  .qh .more { height: 40px; padding: 0 16px; border-radius: 0; background: var(--tx); color: var(--page); font-weight: 700; font-size: 13px;
     display: flex; align-items: center; gap: 6px; }
   .qh .more svg { width: 16px; height: 16px; }
   .tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
-  .tl { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px; display: flex; flex-direction: column; gap: 10px;
+  .tl { background: var(--panel); border: 1px solid var(--line); border-radius: 0; padding: 12px; display: flex; flex-direction: column; gap: 10px;
     min-height: 124px; position: relative; overflow: hidden; transition: border-color .15s var(--ease), background .15s var(--ease); min-width: 0; }
   .tl::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--c); opacity: 0; transition: opacity .15s var(--ease); }
   .tl.on { background: #121216; border-color: var(--line-2); }
   .tl.on::before { opacity: 1; }
   .tl.hot { border-color: var(--tx); }
   .tl { padding: 0; gap: 0; }
-  .tl .tg { display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 10px; text-align: left; width: 100%; flex: 1; border-radius: var(--r) var(--r) 0 0; }
+  .tl .tg { display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 10px; text-align: left; width: 100%; flex: 1; border-radius: 0; }
   .tl button.tg:active { background: var(--press); }
   .tl .stp, .tl .amt { margin: 0 12px 12px; }
-  .tl .led { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--line-2); flex: none; }
+  .tl .led { width: 10px; height: 10px; border-radius: 0; border: 2px solid var(--line-2); flex: none; }
   .tl.on .led { background: var(--c); border-color: var(--c); }
   .tl .t { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
   .tl .t b { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .sw { width: 40px; height: 24px; border-radius: 12px; background: var(--line-2); position: relative; flex: none; transition: background .15s var(--ease); }
-  .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--tx-2); transition: transform .15s var(--ease), background .15s var(--ease); }
+  .sw { width: 40px; height: 24px; border-radius: 0; background: var(--line-2); position: relative; flex: none; transition: background .15s var(--ease); }
+  .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 0; background: var(--tx-2); transition: transform .15s var(--ease), background .15s var(--ease); }
   .sw[aria-checked="true"] { background: var(--c); }
   .sw[aria-checked="true"]::after { transform: translateX(16px); background: #fff; }
   .tl .v { font-family: var(--num); font-size: 32px; line-height: 32px; color: var(--tx-3); -webkit-font-smoothing: none; white-space: nowrap; overflow: hidden; }
@@ -284,10 +284,10 @@
   .tl .s { font-size: 12px; color: var(--tx-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tl.on .s { color: var(--tx-2); }
   .stp { display: flex; align-items: center; gap: 4px; margin-top: auto; }
-  .stp button { flex: 1 !important; width: auto; height: 36px; border-radius: var(--r-s); background: var(--raised); display: grid; place-items: center; color: var(--tx-2); flex: none; }
+  .stp button { flex: 1 !important; width: auto; height: 36px; border-radius: 0; background: var(--raised); display: grid; place-items: center; color: var(--tx-2); flex: none; }
   .stp button:active { background: var(--press); }
   .stp span { flex: 1; text-align: center; font-size: 12px; font-weight: 600; color: var(--tx-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .amt { margin-top: auto; height: 36px; border-radius: var(--r-s); background: var(--page); border: 1px solid var(--line); position: relative; overflow: hidden; touch-action: none; cursor: ew-resize; }
+  .amt { margin-top: auto; height: 36px; border-radius: 0; background: var(--page); border: 1px solid var(--line); position: relative; overflow: hidden; touch-action: none; cursor: ew-resize; }
   .amt b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--c); opacity: .35; }
   .tl.on .amt b { opacity: .85; }
   .amt i { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--tx); }
@@ -301,8 +301,126 @@
   .quick { gap: 12px; }
   .tl { min-height: 112px; }
   /* (Live) the sound edited since it was loaded: the device's orange dot after its name */
-  .now.edited .n #name::after { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--fav); margin-left: 8px; vertical-align: middle; }
+  .now.edited .n #name::after { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 0; background: var(--fav); margin-left: 8px; vertical-align: middle; }
   .meta .edtx { color: var(--fav); font-weight: 600; }
+
+  /* ==== the bento: 12 columns. A graph is a module (6 x 6) with its readouts; every other parameter a tile of its own,
+     as wide as what it is: a switch or a choice of two 2 columns, a choice or a fader 3. The rows don't follow the
+     device's pages of four ==== */
+  .bento { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: 40px; grid-auto-flow: row dense; gap: 10px; }
+  .bx { grid-column: span 6; grid-row: span 6; background: var(--panel); border: 1px solid var(--line); border-radius: 0; display: flex; flex-direction: column;
+    min-width: 0; min-height: 0; overflow: hidden; position: relative; transition: border-color .15s var(--ease), box-shadow .15s var(--ease); }
+  .bx.dev, .tp.dev { border-color: var(--tx); box-shadow: 0 0 0 1px var(--tx); }
+  .bx.flash, .tp.flash { animation: flash 1.2s var(--ease); }
+  .bx header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px 10px; }
+  .bx h3 { font-size: 18px; font-weight: 700; letter-spacing: .02em; display: flex; align-items: center; gap: 10px; color: var(--tx); white-space: nowrap; }
+  .bx h3 svg { width: 18px; height: 18px; color: var(--tx-3); }
+  .live2 { font-size: 11px; font-weight: 700; letter-spacing: .06em; background: var(--tx); color: var(--page); padding: 5px 9px; border-radius: 0; white-space: nowrap; }
+  .hint2 { font-size: 12px; color: var(--tx-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* a graph: the module's body, on a faint grid; its handles big enough for a finger */
+  .gr { flex: 1; margin: 0 12px; border-radius: 0; background-color: var(--page); border: 1px solid var(--line); position: relative; min-height: 0; touch-action: pan-y;
+    background-image: linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
+    background-size: 100% 25%, 12.5% 100%; background-position: 0 -1px, -1px 0; }
+  .gin { position: absolute; inset: 20px; }
+  .gs { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .gs .line { fill: none; stroke: var(--gc, var(--k1)); stroke-width: 3; vector-effect: non-scaling-stroke; stroke-linejoin: miter; stroke-linecap: square; }
+  .gs .fill { fill: var(--gc, var(--k1)); opacity: .2; }
+  .gs .axis { stroke: var(--line-2); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 4 4; }
+  .gs .bar { fill: var(--gc); opacity: .45; } .gs .bar0 { fill: var(--gc); }
+  .g-echo .gs, .g-verb .gs, .g-eq .gs { --gc: var(--k2); }
+  .hd { position: absolute; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 0; background: var(--page); border: 3px solid var(--c); cursor: grab; touch-action: none; }
+  .hd::after { content: ""; position: absolute; inset: 7px; border-radius: 0; background: var(--c); }
+  .g-filt .gr, .g-lfo .gr { cursor: ew-resize; }
+  .lfoph { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 0; background: var(--tx); box-shadow: 0 0 0 6px rgba(242, 242, 243, .16); pointer-events: none; }
+
+  /* a graph's readouts: a value slides sideways (its level a line at the foot), a choice steps on a tap */
+  .ros { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; padding: 10px 12px 12px; }
+  .ro { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; padding: 9px 10px 13px; border-radius: 0; background: var(--raised);
+    border: 1px solid transparent; text-align: left; min-width: 0; touch-action: pan-y; cursor: ew-resize; transition: border-color .15s var(--ease); }
+  .ro.ch { cursor: pointer; }
+  .ro.hot, .ro.held { border-color: var(--tx); }
+  .rl, .tlb { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); display: flex; align-items: center; gap: 6px; white-space: nowrap; min-width: 0; }
+  .rl i, .tlb i, .al i { width: 8px; height: 8px; border-radius: 0; background: var(--c); display: inline-block; flex: none; }
+  .rv { font-family: var(--num); font-size: 32px; line-height: 32px; color: var(--tx); -webkit-font-smoothing: none; white-space: nowrap; overflow: hidden; }
+  .rv small, .tv small { font-size: 16px; color: var(--tx-3); margin-left: 2px; }
+  .ro.ch .rv { font-size: 24px; line-height: 32px; }
+  .rf { position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+    background: linear-gradient(90deg, transparent calc(var(--lo) * 100%), var(--c) calc(var(--lo) * 100%), var(--c) calc(var(--hi) * 100%), transparent calc(var(--hi) * 100%)); }
+
+  /* meters (the sends, the macros): tall bars, the value over them */
+  .g-meters .gr, .g-arcs .gr { background: none; border: 0; margin: 0 6px 8px; touch-action: auto; }
+  .meters { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 12px; padding: 4px 8px 8px; height: 100%; }
+  .mt { display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 0; min-width: 0; }
+  .mv { font-family: var(--num); font-size: 32px; line-height: 32px; color: var(--tx); -webkit-font-smoothing: none; white-space: nowrap; }
+  .mv small { font-size: 16px; color: var(--tx-3); margin-left: 2px; }
+  .mtr { flex: 1; width: 100%; max-width: 84px; border-radius: 0; background: var(--page); position: relative; overflow: hidden; cursor: ns-resize; touch-action: none; border: 1px solid var(--line); min-height: 40px; }
+  .mtr b { position: absolute; left: 0; right: 0; bottom: 0; background: var(--c); }
+  .mt.off .mtr b { opacity: .22; } .mt.off .mv { color: var(--tx-3); }
+  .ml { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); padding: 8px 12px; border-radius: 0; white-space: nowrap; }
+  button.ml { border: 1px solid var(--line-2); }
+  button.ml[aria-checked="true"] { background: var(--c); color: #000; border-color: var(--c); }
+  .mt.hot .mtr { border-color: var(--tx); }
+  /* arcs (HOME's four): large dials */
+  .arcs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; height: 100%; align-items: center; }
+  .arc { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: ns-resize; touch-action: none; min-width: 0; }
+  .arc svg { width: min(120px, 94%); height: auto; }
+  .av { font-family: var(--num); font-size: 32px; line-height: 32px; -webkit-font-smoothing: none; white-space: nowrap; }
+  .av small { font-size: 16px; color: var(--tx-3); margin-left: 2px; }
+  .al { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); display: flex; align-items: center; gap: 6px; }
+  .arc.hot .av { color: var(--c); }
+
+  /* a parameter's tile */
+  .tp { grid-column: span 3; grid-row: span 3; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px; padding: 14px;
+    border-radius: 0; background: var(--panel); border: 1px solid var(--line); text-align: left; min-width: 0; color: var(--tx);
+    transition: border-color .15s var(--ease), background .15s var(--ease); }
+  .tp.t-sw, .tp.t-two { grid-column: span 2; }
+  .tt { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 2px 8px; position: relative; z-index: 1; min-width: 0; }
+  .pg { font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--tx-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .tv { font-family: var(--num); font-size: 48px; line-height: 48px; color: var(--tx); -webkit-font-smoothing: none; white-space: nowrap; overflow: hidden; position: relative; z-index: 1; }
+  /* a fader: the tile is the fader, its level a field of the knob's colour; slide it sideways */
+  .tp.t-fd { cursor: ew-resize; touch-action: pan-y; justify-content: space-between; }
+  .tp.t-fd .fl { position: absolute; top: 0; bottom: 0; left: calc(var(--lo) * 100%); width: calc((var(--hi) - var(--lo)) * 100%); background: var(--c); opacity: .2; transition: opacity .15s var(--ease); }
+  .tp.t-fd::after { content: ""; position: absolute; top: 0; bottom: 0; width: 3px; left: clamp(0px, calc(var(--f) * 100% - 1.5px), calc(100% - 3px)); background: var(--c); }
+  .tp.t-bi::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 1px dashed var(--line-2); }
+  .tp.t-fd.held, .tp.t-fd.hot { border-color: var(--c); } .tp.t-fd.held .fl, .tp.t-fd.hot .fl { opacity: .38; }
+  /* a switch: the whole tile; on, it takes the knob's colour */
+  .tp.t-sw { cursor: pointer; justify-content: space-between; }
+  .tp.t-sw .knob { width: 56px; height: 32px; border-radius: 0; background: var(--line-2); position: relative; flex: none; }
+  .tp.t-sw .knob::after { content: ""; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 0; background: var(--tx-2); transition: transform .15s var(--ease); }
+  .tp.t-sw.on { background: var(--c); border-color: var(--c); color: #000; }
+  .tp.t-sw.on .tlb, .tp.t-sw.on .tv, .tp.t-sw.on .tv small { color: #000; } .tp.t-sw.on .pg { color: rgba(0, 0, 0, .62); } .tp.t-sw.on .tlb i { background: #000; }
+  .tp.t-sw.on .knob { background: rgba(0, 0, 0, .28); } .tp.t-sw.on .knob::after { background: #000; transform: translateX(24px); }
+  .tp.t-sw.hot { border-color: var(--tx); }
+  /* a choice: its options as buttons (two stacked; three or four in a row, the value over them); more, arrows */
+  .tp .opts { display: flex; gap: 6px; min-height: 0; }
+  .tp.t-two .opts { flex-direction: column; flex: 1; }
+  .tp.t-seg .opts { margin-top: auto; background: var(--page); border-radius: 0; padding: 4px; gap: 4px; }
+  .tp .opts button { flex: 1; min-width: 0; border-radius: 0; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--tx-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 6px; }
+  .tp.t-two .opts button { background: var(--raised); text-align: left; padding: 0 12px; }
+  .tp.t-seg .opts button { height: 38px; font-size: 12px; padding: 0 4px; }
+  .tp .opts button[aria-checked="true"] { background: var(--c); color: #000; }
+  .tp.t-seg .tv, .tp.t-arr .tv { font-size: 32px; line-height: 40px; }
+  .tp.t-arr .pos { position: absolute; right: 14px; top: 64px; font-size: 16px; color: var(--tx-3); }
+  .tp.t-arr .arw { margin-top: auto; }
+  .tp.hot { border-color: var(--tx); }
+  .arw { display: flex; gap: 6px; } .arw button { flex: 1; height: 40px; border-radius: 0; background: var(--raised); display: grid; place-items: center; color: var(--tx-2); }
+  .arw button:active, .tp .opts button:active, .ro.ch:active { background: var(--press); }
+  .tp.away p { color: var(--tx-3); font-size: 13px; line-height: 1.4; }
+  .tp.away .tlb { white-space: normal; }
+  .go2 { margin-top: auto; display: inline-flex; align-items: center; gap: 4px; color: var(--studio); font-size: 13px; font-weight: 700; text-decoration: none; }
+  .go2 svg { width: 14px; height: 14px; }
+  @media (max-width: 1100px) { .bx { grid-column: span 12; } .tp { grid-column: span 4; } .tp.t-sw, .tp.t-two { grid-column: span 3; } }
+
+  /* RÁPIDO as a bento */
+  .qhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .qhead h2 { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+  .quick2 { grid-auto-rows: 44px; }
+  .q-filt { grid-column: span 5; grid-row: span 5; } .q-fx { grid-column: span 7; grid-row: span 5; }
+  .q-arp { grid-column: span 4; grid-row: span 3; } .q-tr, .q-tempo { grid-column: span 3; grid-row: span 3; } .q-panic { grid-column: span 2; grid-row: span 3; }
+  .q-s { grid-column: span 2; grid-row: span 3; }
+  .qb { display: flex; min-width: 0; min-height: 0; } .qb > .tl { flex: 1; min-height: 0; border-radius: 0; }
+  .qb .tl .s { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 
 </style>
 </head>
@@ -322,10 +440,10 @@
   <symbol id="i-fx" viewBox="0 0 24 24"><path d="M12 4v4M12 16v4M4 12h4M16 12h4M6.5 6.5l2.5 2.5M15 15l2.5 2.5M6.5 17.5L9 15M15 9l2.5-2.5"/></symbol>
   <symbol id="i-sel" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="16" r="2"/></symbol>
   <symbol id="i-arp" viewBox="0 0 24 24"><path d="M4 18h4v-4h4v-4h4V6h4"/></symbol>
-  <symbol id="i-seq" viewBox="0 0 24 24"><rect x="4" y="5" width="4" height="14" rx="1"/><rect x="10" y="5" width="4" height="14" rx="1"/><rect x="16" y="5" width="4" height="14" rx="1"/></symbol>
+  <symbol id="i-seq" viewBox="0 0 24 24"><rect x="4" y="5" width="4" height="14"/><rect x="10" y="5" width="4" height="14"/><rect x="16" y="5" width="4" height="14"/></symbol>
   <symbol id="i-glo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.5 2.5 2.5 13.5 0 16M12 4c-2.5 2.5-2.5 13.5 0 16"/></symbol>
   <symbol id="i-save" viewBox="0 0 24 24"><path d="M4 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2z"/></symbol>
-  <symbol id="i-studio" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/></symbol>
+  <symbol id="i-studio" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16"/><path d="M4 9h16M9 9v11"/></symbol>
 </svg>
 
 <div class="gate" id="gate">
@@ -708,11 +826,10 @@ function followPage() {
   flashRow(pg.title);
 }
 function flashRow(title) {
-  const r = document.querySelector(`.row[data-title="${CSS.escape(title)}"]`);
+  const all = document.querySelectorAll(`#edit [data-title="${CSS.escape(title)}"]`), r = all[0];   /* (a page: its module, its tiles) */
+  document.querySelectorAll("#edit .dev").forEach((x) => x.classList.remove("dev"));
   if (!r) return;
-  document.querySelectorAll(".row.dev").forEach((x) => x.classList.remove("dev"));
-  r.classList.add("dev");
-  r.classList.remove("flash"); void r.offsetWidth; r.classList.add("flash");
+  all.forEach((x) => { x.classList.add("dev"); x.classList.remove("flash"); void x.offsetWidth; x.classList.add("flash"); });
   r.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 }
 function fromDevice(s, id, old, v) {
@@ -720,7 +837,7 @@ function fromDevice(s, id, old, v) {
   const pg = M.page, k = pg && !pg.home && pg.scope === s ? pg.ids.indexOf(id) : pg && pg.home && !s ? M.homeIds.indexOf(id) : -1;
   const a = fmtValue(d, old), b = fmtValue(d, v);
   toast(k, `${k >= 0 ? `<b>KNOB ${k + 1}</b> ` : ""}${esc(d.label)} <span class="num">${esc(a[0] + a[1])} → ${esc(b[0] + b[1])}</span>`);
-  document.querySelectorAll(`.kn[data-k="${keyOf(s, id)}"],.tl[data-tl="${keyOf(s, id)}"]`).forEach((el) => { el.classList.add("hot"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("hot"), 1600); });
+  document.querySelectorAll(`.kn[data-k="${keyOf(s, id)}"],.tl[data-tl="${keyOf(s, id)}"],[data-cell="${keyOf(s, id)}"],.mt[data-mt="${keyOf(s, id)}"],.arc[data-k="${keyOf(s, id)}"]`).forEach((el) => { el.classList.add("hot"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("hot"), 1600); });
 }
 
 /* ------------------------------------------------------------ what we send --- */
@@ -742,8 +859,8 @@ function setVal(s, id, v) {
 /* ----------------------------------------------------------------- views --- */
 function knobSvg(d, v, i) {
   const r = 20, c = 2 * Math.PI * r, s = c * .75, a = frac(d, v), z = d.min < 0 && d.max > 0 ? -d.min / (d.max - d.min) : 0, lo = Math.min(a, z), hi = Math.max(a, z);
-  return `<svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="${r}" fill="none" stroke="#232327" stroke-width="6" stroke-linecap="round" stroke-dasharray="${s} ${c}" transform="rotate(135 26 26)"/>
-    <circle cx="26" cy="26" r="${r}" fill="none" stroke="${KH[i]}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${Math.max(.1, (hi - lo) * s)} ${c}" stroke-dashoffset="${-lo * s}" transform="rotate(135 26 26)"/></svg>`;
+  return `<svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="${r}" fill="none" stroke="#232327" stroke-width="6" stroke-linecap="butt" stroke-dasharray="${s} ${c}" transform="rotate(135 26 26)"/>
+    <circle cx="26" cy="26" r="${r}" fill="none" stroke="${KH[i]}" stroke-width="6" stroke-linecap="butt" stroke-dasharray="${Math.max(.1, (hi - lo) * s)} ${c}" stroke-dashoffset="${-lo * s}" transform="rotate(135 26 26)"/></svg>`;
 }
 function knob(s, id, i) {
   const d = id < 127 ? desc(s, id) : null;
@@ -763,16 +880,17 @@ function paintValue(s, id) {
   });
   if (S.mode === "play") { drawXY(); drawFaders(); }
   paintTile(s, id);
+  paintCards(s, id);
   if (id === 0 || id === 25 || id === 26) renderMeta();
 }
 /* a page's shape, from its values */
 function shape(kind, s, ids) {
   const W = 160, H = 72, f = (k) => { const id = ids[k]; return id < 127 && desc(s, id) ? frac(desc(s, id), val(s, id)) : 0; };
   if (kind === "env") { const a = f(0) * 40, d = a + f(1) * 40, y = H - 4 - f(2) * (H - 8), r = 120 + f(3) * 38;
-    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="M0 ${H - 4} L${a} 4 L${d} ${y} L120 ${y} L${r} ${H - 4}" fill="none" stroke="#287cff" stroke-width="2" stroke-linejoin="round"/></svg>`; }
+    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="M0 ${H - 4} L${a} 4 L${d} ${y} L120 ${y} L${r} ${H - 4}" fill="none" stroke="#287cff" stroke-width="2" stroke-linejoin="miter"/></svg>`; }
   if (kind === "lfo") { const w = ids[1] < 127 ? val(s, ids[1]) : 1, cyc = 1 + Math.round(f(0) * 5); let p = "";
     for (let i = 0; i <= 120; i++) { const t = (i / 120 * cyc) % 1, y = w === 0 ? Math.sin(t * 2 * Math.PI) : w === 1 ? (t < .5 ? t * 4 - 1 : 3 - t * 4) : w === 2 ? 1 - t * 2 : w === 3 ? (t < .5 ? 1 : -1) : [.6, -.2, .9, -.7, .3][Math.floor(i / 120 * cyc * 2) % 5]; p += `${i ? "L" : "M"}${i / 120 * W} ${H / 2 - y * (H / 2 - 6)}`; }
-    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="${p}" fill="none" stroke="#ffc618" stroke-width="2" stroke-linejoin="round"/></svg>`; }
+    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="${p}" fill="none" stroke="#ffc618" stroke-width="2" stroke-linejoin="miter"/></svg>`; }
   if (kind === "faders") return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${[0, 1, 2, 3].map((i) => `<rect x="${i * 42}" y="4" width="34" height="${H - 8}" rx="4" fill="#17171a"/><rect x="${i * 42}" y="${4 + (1 - f(i)) * (H - 8)}" width="34" height="${f(i) * (H - 8)}" rx="4" fill="${KH[i]}" opacity=".85"/>`).join("")}</svg>`;
   return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${[0, 1, 2, 3].map((i) => ids[i] < 127 ? `<rect x="0" y="${i * 18 + 2}" width="${W}" height="10" rx="3" fill="#17171a"/><rect x="0" y="${i * 18 + 2}" width="${Math.max(4, f(i) * W)}" height="10" rx="3" fill="${KH[i]}"/>` : "").join("")}</svg>`;
 }
@@ -885,20 +1003,9 @@ function quickView() {
 }
 
 function renderWork() {
-  let h = "";
-  if (S.folder === "HOME" && S.mode === "quick") h = quickView();
-  else if (S.folder === "HOME") {
-    h = HOME_ROWS.map(([t, sub, folder, s, ids, kind]) => row(t, sub, folder, s, ids || M.homeIds, kind)).join("");
-  } else {
-    const pages = LAYOUT.filter((x) => x.folder === S.folder);
-    h = pages.map((x) => (x.scope === 2 || x.title === "TOOLS" || !x.ids.some((i) => i < 127) ? awayRow(x.title, x.title, S.folder)
-      : row(x.title, x.title, S.folder, x.scope, x.ids, x.title.startsWith("ENV") && !x.title.includes("DEST") && !x.title.includes("LOOP") ? "env" : x.title === "LFO" ? "lfo" : x.title === "MACROS" ? "faders" : "bars"))).join("");
-    if (S.folder === "SEQ") h += `<p class="note">Las notas del patrón se editan en Estudio, en el secuenciador.</p>`;
-  }
-  $("edit").innerHTML = h;
-  if (M.page && S.folder !== "HOME" && FAM[M.page.fam] === S.folder) flashRowQuiet(M.page.title);
+  $("edit").innerHTML = S.folder === "HOME" && S.mode === "quick" ? quickBento() : bentoView(S.folder);
 }
-function flashRowQuiet(title) { const r = document.querySelector(`.row[data-title="${CSS.escape(title)}"]`); if (r) r.classList.add("dev"); }
+function flashRowQuiet(title) { document.querySelectorAll(`#edit [data-title="${CSS.escape(title)}"]`).forEach((r) => r.classList.add("dev")); }
 function renderWhere() { $("where").textContent = !M.page ? "" : M.page.home ? "HOME" : M.page.title; renderNav(); }
 function renderNav() {
   const dev = M.page ? (M.page.home ? "HOME" : FAM[M.page.fam]) : "";
@@ -1099,6 +1206,249 @@ function drawScope(cv) {
   for (let i = 0; i < 240; i++) g.lineTo(i / 239 * w, h / 2 - (buf[t + i] || 0) * h * .85); g.stroke();
 }
 (function loop() { drawScope($("scope")); if (S.mode === "play") drawScope($("xyscope")); requestAnimationFrame(loop); })();
+
+/* ------------------------------------------------------------------ bento --- */
+/* The folders, EDITAR and RÁPIDO as a bento grid (12 columns), not the device's pages of four: a page with a graph is a
+   large module and the graph is the control (drag it), with what it draws under it; every other parameter is a tile of
+   its own, sized by what it is (a switch small, a choice of up to four as its options, a value as a fader you slide
+   sideways). A parameter keeps the colour of the knob that turns it on its page; its page's name is in its corner. */
+const GRAPH = { ENV: "env", "ENV 2": "env", LFO: "lfo", "LFO 2": "lfo", "LFO 3": "lfo", FILTER: "filt", FX: "meters", MACROS: "meters",
+  HOME: "arcs", DLY: "echo", REVERB: "verb", "EQ+COMP": "eq" };
+/* what each graph draws (its page's knobs, by position): those are its readouts; the rest of the page, tiles */
+const GUSE = { env: [0, 1, 2, 3], lfo: [0, 1], filt: [0], meters: [0, 1, 2, 3], arcs: [0, 1, 2, 3], echo: [0, 1, 2, 3], verb: [1, 2, 3], eq: [0, 1, 2] };
+const live = (ids) => ids.map((id, k) => ({ id, k })).filter((x) => x.id < 127);
+const isOnOff = (d) => d && (d.fmt === F.ONOFF || (d.fmt === F.ENUM && d.names.length === 2 && d.names[0] === "OFF"));
+const isEnum = (d) => d && d.fmt === F.ENUM;
+const ff = (s, id) => (desc(s, id) ? frac(desc(s, id), val(s, id)) : 0);
+
+/* ---- the graphs (SVG in 0..1 units, stretched; their handles are HTML so they keep their shape) */
+function gEnv(s, ids) {
+  const [a, d, su, r] = ids.map((id) => (id < 127 ? ff(s, id) : 0));
+  const xa = .02 + a * .24, xd = xa + .02 + d * .24, ys = .08 + (1 - su) * .84, xr = .76 + r * .22;
+  const pts = [[0, .96], [xa, .06], [xd, ys], [.76, ys], [xr, .96]];
+  const path = pts.map((p, i) => `${i ? "L" : "M"}${p[0]} ${p[1]}`).join(" ");
+  return { svg: `<path d="${path} L${xr} 1 L0 1Z" class="fill"/><path d="${path}" class="line"/>`,
+    handles: [["a", xa, .06, 0], ["d", xd, ys, 1], ["s", .76, ys, 2], ["r", xr, .96, 3]] };
+}
+function lfoY(w, t) { const u = t % 1; return w === 0 ? Math.sin(u * 2 * Math.PI) : w === 1 ? (u < .5 ? u * 4 - 1 : 3 - u * 4) : w === 2 ? 1 - u * 2 : w === 3 ? (u < .5 ? 1 : -1) : [.6, -.2, .9, -.7, .3, -.9, .1, .7][Math.floor(t * 2) % 8]; }
+function gLfo(s, ids) {
+  const w = ids[1] < 127 ? val(s, ids[1]) : 0, cyc = 1 + Math.round(ff(s, ids[0]) * 5);
+  let p = "";
+  for (let i = 0; i <= 160; i++) { const x = i / 160; p += `${i ? "L" : "M"}${x} ${.5 - lfoY(w, x * cyc) * .4}`; }
+  return { svg: `<line x1="0" y1=".5" x2="1" y2=".5" class="axis"/><path d="${p}" class="line"/><line class="ph" x1="0" y1="0" x2="0" y2="1"/>`, handles: [], cyc };
+}
+function gFilt(s, ids) {
+  const id = ids[0], v = val(s, id), d = desc(s, id), f = d ? (v - d.min) / (d.max - d.min) : .5;
+  const lp = v < 0 ? 1 + v / 64 : 1, hp = v > 0 ? v / 63 : 0;
+  let p = "";
+  for (let i = 0; i <= 100; i++) { const x = i / 100; let y = .3; if (x > lp) y += (x - lp) * 2.6; if (x < hp) y += (hp - x) * 2.6; p += `${i ? "L" : "M"}${x} ${Math.min(1, y)}`; }
+  return { svg: `<line x1=".5" y1="0" x2=".5" y2="1" class="axis"/><path d="${p} L1 1 L0 1Z" class="fill"/><path d="${p}" class="line"/>`, handles: [["f", f, .3, 0]] };
+}
+function gEcho(s, ids) {
+  const t = ids[0] < 127 ? val(s, ids[0]) : 1, fb = ff(s, ids[1]), mix = ids[3] < 127 ? ff(s, ids[3]) : .5, gap = .08 + (t % 8) * .03;
+  let h = "";
+  for (let i = 0, a = .9 * mix + .1; i < 14 && i * gap < 1; i++, a *= .25 + fb * .7) h += `<rect x="${i * gap}" y="${1 - a * .9}" width="${gap * .45}" height="${a * .9}" class="${i ? "bar" : "bar0"}"/>`;
+  return { svg: h, handles: [] };
+}
+function gVerb(s, ids) {
+  const size = ff(s, ids[1]), damp = ff(s, ids[2]), pre = ids[3] < 127 ? ff(s, ids[3]) : 0, x0 = .02 + pre * .18, len = .25 + size * .7;
+  let p = `M0 1 L${x0} 1 L${x0 + .01} .1`;
+  for (let i = 1; i <= 60; i++) { const x = x0 + .01 + (i / 60) * len; p += ` L${Math.min(1, x)} ${1 - .9 * Math.exp(-i / 60 * (2 + damp * 5))}`; }
+  return { svg: `<path d="${p} L1 1Z" class="fill"/><path d="${p}" class="line"/>`, handles: [] };
+}
+function gEq(s, ids) {
+  const b = [0, 1, 2].map((k) => (ids[k] < 127 && desc(s, ids[k]) ? (val(s, ids[k]) - (desc(s, ids[k]).min + desc(s, ids[k]).max) / 2) / ((desc(s, ids[k]).max - desc(s, ids[k]).min) / 2) : 0));
+  let p = "";
+  for (let i = 0; i <= 100; i++) { const x = i / 100, y = .5 - .38 * (b[0] / (1 + Math.exp((x - .22) * 18)) + b[1] * Math.exp(-((x - .5) ** 2) * 40) + b[2] / (1 + Math.exp(-(x - .78) * 18))); p += `${i ? "L" : "M"}${x} ${y}`; }
+  return { svg: `<line x1="0" y1=".5" x2="1" y2=".5" class="axis"/><path d="${p}" class="line"/>`, handles: [] };
+}
+function gMeters(s, ids, toggles) {
+  return live(ids).map(({ id, k }) => { const d = desc(s, id); if (!d) return ""; const f = frac(d, val(s, id)), [t, u] = fmtValue(d, val(s, id));
+    const q = toggles && QSPEC.get(keyOf(s, id)), off = q && !qOn(q);
+    return `<div class="mt${off ? " off" : ""}" style="--c:${KC[k]}" data-mt="${keyOf(s, id)}"><span class="mv num">${esc(t)}<small>${esc(u)}</small></span>
+      <div class="mtr" data-drag="v" data-k="${keyOf(s, id)}"><b style="height:${f * 100}%"></b></div>
+      ${q ? `<button class="ml" data-qtog="${keyOf(s, id)}" role="switch" aria-checked="${!off}">${esc(q.name)}</button>` : `<span class="ml">${esc(d.label)}</span>`}</div>`; }).join("");
+}
+function gArcs(s, ids) {
+  return live(ids).map(({ id, k }) => { const d = desc(s, id); if (!d) return ""; const v = val(s, id), a = frac(d, v), z = d.min < 0 && d.max > 0 ? -d.min / (d.max - d.min) : 0;
+    const r = 38, c = 2 * Math.PI * r, sp = c * .75, lo = Math.min(a, z), hi = Math.max(a, z), [t, u] = fmtValue(d, v);
+    return `<div class="arc" data-drag="v" data-k="${keyOf(s, id)}" style="--c:${KC[k]}"><svg viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="${r}" fill="none" stroke="var(--raised)" stroke-width="9" stroke-linecap="butt" stroke-dasharray="${sp} ${c}" transform="rotate(135 48 48)"/>
+      <circle cx="48" cy="48" r="${r}" fill="none" stroke="${KH[k]}" stroke-width="9" stroke-linecap="butt" stroke-dasharray="${Math.max(.1, (hi - lo) * sp)} ${c}" stroke-dashoffset="${-lo * sp}" transform="rotate(135 48 48)"/></svg>
+      <span class="av num">${esc(t)}<small>${esc(u)}</small></span><span class="al"><i></i>${esc(d.label)}</span></div>`; }).join("");
+}
+function graphHtml(kind, s, ids, opt = {}) {
+  if (kind === "meters") return `<div class="meters">${gMeters(s, ids, opt.toggles)}</div>`;
+  if (kind === "arcs") return `<div class="arcs">${gArcs(s, ids)}</div>`;
+  const g = { env: gEnv, lfo: gLfo, filt: gFilt, echo: gEcho, verb: gVerb, eq: gEq }[kind](s, ids);
+  return `<div class="gin"><svg class="gs" viewBox="0 0 1 1" preserveAspectRatio="none">${g.svg}</svg>` +
+    g.handles.map(([h, x, y, k]) => `<span class="hd" data-h="${h}" style="left:${x * 100}%;top:${y * 100}%;--c:${KC[k]}"></span>`).join("") +
+    (kind === "lfo" ? `<span class="lfoph" data-cyc="${g.cyc}"></span>` : "") + `</div>`;
+}
+
+/* ---- a value's fill: from its zero (the middle when it goes both ways) to where it is */
+const zeroOf = (d) => (d.min < 0 && d.max > 0 ? -d.min / (d.max - d.min) : 0);
+function fillVars(d, v) { const f = frac(d, v), z = zeroOf(d); return `--lo:${Math.min(f, z)};--hi:${Math.max(f, z)};--f:${f}`; }
+const isChoice = (d) => isEnum(d) || isOnOff(d);
+const nextOf = (d, v) => (v >= d.max ? d.min : v + 1);
+const valHtml = (d, v) => { const [t, u] = fmtValue(d, v); return `${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}`; };
+
+/* a graph's readout: a value slides sideways, a choice steps on a tap */
+function readout(s, id, k) {
+  const d = desc(s, id); if (!d) return "";
+  const v = val(s, id), key = keyOf(s, id), lab = `<span class="rl"><i></i>${esc(d.label)}</span>`;
+  if (isChoice(d)) return `<button class="ro ch" style="--c:${KC[k]}" data-cell="${key}" data-ro="${k}" data-set="${key}" data-v="${nextOf(d, v)}" aria-label="${esc(d.label)}: ${esc(fmtValue(d, v)[0])}, tocar para cambiar">${lab}<span class="rv num">${valHtml(d, v)}</span></button>`;
+  return `<div class="ro" style="--c:${KC[k]};${fillVars(d, v)}" data-cell="${key}" data-ro="${k}" data-fd="${key}" role="slider" tabindex="0" aria-label="${esc(d.label)}" aria-valuenow="${v}" aria-valuemin="${d.min}" aria-valuemax="${d.max}">${lab}<span class="rv num">${valHtml(d, v)}</span><span class="rf"></span></div>`;
+}
+
+/* a parameter's tile, by what it is */
+function tileP(s, id, k, pt) {
+  const d = desc(s, id); if (!d) return "";
+  const v = val(s, id), key = keyOf(s, id), lv = devLive(S.folder, pt) ? " dev" : "", at = `style="--c:${KC[k]}${isChoice(d) ? "" : ";" + fillVars(d, v)}" data-cell="${key}" data-kk="${k}" data-title="${esc(pt)}"`;
+  const top = `<span class="tt"><span class="tlb"><i></i>${esc(d.label)}</span><span class="pg">${esc(pt)}</span></span>`;
+  if (isOnOff(d)) { const on = v !== d.min;
+    return `<button class="tp t-sw${on ? " on" : ""}${lv}" ${at} role="switch" aria-checked="${on}" data-set="${key}" data-v="${on ? d.min : d.max}" aria-label="${esc(d.label)}">${top}<span class="tv num">${valHtml(d, v)}</span><span class="knob" aria-hidden="true"></span></button>`; }
+  const opts = () => d.names.map((n, i) => `<button role="radio" aria-checked="${i + d.min === v}" data-set="${key}" data-v="${i + d.min}">${esc(n)}</button>`).join("");
+  if (isEnum(d) && d.names.length <= 2) return `<div class="tp t-two${lv}" ${at}>${top}<div class="opts" role="radiogroup" aria-label="${esc(d.label)}">${opts()}</div></div>`;
+  if (isEnum(d) && d.names.length <= 4) return `<div class="tp t-seg${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span><div class="opts" role="radiogroup" aria-label="${esc(d.label)}">${opts()}</div></div>`;
+  if (isEnum(d)) return `<div class="tp t-arr${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span><span class="pos num">${v - d.min + 1}/${d.max - d.min + 1}</span>
+    <div class="arw"><button data-set="${key}" data-v="${v <= d.min ? d.max : v - 1}" aria-label="${esc(d.label)}: anterior"><svg class="i"><use href="#i-prev"/></svg></button><button data-set="${key}" data-v="${nextOf(d, v)}" aria-label="${esc(d.label)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div></div>`;
+  if (d.max <= d.min) return `<div class="tp${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span></div>`;   /* (a reading: CPU) */
+  return `<div class="tp t-fd${zeroOf(d) ? " t-bi" : ""}${lv}" ${at} data-fd="${key}" role="slider" tabindex="0" aria-label="${esc(d.label)}" aria-valuenow="${v}" aria-valuemin="${d.min}" aria-valuemax="${d.max}">${top}<span class="tv num">${valHtml(d, v)}</span><span class="fl" aria-hidden="true"></span></div>`;
+}
+
+/* ---- a module: a page's graph, large, and its readouts */
+function devLive(folder, title) { return M.page && !M.page.home && FAM[M.page.fam] === folder && M.page.title === title; }
+function module(p, kind, opt = {}) {
+  const lv = p.folder === "HOME" ? !!(M.page && M.page.home) : devLive(p.folder, p.title);
+  const ro = kind === "meters" || kind === "arcs" ? "" : `<div class="ros">${GUSE[kind].filter((k) => p.ids[k] < 127).map((k) => readout(p.s, p.ids[k], k)).join("")}</div>`;
+  return `<section class="bx g-${kind}${lv ? " dev" : ""}${opt.cls ? " " + opt.cls : ""}" data-title="${esc(p.title)}" data-g="${kind}">
+    <header><h3><svg class="i"><use href="#i-${ICON[p.folder] || "edit"}"/></svg>${esc(opt.name || p.title)}</h3>${lv ? `<span class="live2">En el sinte</span>` : opt.hint ? `<span class="hint2">${esc(opt.hint)}</span>` : ""}</header>
+    <div class="gr" data-gr="${kind}" data-s="${p.s}" data-ids="${p.ids.join(",")}"${opt.toggles ? ' data-toggles="1"' : ""}>${graphHtml(kind, p.s, p.ids, opt)}</div>${ro}</section>`;
+}
+function pagesOf(folder) {
+  if (folder === "HOME") return [{ title: "HOME", folder: "HOME", s: 0, ids: M.homeIds }, ...["ENV", "FILTER", "LFO", "FX", "MACROS"].map((t) => { const x = LAYOUT.find((y) => y.title === t); return { title: t, folder: x.folder, s: x.scope, ids: x.ids }; })];
+  return LAYOUT.filter((x) => x.folder === folder).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
+}
+function bentoView(folder) {
+  const out = [], away = [];
+  pagesOf(folder).forEach((p) => {
+    const cells = live(p.ids);
+    if (p.scope === 2 || p.title === "TOOLS" || !cells.length) { away.push(p.title); return; }
+    const kind = GRAPH[p.title], used = kind ? GUSE[kind] : [];
+    if (kind) out.push(module(p, kind));
+    cells.filter(({ k }) => !used.includes(k)).forEach(({ id, k }) => out.push(tileP(p.s, id, k, p.title)));
+  });
+  if (away.length) out.push(`<section class="tp away"><span class="tt"><span class="tlb">${esc(away.join(", "))}</span></span><p>${away.length > 1 ? "Se editan" : "Se edita"} en el sinte o en Estudio.</p>
+    <a class="go2" href="${STUDIO_URL}">Abrir Estudio<svg class="i"><use href="#i-next"/></svg></a></section>`);
+  return `<div class="bento">${out.join("")}</div>${folder === "SEQ" ? `<p class="note">Las notas del patrón se editan en Estudio, en el secuenciador.</p>` : ""}`;
+}
+
+/* ---- RÁPIDO as a bento: the sweep filter and the sends large, the switches around them */
+function quickBento() {
+  const T = (id, s = 0) => QSPEC.get(keyOf(s, id));
+  const box = (q, size) => `<div class="qb ${size}">${tile(q)}</div>`;
+  return `<div class="qhead"><h2>Rápido</h2><button class="more" data-mode-go="edit">Editar más<svg class="i"><use href="#i-next"/></svg></button></div>
+  <div class="bento quick2">
+    ${module({ title: "FILTER", folder: "FX", s: 0, ids: [50, 127, 127, 127] }, "filt", { cls: "q-filt", name: "Filtro", hint: "LP ← OFF → HP" })}
+    ${module({ title: "FX", folder: "FX", s: 0, ids: [33, 34, 35, 36] }, "meters", { cls: "q-fx", name: "Efectos", hint: "Toca el nombre para encender o apagar", toggles: true })}
+    ${box(T(17), "q-arp")}${box(T(28), "q-tr")}${box(T(0, 1), "q-tempo")}${box(T(-1), "q-panic")}
+    ${box(T(23), "q-s")}${box(T(49), "q-s")}${box(T(27), "q-s")}${box(T(37), "q-s")}${box(T(38), "q-s")}${box(T(78), "q-s")}
+  </div>`;
+}
+
+/* ---- painting: a value changed; what shows it redraws (a fader a finger holds only moves) */
+let bdrag = null;
+function paintCards(s, id) {
+  const key = keyOf(s, id);
+  document.querySelectorAll("#edit .gr[data-gr]").forEach((gr) => {
+    const ids = gr.dataset.ids.split(",").map(Number);
+    if (+gr.dataset.s !== s || !ids.includes(id)) return;
+    if (gr.dataset.gr === "meters" || gr.dataset.gr === "arcs") {
+      gr.querySelectorAll(gr.dataset.gr === "meters" ? ".mt" : ".arc").forEach((el) => {
+        const kk = gr.dataset.gr === "meters" ? el.dataset.mt : el.dataset.k;
+        if (kk !== key) return;
+        const d = desc(s, id), f = frac(d, val(s, id));
+        if (gr.dataset.gr === "meters") { el.querySelector(".mtr b").style.height = f * 100 + "%"; el.querySelector(".mv").innerHTML = valHtml(d, val(s, id)); const q = gr.dataset.toggles && QSPEC.get(kk); if (q) { el.classList.toggle("off", !qOn(q)); el.querySelector(".ml").setAttribute("aria-checked", qOn(q)); } }
+        else { const tmp = document.createElement("div"); tmp.innerHTML = gArcs(s, ids.map((x) => (x === id ? x : 127))); const nn = tmp.querySelector(".arc"); el.querySelector("svg").replaceWith(nn.querySelector("svg")); el.querySelector(".av").innerHTML = nn.querySelector(".av").innerHTML; }
+      });
+    } else gr.innerHTML = graphHtml(gr.dataset.gr, s, ids);
+  });
+  document.querySelectorAll(`#edit [data-cell="${key}"]`).forEach((el) => {
+    const d = desc(s, id), v = val(s, id);
+    if (el.dataset.fd) {                                   /* a fader: in place, so a finger on it keeps it */
+      const f = frac(d, v), z = zeroOf(d);
+      el.style.setProperty("--lo", Math.min(f, z)); el.style.setProperty("--hi", Math.max(f, z)); el.style.setProperty("--f", f);
+      el.querySelector(el.classList.contains("ro") ? ".rv" : ".tv").innerHTML = valHtml(d, v); el.setAttribute("aria-valuenow", v);
+    } else el.outerHTML = el.classList.contains("ro") ? readout(s, id, +el.dataset.ro) : tileP(s, id, +el.dataset.kk, el.dataset.title);
+  });
+}
+
+/* ---- touch. Faders and readouts slide sideways from where they are (a vertical swipe still scrolls the page); the
+   graphs' handles, the meters and the dials take the finger outright */
+$("edit").addEventListener("pointerdown", (e) => {
+  const hd = e.target.closest(".hd"), gr = e.target.closest(".gr[data-gr]"), mtr = e.target.closest(".mtr[data-k]"), arc = e.target.closest(".arc[data-k]"), fd = e.target.closest("[data-fd]");
+  if (hd || (gr && (gr.dataset.gr === "filt" || gr.dataset.gr === "lfo") && !fd)) {
+    const g = (hd || gr).closest(".gr"), gin = g.querySelector(".gin");
+    bdrag = { el: g, gin, kind: g.dataset.gr, h: hd ? hd.dataset.h : g.dataset.gr === "filt" ? "f" : "l", s: +g.dataset.s, ids: g.dataset.ids.split(",").map(Number), x0: e.clientX, v0: null, on: true };
+    if (bdrag.h === "l") bdrag.v0 = val(bdrag.s, bdrag.ids[0]);
+    g.setPointerCapture(e.pointerId); e.preventDefault(); graphDrag(e); return;
+  }
+  const el = mtr || arc || fd; if (!el) return;
+  const [s, id] = (el.dataset.k || el.dataset.fd).split(":").map(Number), d = desc(s, id); if (!d) return;
+  bdrag = { el, dir: mtr ? "abs" : arc ? "v" : "h", s, id, d, x0: e.clientX, y0: e.clientY, v0: val(s, id), on: !fd, pid: e.pointerId };
+  if (!fd) { el.setPointerCapture(e.pointerId); e.preventDefault(); if (mtr) barAt(e); }
+});
+$("edit").addEventListener("pointermove", (e) => {
+  if (!bdrag) return;
+  if (bdrag.kind) { graphDrag(e); return; }
+  const dx = e.clientX - bdrag.x0, dy = bdrag.y0 - e.clientY;
+  if (!bdrag.on) {                                       /* a fader: it is a slide once it goes sideways */
+    if (Math.abs(dx) < 6 || Math.abs(dx) < Math.abs(dy)) return;
+    bdrag.on = true; bdrag.x0 = e.clientX; bdrag.el.classList.add("held");
+    try { bdrag.el.setPointerCapture(bdrag.pid); } catch (er) { /* (gone) */ }
+    return;
+  }
+  const span = bdrag.d.max - bdrag.d.min;
+  if (bdrag.dir === "abs") barAt(e);
+  else if (bdrag.dir === "v") setVal(bdrag.s, bdrag.id, bdrag.v0 + dy * span / 220);
+  else setVal(bdrag.s, bdrag.id, bdrag.v0 + dx * span / Math.max(220, bdrag.el.getBoundingClientRect().width * 1.4));
+});
+const bend = () => { if (bdrag && bdrag.el) bdrag.el.classList.remove("held"); bdrag = null; };
+$("edit").addEventListener("pointerup", bend); $("edit").addEventListener("pointercancel", bend);
+function barAt(e) {
+  const r = bdrag.el.getBoundingClientRect(), d = bdrag.d;
+  setVal(bdrag.s, bdrag.id, d.min + Math.max(0, Math.min(1, 1 - (e.clientY - r.top) / r.height)) * (d.max - d.min));
+}
+function graphDrag(e) {
+  const r = (bdrag.gin || bdrag.el).getBoundingClientRect(), x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
+  const s = bdrag.s, ids = bdrag.ids, put = (k, f) => { const id = ids[k], d = id < 127 && desc(s, id); if (d) setVal(s, id, d.min + Math.max(0, Math.min(1, f)) * (d.max - d.min)); };
+  if (bdrag.h === "f") put(0, x);
+  else if (bdrag.h === "l") { const d = desc(s, ids[0]); if (d) setVal(s, ids[0], bdrag.v0 + (e.clientX - bdrag.x0) / r.width * (d.max - d.min)); }
+  else if (bdrag.h === "a") put(0, (x - .02) / .24);
+  else if (bdrag.h === "d") { const xa = .02 + ff(s, ids[0]) * .24; put(1, (x - xa - .02) / .24); put(2, 1 - (y - .08) / .84); }
+  else if (bdrag.h === "s") put(2, 1 - (y - .08) / .84);
+  else if (bdrag.h === "r") put(3, (x - .76) / .22);
+}
+$("edit").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-set]"); if (!b) return;
+  const [s, id] = b.dataset.set.split(":").map(Number);
+  setVal(s, id, +b.dataset.v);
+});
+$("edit").addEventListener("keydown", (e) => {
+  const el = e.target.closest("[data-fd]"), st = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1, PageUp: 8, PageDown: -8 }[e.key];
+  if (!el || !st) return; e.preventDefault();
+  const [s, id] = el.dataset.fd.split(":").map(Number); setVal(s, id, val(s, id) + st);
+});
+/* the LFOs' playheads, at their rate */
+(function lfoLoop(tm) {
+  document.querySelectorAll(".gr[data-gr='lfo']").forEach((g) => {
+    const ids = g.dataset.ids.split(",").map(Number), s = +g.dataset.s, ph = g.querySelector(".lfoph"); if (!ph) return;
+    const hz = desc(s, ids[0]) ? 0.05 * Math.pow(800, (val(s, ids[0]) & 127) / 127) : 1, cyc = +ph.dataset.cyc || 1;
+    const x = ((tm / 1000) * Math.min(hz, 6) / cyc) % 1, w = ids[1] < 127 ? val(s, ids[1]) : 0;
+    ph.style.left = x * 100 + "%"; ph.style.top = (.5 - lfoY(w, x * cyc) * .4) * 100 + "%";
+  });
+  requestAnimationFrame(lfoLoop);
+})(0);
 
 /* ------------------------------------------------------------------ start --- */
 $("connect").onclick = () => connectMidi();

@@ -13,6 +13,9 @@ font = re.search(r'/\*SLOOP-FONT\*/url\((data:font/ttf;base64,[A-Za-z0-9+/=]+)\)
 mock = (ROOT / "build" / "live-mock.json").read_text().replace("</", "<\\/")
 css = (src / "live.css").read_text().replace("__FONT__", font)
 js = (src / "live.js").read_text()
+START = "/* ------------------------------------------------------------------ start --- */"   # (bento.js before the start)
+assert js.count(START) == 1
+js = js.replace(START, (src / "bento.js").read_text() + "\n" + START)
 html = (src / "live.html").read_text()
 for k, v in (("__CSS__", css), ("__MOCK__", mock), ("__JS__", js)):
     assert html.count(k) == 1, k

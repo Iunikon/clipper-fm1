@@ -306,11 +306,10 @@ function followPage() {
   flashRow(pg.title);
 }
 function flashRow(title) {
-  const r = document.querySelector(`.row[data-title="${CSS.escape(title)}"]`);
+  const all = document.querySelectorAll(`#edit [data-title="${CSS.escape(title)}"]`), r = all[0];   /* (a page: its module, its tiles) */
+  document.querySelectorAll("#edit .dev").forEach((x) => x.classList.remove("dev"));
   if (!r) return;
-  document.querySelectorAll(".row.dev").forEach((x) => x.classList.remove("dev"));
-  r.classList.add("dev");
-  r.classList.remove("flash"); void r.offsetWidth; r.classList.add("flash");
+  all.forEach((x) => { x.classList.add("dev"); x.classList.remove("flash"); void x.offsetWidth; x.classList.add("flash"); });
   r.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 }
 function fromDevice(s, id, old, v) {
@@ -318,7 +317,7 @@ function fromDevice(s, id, old, v) {
   const pg = M.page, k = pg && !pg.home && pg.scope === s ? pg.ids.indexOf(id) : pg && pg.home && !s ? M.homeIds.indexOf(id) : -1;
   const a = fmtValue(d, old), b = fmtValue(d, v);
   toast(k, `${k >= 0 ? `<b>KNOB ${k + 1}</b> ` : ""}${esc(d.label)} <span class="num">${esc(a[0] + a[1])} → ${esc(b[0] + b[1])}</span>`);
-  document.querySelectorAll(`.kn[data-k="${keyOf(s, id)}"],.tl[data-tl="${keyOf(s, id)}"]`).forEach((el) => { el.classList.add("hot"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("hot"), 1600); });
+  document.querySelectorAll(`.kn[data-k="${keyOf(s, id)}"],.tl[data-tl="${keyOf(s, id)}"],[data-cell="${keyOf(s, id)}"],.mt[data-mt="${keyOf(s, id)}"],.arc[data-k="${keyOf(s, id)}"]`).forEach((el) => { el.classList.add("hot"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("hot"), 1600); });
 }
 
 /* ------------------------------------------------------------ what we send --- */
@@ -340,8 +339,8 @@ function setVal(s, id, v) {
 /* ----------------------------------------------------------------- views --- */
 function knobSvg(d, v, i) {
   const r = 20, c = 2 * Math.PI * r, s = c * .75, a = frac(d, v), z = d.min < 0 && d.max > 0 ? -d.min / (d.max - d.min) : 0, lo = Math.min(a, z), hi = Math.max(a, z);
-  return `<svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="${r}" fill="none" stroke="#232327" stroke-width="6" stroke-linecap="round" stroke-dasharray="${s} ${c}" transform="rotate(135 26 26)"/>
-    <circle cx="26" cy="26" r="${r}" fill="none" stroke="${KH[i]}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${Math.max(.1, (hi - lo) * s)} ${c}" stroke-dashoffset="${-lo * s}" transform="rotate(135 26 26)"/></svg>`;
+  return `<svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="${r}" fill="none" stroke="#232327" stroke-width="6" stroke-linecap="butt" stroke-dasharray="${s} ${c}" transform="rotate(135 26 26)"/>
+    <circle cx="26" cy="26" r="${r}" fill="none" stroke="${KH[i]}" stroke-width="6" stroke-linecap="butt" stroke-dasharray="${Math.max(.1, (hi - lo) * s)} ${c}" stroke-dashoffset="${-lo * s}" transform="rotate(135 26 26)"/></svg>`;
 }
 function knob(s, id, i) {
   const d = id < 127 ? desc(s, id) : null;
@@ -361,16 +360,17 @@ function paintValue(s, id) {
   });
   if (S.mode === "play") { drawXY(); drawFaders(); }
   paintTile(s, id);
+  paintCards(s, id);
   if (id === 0 || id === 25 || id === 26) renderMeta();
 }
 /* a page's shape, from its values */
 function shape(kind, s, ids) {
   const W = 160, H = 72, f = (k) => { const id = ids[k]; return id < 127 && desc(s, id) ? frac(desc(s, id), val(s, id)) : 0; };
   if (kind === "env") { const a = f(0) * 40, d = a + f(1) * 40, y = H - 4 - f(2) * (H - 8), r = 120 + f(3) * 38;
-    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="M0 ${H - 4} L${a} 4 L${d} ${y} L120 ${y} L${r} ${H - 4}" fill="none" stroke="#287cff" stroke-width="2" stroke-linejoin="round"/></svg>`; }
+    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="M0 ${H - 4} L${a} 4 L${d} ${y} L120 ${y} L${r} ${H - 4}" fill="none" stroke="#287cff" stroke-width="2" stroke-linejoin="miter"/></svg>`; }
   if (kind === "lfo") { const w = ids[1] < 127 ? val(s, ids[1]) : 1, cyc = 1 + Math.round(f(0) * 5); let p = "";
     for (let i = 0; i <= 120; i++) { const t = (i / 120 * cyc) % 1, y = w === 0 ? Math.sin(t * 2 * Math.PI) : w === 1 ? (t < .5 ? t * 4 - 1 : 3 - t * 4) : w === 2 ? 1 - t * 2 : w === 3 ? (t < .5 ? 1 : -1) : [.6, -.2, .9, -.7, .3][Math.floor(i / 120 * cyc * 2) % 5]; p += `${i ? "L" : "M"}${i / 120 * W} ${H / 2 - y * (H / 2 - 6)}`; }
-    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="${p}" fill="none" stroke="#ffc618" stroke-width="2" stroke-linejoin="round"/></svg>`; }
+    return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true"><path d="${p}" fill="none" stroke="#ffc618" stroke-width="2" stroke-linejoin="miter"/></svg>`; }
   if (kind === "faders") return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${[0, 1, 2, 3].map((i) => `<rect x="${i * 42}" y="4" width="34" height="${H - 8}" rx="4" fill="#17171a"/><rect x="${i * 42}" y="${4 + (1 - f(i)) * (H - 8)}" width="34" height="${f(i) * (H - 8)}" rx="4" fill="${KH[i]}" opacity=".85"/>`).join("")}</svg>`;
   return `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${[0, 1, 2, 3].map((i) => ids[i] < 127 ? `<rect x="0" y="${i * 18 + 2}" width="${W}" height="10" rx="3" fill="#17171a"/><rect x="0" y="${i * 18 + 2}" width="${Math.max(4, f(i) * W)}" height="10" rx="3" fill="${KH[i]}"/>` : "").join("")}</svg>`;
 }
@@ -483,20 +483,9 @@ function quickView() {
 }
 
 function renderWork() {
-  let h = "";
-  if (S.folder === "HOME" && S.mode === "quick") h = quickView();
-  else if (S.folder === "HOME") {
-    h = HOME_ROWS.map(([t, sub, folder, s, ids, kind]) => row(t, sub, folder, s, ids || M.homeIds, kind)).join("");
-  } else {
-    const pages = LAYOUT.filter((x) => x.folder === S.folder);
-    h = pages.map((x) => (x.scope === 2 || x.title === "TOOLS" || !x.ids.some((i) => i < 127) ? awayRow(x.title, x.title, S.folder)
-      : row(x.title, x.title, S.folder, x.scope, x.ids, x.title.startsWith("ENV") && !x.title.includes("DEST") && !x.title.includes("LOOP") ? "env" : x.title === "LFO" ? "lfo" : x.title === "MACROS" ? "faders" : "bars"))).join("");
-    if (S.folder === "SEQ") h += `<p class="note">Las notas del patrón se editan en Estudio, en el secuenciador.</p>`;
-  }
-  $("edit").innerHTML = h;
-  if (M.page && S.folder !== "HOME" && FAM[M.page.fam] === S.folder) flashRowQuiet(M.page.title);
+  $("edit").innerHTML = S.folder === "HOME" && S.mode === "quick" ? quickBento() : bentoView(S.folder);
 }
-function flashRowQuiet(title) { const r = document.querySelector(`.row[data-title="${CSS.escape(title)}"]`); if (r) r.classList.add("dev"); }
+function flashRowQuiet(title) { document.querySelectorAll(`#edit [data-title="${CSS.escape(title)}"]`).forEach((r) => r.classList.add("dev")); }
 function renderWhere() { $("where").textContent = !M.page ? "" : M.page.home ? "HOME" : M.page.title; renderNav(); }
 function renderNav() {
   const dev = M.page ? (M.page.home ? "HOME" : FAM[M.page.fam]) : "";
