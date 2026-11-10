@@ -2,7 +2,7 @@
 /* ESTUDIO inside Live: the classic editor (everything else: backup, samples, the system, the advanced sequencer…), in
    this same file (gzip, base64), so it opens offline too. While it is open Live lets the FM-1 go (WATCH off, no PING,
    no STATE, its MIDI input unhooked) and the editor connects on its own; back to any folder, Live takes it again */
-let studioHtml = null;
+let studioHtml = null, studioUrl = null;
 async function studioSrc() {
   if (studioHtml) return studioHtml;
   const b64 = ($("studiogz") || {}).textContent || "", bin = Uint8Array.from(atob(b64.trim()), (c) => c.charCodeAt(0));
@@ -18,8 +18,8 @@ async function openStudio() {
   S.folder = "ESTUDIO"; renderNav(); document.body.classList.add("studio");
   $("edit").dataset.folder = "ESTUDIO";
   $("edit").innerHTML = `<div class="stu"><div class="stub"><b>Estudio</b><span>Live está en pausa mientras estás aquí: el editor usa el FM-1. Toca <b>Conectar</b> en el editor.</span>
-    <button class="more" data-f="LIVE">Volver a Live</button></div><iframe id="stuf" title="Estudio" allow="midi; fullscreen" sandbox="allow-scripts allow-same-origin allow-downloads allow-modals allow-popups allow-forms"></iframe></div>`;
-  try { $("stuf").srcdoc = await studioSrc(); } catch (e) { $("stuf").replaceWith(Object.assign(document.createElement("p"), { className: "pce", textContent: "No pude abrir Estudio en este navegador." })); }
+    <button class="more" data-f="LIVE">Volver a Live</button></div><iframe id="stuf" title="Estudio" allow="midi; fullscreen"></iframe></div>`;
+  try { studioUrl = studioUrl || URL.createObjectURL(new Blob([await studioSrc()], { type: "text/html" })); $("stuf").src = studioUrl; }   /* (a blob, not srcdoc: the editor keeps its tab in the URL) */ catch (e) { $("stuf").replaceWith(Object.assign(document.createElement("p"), { className: "pce", textContent: "No pude abrir Estudio en este navegador." })); }
 }
 async function closeStudio() {
   document.body.classList.remove("studio");

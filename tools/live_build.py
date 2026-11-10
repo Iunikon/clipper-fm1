@@ -21,7 +21,11 @@ START = "/* ------------------------------------------------------------------ s
 assert js.count(START) == 1
 js = js.replace(START, (src / "bento.js").read_text() + "\n" + (src / "seq.js").read_text() + "\n" + (src / "pages.js").read_text() + "\n" + (src / "studio.js").read_text() + "\n" + START)
 html = (src / "live.html").read_text()
-studio = base64.b64encode(gzip.compress((ROOT / "web" / "editor.html").read_bytes(), 9, mtime=0)).decode()   # (Estudio inside, offline)
+ed = (ROOT / "web" / "editor.html").read_text()
+REPL = 'history.replaceState(null, "", location.pathname + location.search + "#" + name)'   # (inside Live the editor is a blob:
+assert ed.count(REPL) == 1                                                                  #  its tab in the hash alone)
+ed = ed.replace(REPL, '{ try { history.replaceState(null, "", "#" + name); } catch (e) { /* (inside Live) */ } }')
+studio = base64.b64encode(gzip.compress(ed.encode(), 9, mtime=0)).decode()   # (Estudio inside, offline)
 for k, v in (("__CSS__", css), ("__MOCK__", mock), ("__STUDIO__", studio), ("__JS__", js)):
     assert html.count(k) == 1, k
     html = html.replace(k, v)

@@ -607,7 +607,7 @@ document.addEventListener("click", (e) => {
     disarm(b, "Borrar"); PC.act(CE.SMP_ERASE, [n & 127], "Sample borrado").then((ok) => ok && PC.again("smp"));
   } else if (b.dataset.pc === "up-erase") {
     if (b.dataset.arm !== "1") { arm(b, "Borrar", "¿Seguro?"); return; }
-    disarm(b, "Borrar"); PC.act(CE.UP_ERASE, [n & 127], "Sonido de usuario borrado").then((ok) => ok && reloadSoon());
+    disarm(b, "Borrar"); PC.act(CE.UP_ERASE, [n & 127], "Sonido de usuario borrado").then(async (ok) => { if (!ok) return; US.slots = null; try { await readList(); } catch (e) { /* (the next RELOAD) */ } reloadSoon(); });
   } else if (b.dataset.pc === "prj-load" || b.dataset.pc === "prj-save") {
     const load = b.dataset.pc === "prj-load", lab = load ? "Cargar" : b.textContent;
     if (b.dataset.arm !== "1") { arm(b, lab, "¿Seguro?"); return; }

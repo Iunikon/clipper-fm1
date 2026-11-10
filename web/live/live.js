@@ -589,7 +589,7 @@ function renderAll() { renderBar(); renderWhere(); renderWork(); }
 const KINDS = ["BASS", "KEYS", "ORGN", "PAD", "LEAD", "PLCK", "STAB", "FX", "USER"];
 const B = { kind: "BASS", open: false };
 function renderBrowser() {
-  const kinds = KINDS.filter((k) => M.list.some((x) => x.kind === k));
+  const kinds = KINDS.filter((k) => k === "USER" || M.list.some((x) => x.kind === k));   /* (USER always, even empty) */
   const favKeys = new Set(M.favs.map((f) => f.e + ":" + f.k + ":" + f.name));
   const cnt = (k) => (k === "FAVS" ? M.favs.length : k === "ALL" ? M.list.length : M.list.filter((x) => x.kind === k).length);
   const kd = (k, label, cls = "") => `<button class="kd ${cls}" data-kind="${k}" aria-current="${B.kind === k}"><span>${label}</span><span class="n">${cnt(k)}</span></button>`;
@@ -602,6 +602,7 @@ function renderBrowser() {
   $("snds").innerHTML = items.map((o) => { const f = favKeys.has(o.x.e + ":" + o.x.k + ":" + o.x.name);
     return `<button class="sd" role="listitem" ${o.fav != null ? `data-favgo="${o.fav}"` : `data-load="${o.n}"`} aria-current="${o.n === cur}"><span class="n">${esc(o.x.name)}</span><span class="x">${o.n >= 0 ? o.n + 1 : ""}</span>
       <span class="m">${B.kind === "ALL" || B.kind === "FAVS" ? `<span class="k">${esc(o.x.kind)}</span>` : ""}<span class="e">${esc(M.info.engines[o.x.e] || "USER")}</span>${f ? '<svg class="i st"><use href="#i-star"/></svg>' : ""}</span></button>`; }).join("");
+  if (!items.length && B.kind === "USER") $("snds").innerHTML = `<p class="pce">Todavía no hay sonidos de usuario. Guarda uno con <b>Guardar</b>: el FM-1 tiene 32 ranuras.</p>`;
 }
 function openBrowser(on, kind) {
   B.open = on;
@@ -614,7 +615,7 @@ function openBrowser(on, kind) {
 /* Every folder at once down the side; the sound that plays on top with what can be done to it (a favourite, its edits
    discarded, the one before or after it in its folder); the folder's sounds as cards. Favourites: the 16 slots, the
    free ones too */
-const SV = { kind: null };
+const SV = { kind: null }, US = { slots: null, busy: false };   /* (USER: the 32 slots, read when shown) */
 const favKey = (x) => x.e + ":" + x.k + ":" + x.name;
 function svItems(kind) {
   if (kind === "FAVS") return M.favs.map((f, i) => ({ fav: i, x: f, n: M.list.findIndex((y) => favKey(y) === favKey(f)) }));
@@ -623,14 +624,19 @@ function svItems(kind) {
 function soundsView() {
   const n = entryNow(), x = M.list[n], fav = M.favCur >= 0;
   if (!SV.kind) SV.kind = x ? x.kind : "FAVS";
-  const kinds = ["FAVS", "ALL", ...KINDS.filter((k) => M.list.some((y) => y.kind === k))];
-  const cnt = (k) => (k === "FAVS" ? `${M.favs.length}/16` : svItems(k).length);
+  const kinds = ["FAVS", "ALL", ...KINDS.filter((k) => k !== "USER" && M.list.some((y) => y.kind === k)), "USER"];   /* (USER always: its 32 slots) */
+  if (SV.kind === "USER" && !US.slots && !US.busy) { US.busy = true; readSlots().then((v) => { US.slots = v; }, () => { US.slots = []; }).finally(() => { US.busy = false; if (S.folder === "SAVE") renderWork(); }); }
+  const cnt = (k) => (k === "FAVS" ? `${M.favs.length}/16` : k === "USER" ? `${M.list.filter((y) => y.kind === "USER").length}/32` : svItems(k).length);
   const items = svItems(SV.kind), favs = new Set(M.favs.map(favKey)), inKind = x ? svItems(x.kind) : [], at = inKind.findIndex((o) => o.n === n);
   const name = x ? x.name : (M.info.engines[M.engine] || "") + " " + (M.preset + 1);
   const card = (o) => { const f = favs.has(favKey(o.x)), cur = o.n === n && n >= 0;
     return `<button class="sc${cur ? " cur" : ""}" role="listitem" ${o.fav != null ? `data-favgo="${o.fav}"` : `data-load="${o.n}"`} aria-current="${cur}">
       <span class="sn">${o.fav != null ? `<span class="fi num">${String(o.fav + 1).padStart(2, "0")}</span>` : ""}${esc(o.x.name)}${f && o.fav == null ? '<svg class="i st" aria-label="favorito"><use href="#i-star"/></svg>' : ""}</span>
       <span class="sm">${SV.kind === "ALL" || SV.kind === "FAVS" ? `<span class="k">${esc(o.x.kind)}</span>` : ""}<span class="e">${esc(M.info.engines[o.x.e] || "USER")}</span><span class="num">${o.n >= 0 ? o.n + 1 : ""}</span></span></button>`; };
+  const uslot = (u, k) => { const m = M.list.findIndex((y) => y.e === M.info.nengines && y.k === k), cur = m === n && n >= 0;
+    return u.used ? `<button class="sc${cur ? " cur" : ""}" role="listitem" ${m >= 0 ? `data-load="${m}"` : ""} aria-current="${cur}"><span class="sn"><span class="fi num">${upLabel(k)}</span>${esc(u.name)}</span><span class="sm"><span class="e">${esc(M.info.engines[u.e] || "")}</span></span></button>`
+      : `<div class="sc free" role="listitem"><span class="sn"><span class="fi num">${upLabel(k)}</span>Libre</span><span class="sm">Guarda aquí con Guardar</span></div>`; };
+  const userBody = SV.kind === "USER" ? (US.slots ? US.slots.map(uslot).join("") : `<p class="pce">Leyendo las ranuras de usuario del FM-1…</p>`) : null;
   const free = SV.kind === "FAVS" ? Array.from({ length: 16 - M.favs.length }, (_, i) => `<div class="sc free" role="listitem"><span class="sn"><span class="fi num">${String(M.favs.length + i + 1).padStart(2, "0")}</span>Libre</span><span class="sm">Carga un sonido y márcalo con la estrella</span></div>`).join("") : "";
   return `<div class="sv">
     <div class="svl"><nav class="svk" aria-label="Carpetas de sonidos">${kinds.map((k) => `<button class="kf${k === "FAVS" ? " fk" : ""}" data-skind="${k}" aria-current="${SV.kind === k}"><span>${k === "FAVS" ? "Favoritos" : k === "ALL" ? "Todos" : k}</span><span class="num">${cnt(k)}</span></button>`).join("")}</nav>
@@ -651,8 +657,8 @@ function soundsView() {
           ${x && x.e === M.info.nengines ? `<button class="btn dsc2" data-pc="up-erase" data-n="${x.k}">Borrar</button>` : ""}</div></section>
       ${DEV.some(([k]) => k === SV.kind)
         ? `<header class="svh"><h2>${DEV.find(([k]) => k === SV.kind)[1]}</h2></header>${devView(SV.kind)}`
-        : `<header class="svh"><h2>${SV.kind === "FAVS" ? "Favoritos" : SV.kind === "ALL" ? "Todos los sonidos" : esc(SV.kind)}</h2><span class="c num">${SV.kind === "FAVS" ? `${M.favs.length} de 16` : `${items.length} sonidos`}</span></header>
-      <div class="scs" role="list">${items.map(card).join("")}${free}</div>`}
+        : `<header class="svh"><h2>${SV.kind === "FAVS" ? "Favoritos" : SV.kind === "ALL" ? "Todos los sonidos" : SV.kind === "USER" ? "Sonidos de usuario" : esc(SV.kind)}</h2><span class="c num">${SV.kind === "FAVS" ? `${M.favs.length} de 16` : SV.kind === "USER" ? `${items.length} de 32` : `${items.length} sonidos`}</span></header>
+      <div class="scs" role="list">${userBody != null ? userBody : items.map(card).join("") + free}</div>`}
     </div></div>`;
 }
 
@@ -772,7 +778,7 @@ async function doSave() {
     const r = await rq(C.UP_STORE, [slot, ...[...name].map((c) => c.charCodeAt(0)), 0], { timeout: 3000, retries: 0 });
     const rc = r[1];
     if (rc) { $("shw").textContent = { 1: "Esta pista no tiene un sonido que guardar (la de batería).", 2: "No se pudo escribir la memoria del FM-1.", 3: "Para la reproducción y vuelve a guardar." }[rc] || "No se pudo guardar."; return; }
-    await readList();
+    await readList(); US.slots = null;
     const n = M.list.findIndex((x) => x.e === M.info.nengines && x.k === slot);
     if (n >= 0) await rq(C.LIST_GO, u14(n));          /* (the device plays it from its slot: RELOAD brings the rest) */
     openSave(false);
