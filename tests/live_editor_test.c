@@ -219,6 +219,37 @@ int main(void)
         check(arg()[0] == 1u && transport_req == 1u, "TRANSPORT 1: the start asked for");
         transport_req = 0;
     }
+    /* X_GET / X_SET: the synth pages' values (MIDI's BEND here); X_CHANGED when the device changes one or a MOD SEQ step */
+    {
+        uint8_t q[3];
+        a[0] = 1; ed(ED_WATCH, a, 1);
+        frames_pushing(3, 0, 0);
+        q[0] = X_MBEND; ed(ED_X_GET, q, 1);
+        check(rx_last[4] == ED_X_GET && arg()[0] == X_MBEND && strlen((const char *)arg() + 9) > 0u, "X_GET BEND: its value and label");
+        q[0] = X_MBEND; q[1] = (8192 + 12) & 127; q[2] = (8192 + 12) >> 7; ed(ED_X_SET, q, 3);
+        check(midi_bend == 12u && (arg()[1] | arg()[2] << 7) == 8192 + 12, "X_SET BEND 12: set, as the knob");
+        check(frames_pushing(3, ED_X_CHANGED, 0) == 0u, "the editor's own X_SET: no push");
+        midi_bend = 2;
+        check(frames_pushing(3, ED_X_CHANGED, 0) == 1u, "BEND changed on the device: X_CHANGED pushed");
+        TSEL->ms[0][3] = (int8_t)(TSEL->ms[0][3] == 5 ? 4 : 5);
+        check(frames_pushing(10, ED_X_CHANGED, 0) >= 1u, "a MOD SEQ step changed on the device: X_CHANGED pushed");
+        q[0] = 120; ed(ED_X_GET, q, 1);
+        check(arg()[0] == 0xFFu - 128u || arg()[0] == 127u, "X_GET of no such id: an empty reply");
+    }
+    /* STATE and REC: the REC button from the editor, arm and back */
+    {
+        uint8_t q[2];
+        ed(ED_STATE, a, 0);
+        check(rx_last[4] == ED_STATE && rx_n == 5u + 11u + 1u && arg()[0] <= 100u, "STATE: cpu, late, peak, scale, rec, the REC screen, empty");
+        song.playing = 0; song.rec = 0; rec_wait = 0;
+        q[0] = 0; ed(ED_REC, q, 1);
+        check(rec_wait && (arg()[6] & 2u), "REC stopped: armed, as the button");
+        q[0] = 0; ed(ED_REC, q, 1);
+        check(!rec_wait && !(arg()[6] & 3u), "REC again: off");
+        q[0] = 2; q[1] = 1; ed(ED_REC, q, 2);
+        check(rec_count == 1u && arg()[8] == 1u, "REC START COUNT");
+        q[1] = 0; ed(ED_REC, q, 2);
+    }
     printf("live: %s\n", fails ? "FAILED" : "all passed");
     return fails != 0;
 }

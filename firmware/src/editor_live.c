@@ -22,15 +22,31 @@
  *  106 PLAY           -> playing (0/1), the step the selected part plays (2 x 7 bits; its index in its pattern). Also
  *                        pushed while watched when either changes (the sequencer's playhead)
  *  107 TRANSPORT on   -> playing: starts (1) or stops (0) the sequencer as the PLAY button does
+ *  109 X_GET id       -> id, value v14, fmt, min v14, max v14, flags (1: names follow), label, unit, then the names: one of
+ *                        the synth pages' values (ui_synth.c X_*: LAYER, LAYER 2, MORPH, RANDOM, UNDO, MATRIX, MOD SEQ,
+ *                        TUNING, MIDI, MIDI 2, FMX's), its range as the knob sees it now (some move: UNDO, a layer's SOUND)
+ *  110 X_SET id v14   -> as X_GET: the value set as KNOB n sets it on that page (its action too: SWAP, GO, BACK...)
+ *  111 X_CHANGED      (push) the synth pages' values or the MOD SEQ's steps changed on the device: read them again
+ *  112 STATE          -> cpu % (the audio load), late (2 x 7: halves rendered late since power-on), peak % (the worst
+ *                        half lately), the scale's 12 notes (2 x 7, bit 0 the root), rec (bit 0 recording, 1 armed,
+ *                        2 a free take, 3 the count-in runs), the REC screen's MODE (0 FREE 1 TEMPO), START (0 NOTE 1
+ *                        COUNT), QUANT (0 ON 1 OFF), the project empty (1)
+ *  113 REC op [v]     -> STATE: 0 the REC button (arm / record / stop recording), 1 MODE v, 2 START v, 3 QUANT v
+ * PAGE's scope 3: a synth page, its 4 ids X_* (X_GET); PLAY ends with STATE's rec byte, and is pushed when it changes
  * Included by editor.c after ui.c (fav_list, preset_go, fav_toggle). */
-enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO, ED_EDITED, ED_TOOL, ED_PLAY, ED_TRANSPORT };
+enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO, ED_EDITED, ED_TOOL, ED_PLAY, ED_TRANSPORT,
+       ED_X_GET = 109, ED_X_SET, ED_X_CHANGED, ED_STATE, ED_REC };
 #define ED_LV_EDITED ((uint8_t)(hist_edited && !hist_cmp_on))
 static struct {
     uint8_t home, page, edited;
-    uint32_t fsig, play;
+    uint32_t fsig, play, xsig;
 } ed_lv;
-#define ED_LV_PLAY ((uint32_t)song.playing << 15 | (TSEL->seq_idx % trk_len(TSEL)))   /* playing, and the step */
+#define ED_LV_REC ((uint32_t)(song.rec != 0u) | (uint32_t)rec_wait << 1 | (uint32_t)ft_on << 2 | (uint32_t)ci_on << 3)
+#define ED_LV_PLAY (ED_LV_REC << 16 | (uint32_t)song.playing << 15 | (TSEL->seq_idx % trk_len(TSEL)))   /* rec, playing, step */
 
+#if CLIPPER_SYNTH
+UI_SMALL static uint32_t ed_lv_xsig(void);
+#endif
 UI_SMALL static uint32_t ed_lv_fsig(void)                          /* the favourites, in order */
 {
     uint32_t i, h = 0;
@@ -54,7 +70,7 @@ UI_SMALL static uint32_t ed_lv_cur(void)                           /* the LIST e
 UI_SMALL static void ed_lv_page(void)
 {
     const page_t *pg = cur_page();
-    uint32_t k, sc = pg->scope == SC_GLOBAL ? 1u : pg->scope == SC_TRACK || pg->scope == SC_ENGINE ? 0u : 2u;
+    uint32_t k, sc = pg->scope == SC_GLOBAL ? 1u : pg->scope == SC_TRACK || pg->scope == SC_ENGINE ? 0u : pg->scope == SC_SYN ? 3u : 2u;
     int16_t *vp;
     ed_b(ui.home);
     ed_b(pg->fam);
@@ -100,12 +116,65 @@ UI_SMALL static void ed_lv_shadow(void)                            /* WATCH: in 
     ed_lv.fsig = ed_lv_fsig();
     ed_lv.edited = ED_LV_EDITED;
     ed_lv.play = ED_LV_PLAY;
+#if CLIPPER_SYNTH
+    ed_lv.xsig = ed_lv_xsig();
+#endif
 }
 UI_SMALL static void ed_lv_play(uint32_t pl)
 {
-    ed_b(pl >> 15);
+    ed_b((pl >> 15) & 1u);
     ed_b(pl & 127u);
     ed_b((pl >> 7) & 127u);
+    ed_b(pl >> 16);                                  /* (STATE's rec byte) */
+}
+#if CLIPPER_SYNTH
+UI_SMALL static uint32_t ed_lv_xsig(void)                          /* the synth pages' values, the MOD SEQ's steps */
+{
+    uint32_t i, h = syn_sig();
+    int16_t *vp;
+    for (i = 0; i < X_COUNT; i++)
+        if (syn_desc(i, &vp) && vp)
+            h = (h ^ (uint16_t)*vp) * 16777619u;
+    for (i = 0; i < MSEQ_LANES * MSEQ_STEPS; i++)
+        h = (h ^ (uint8_t)TSEL->ms[i / MSEQ_STEPS][i % MSEQ_STEPS]) * 16777619u;
+    return h;                                        /* (not the step playing: that is no news) */
+}
+UI_SMALL static void ed_lv_x(uint32_t id)                          /* X_GET's reply */
+{
+    int16_t *vp;
+    const param_desc_t *d = syn_desc(id, &vp);
+    uint32_t i;
+    ed_b(id);
+    if (!d || !vp) {
+        ed_v(0); ed_b(0); ed_v(0); ed_v(0); ed_b(0); ed_str("", 1); ed_str("", 1);
+        return;
+    }
+    ed_v(*vp);
+    ed_b(d->fmt);
+    ed_v(d->min);
+    ed_v(d->max);
+    ed_b(d->names ? 1u : 0u);
+    ed_str(d->label, 8);
+    ed_str(d->unit ? d->unit : "", 8);
+    if (d->names)
+        for (i = 0; i <= (uint32_t)(d->max - d->min) && i < 64u; i++)
+            ed_str(d->names[i], 8);
+}
+#endif
+UI_SMALL static void ed_lv_state(void)
+{
+    uint32_t m = is_drum(TSEL) ? 0u : scale_mask(TSEL);
+    ed_b(clamp((int32_t)(song.cpu_q8 * 100u / 256u), 0, 127));
+    ed_b(diag_late & 127u);
+    ed_b((diag_late >> 7) & 127u);
+    ed_b(clamp((int32_t)diag_peak, 0, 127));
+    ed_b(m & 127u);
+    ed_b((m >> 7) & 127u);
+    ed_b(ED_LV_REC);
+    ed_b(rec_tempo);
+    ed_b(rec_count);
+    ed_b(rec_quant_off);
+    ed_b((uint32_t)project_empty());
 }
 UI_SMALL static int ed_lv_sync(void)                               /* while watched: 1 = a push went out */
 {
@@ -126,7 +195,7 @@ UI_SMALL static int ed_lv_sync(void)                               /* while watc
         return 1;
     }
     h = ED_LV_PLAY;
-    if (h != ed_lv.play && (song.playing || ed_lv.play >> 15)) {   /* (stopped: the step it rests on is no news) */
+    if (h != ed_lv.play && (song.playing || (ed_lv.play >> 15 & 1u) || (h >> 16) != (ed_lv.play >> 16))) {   /* (stopped: the step it rests on is no news) */
         ed_lv.play = h;
         ed_begin(ED_PLAY);
         ed_lv_play(h);
@@ -134,6 +203,15 @@ UI_SMALL static int ed_lv_sync(void)                               /* while watc
         return 1;
     }
     ed_lv.play = h;
+#if CLIPPER_SYNTH
+    h = ed_lv_xsig();
+    if (h != ed_lv.xsig) {
+        ed_lv.xsig = h;
+        ed_begin(ED_X_CHANGED);
+        ed_send();
+        return 1;
+    }
+#endif
     h = ed_lv_fsig();
     if (h != ed_lv.fsig) {
         ed_lv.fsig = h;
@@ -194,6 +272,38 @@ UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   
         if (i != song.playing)
             transport_req = i ? 1u : 2u;
         ed_b(i);
+        return 1;
+#if CLIPPER_SYNTH
+    case ED_X_GET:                                  /* id -> id, value, desc */
+    case ED_X_SET: {                                /* id, v14 -> as X_GET */
+        int16_t *vp;
+        const param_desc_t *d;
+        i = na ? a[0] : 0xFFu;
+        if (i >= X_COUNT)
+            i = 0xFFu;
+        if (cmd == ED_X_SET && i != 0xFFu && na >= 3u && (d = syn_desc(i, &vp)) != 0 && vp && d->max > d->min) {
+            *vp = (int16_t)clamp((int32_t)(a[1] | a[2] << 7) - 8192, d->min, d->max);
+            syn_changed(i, vp);                     /* (as KNOB n on the page; no whole redraw: the page's signatures) */
+            ed_lv.xsig = ed_lv_xsig();              /* (the editor's own change: no push) */
+        }
+        ed_lv_x(i);
+        return 1;
+    }
+#endif
+    case ED_STATE:
+        ed_lv_state();
+        return 1;
+    case ED_REC:                                    /* op [v] -> STATE */
+        i = na ? a[0] : 0xFFu;
+        if (i == 0u)
+            rec_toggle();
+        else if (i == 1u && na >= 2u)
+            rec_tempo = (uint8_t)(a[1] & 1u), settings_later = 1;
+        else if (i == 2u && na >= 2u)
+            rec_count = (uint8_t)(a[1] & 1u), settings_later = 1;
+        else if (i == 3u && na >= 2u)
+            rec_quant_off = (uint8_t)(a[1] & 1u), settings_later = 1;
+        ed_lv_state();
         return 1;
     case ED_TOOL:                                   /* id -> id, rc */
         i = na ? a[0] : 0u;
