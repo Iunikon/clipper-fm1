@@ -76,12 +76,13 @@ function gEq(s, ids) {
   return { svg: rule(50) + `<path d="${pts(p)}" class="line"/>`, handles: [] };
 }
 /* graph_fx: a thin bar a send, a cap on its level; here a whole column takes the finger */
+const FXPAGE = { 33: "FX", 34: "CHORUS", 35: "DLY", 36: "REVERB" };   /* (a send: the page that edits its effect) */
 function gMeters(s, ids, toggles) {
   return live(ids).map(({ id, k }) => { const d = desc(s, id); if (!d) return ""; const f = frac(d, val(s, id)), z = zeroOf(d), [t, u] = fmtValue(d, val(s, id));
     const q = toggles && QSPEC.get(keyOf(s, id)), off = q && !qOn(q);
     return `<div class="mt${off ? " off" : ""}" style="--c:${KC[k]};--lo:${Math.min(f, z)};--hi:${Math.max(f, z)};--f:${f}" data-mt="${keyOf(s, id)}"><span class="mv num">${esc(t)}<small>${esc(u)}</small></span>
       <div class="mtr${z ? " bi" : ""}" data-drag="v" data-k="${keyOf(s, id)}"><i></i><b></b><s></s></div>
-      ${q ? `<button class="ml" data-qtog="${keyOf(s, id)}" role="switch" aria-checked="${!off}">${esc(q.name)}</button>` : `<span class="ml">${esc(d.label)}</span>`}</div>`; }).join("");
+      ${q ? `<span class="mlw"><button class="ml" data-qtog="${keyOf(s, id)}" role="switch" aria-checked="${!off}">${esc(q.name)}</button><button class="mle" data-fxedit="${FXPAGE[id] || "FX"}" aria-label="Editar ${esc(q.name)}"><svg class="i"><use href="#i-edit"/></svg></button></span>` : `<span class="ml">${esc(d.label)}</span>`}</div>`; }).join("");
 }
 function gArcs(s, ids) {
   return live(ids).map(({ id, k }) => { const d = desc(s, id); if (!d) return ""; const v = val(s, id), a = frac(d, v), z = d.min < 0 && d.max > 0 ? -d.min / (d.max - d.min) : 0;
@@ -118,6 +119,7 @@ function tileP(s, id, k, pt, tag = pt) {
   const d = desc(s, id); if (!d) return "";
   const v = val(s, id), key = keyOf(s, id), lv = devLive(S.folder, pt) ? " dev" : "", at = `style="--c:${KC[k]}${isChoice(d) ? "" : ";" + fillVars(d, v)}" data-cell="${key}" data-kk="${k}" data-title="${esc(pt)}" data-tag="${tag ? 1 : 0}"`;
   const top = `<span class="tt"><span class="tlb"><i></i>${esc(d.label)}</span>${tag ? `<span class="pg">${esc(pt)}</span>` : ""}</span>`;
+  if (typeof isGo === "function" && isGo(d)) return `<button class="tp t-go${lv}" ${at} data-set="${key}" data-v="${d.max}"><span class="tt"><span class="tlb"><i></i>${esc(d.label)}</span></span><span class="tv">GO</span></button>`;   /* (RAND, BACK, SET A, SWAP…: an action) */
   if (isOnOff(d)) { const on = v !== d.min;
     return `<button class="tp t-sw${on ? " on" : ""}${lv}" ${at} role="switch" aria-checked="${on}" data-set="${key}" data-v="${on ? d.min : d.max}" aria-label="${esc(d.label)}">${top}<span class="tv num">${valHtml(d, v)}</span><span class="knob" aria-hidden="true"></span></button>`; }
   const opts = () => d.names.map((n, i) => `<button role="radio" aria-checked="${i + d.min === v}" data-set="${key}" data-v="${i + d.min}">${esc(n)}</button>`).join("");
@@ -125,7 +127,8 @@ function tileP(s, id, k, pt, tag = pt) {
   if (isEnum(d) && d.names.length <= 4) return `<div class="tp t-seg${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span><div class="opts" role="radiogroup" aria-label="${esc(d.label)}">${opts()}</div></div>`;
   if (isEnum(d)) return `<div class="tp t-arr${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span><span class="pos num">${v - d.min + 1}/${d.max - d.min + 1}</span>
     <div class="arw"><button data-set="${key}" data-v="${v <= d.min ? d.max : v - 1}" aria-label="${esc(d.label)}: anterior"><svg class="i"><use href="#i-prev"/></svg></button><button data-set="${key}" data-v="${nextOf(d, v)}" aria-label="${esc(d.label)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div></div>`;
-  if (d.max <= d.min) return `<div class="tp${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span></div>`;   /* (a reading: CPU) */
+  if (d.max <= d.min && d.label === "CPU" && M.state) return `<div class="tp${lv}" ${at}>${top}<span class="tv num">${M.state.cpu}<small>%</small></span><span class="pos2 num">LATE ${M.state.late}  PEAK ${M.state.peak}%</span></div>`;   /* (SYSTEM's reading: STATE) */
+  if (d.max <= d.min) return `<div class="tp${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span></div>`;   /* (a reading) */
   return `<div class="tp t-fd${zeroOf(d) ? " t-bi" : ""}${lv}" ${at} data-fd="${key}" role="slider" tabindex="0" aria-label="${esc(d.label)}" aria-valuenow="${v}" aria-valuemin="${d.min}" aria-valuemax="${d.max}">${top}<span class="tv num">${valHtml(d, v)}</span><span class="fl" aria-hidden="true"></span></div>`;
 }
 
@@ -549,7 +552,7 @@ document.addEventListener("change", (e) => {
 });
 
 /* ---- SAVE > Dispositivo: biblioteca, samples, kits y proyectos ---- */
-const DEV = [["SMP", "Samples"], ["KIT", "Drum kits"], ["LIB", "Biblioteca"], ["PRJ", "Proyectos"]];
+const DEV = [["KIT", "Drum kits"], ["LIB", "Biblioteca"], ["PRJ", "Proyectos"]];   /* (the samples: in Estudio) */
 const KIT = { k: 0 };
 function devView(kind) {
   if (kind === "SMP") {

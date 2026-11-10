@@ -83,7 +83,7 @@ function seqBlock() {
   for (let i = 0; i < rows * 16 && i < SQ.steps.length; i++) cells.push(sqCell(i, len));
   const lv = M.page && !M.page.home && M.page.title === "NOTES";
   return `<section class="blk sqb${lv ? " dev" : ""}" data-title="NOTES"><header class="bh"><h2><svg class="i"><use href="#i-seq"/></svg>NOTES</h2>
-      <span class="c num">${len} pasos</span><div class="seg sqm" role="group" aria-label="Secuenciador"><button data-sqmode="b" aria-pressed="${!SQ.full}">Básico</button><button data-sqmode="c" aria-pressed="${SQ.full}">Completo</button></div><button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
+      <span class="c num">${len} pasos</span><button class="sqst" data-f="ESTUDIO">Avanzado en Estudio</button><button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
     ${SQ.full ? sqFullBody(len, cells.join("")) : `<div class="sqg" role="group" aria-label="Pasos">${cells.join("")}</div>`}${sqEditor()}${SQ.full ? sqLib() : ""}</section>`;
 }
 function sqPaint(i) {
@@ -108,7 +108,7 @@ const unpack7 = (a) => { const out = []; for (let i = 0; i < a.length; i += 8) {
 const SQX = { loaded: false, loading: false, tr: 0, micro: null, fill: null, locks: null };
 const sqTr = () => (PCD.tracks && PCD.tracks !== "…" ? PCD.tracks.sel : 0) || 0;
 const sqPref = (() => { try { return JSON.parse(localStorage.getItem("clipper.sq") || "{}"); } catch (e) { return {}; } })();
-Object.assign(SQ, { full: !!sqPref.full, view: sqPref.view || "grid", lane: sqPref.lane || "vel", r0: 0, r1: 0, ext: false, clip: null, page: 0, oct: null });
+Object.assign(SQ, { full: false, view: sqPref.view || "grid", lane: sqPref.lane || "vel", r0: 0, r1: 0, ext: false, clip: null, page: 0, oct: null });
 const sqPrefSave = () => { try { localStorage.setItem("clipper.sq", JSON.stringify({ full: SQ.full, view: SQ.view, lane: SQ.lane })); } catch (e) { /* (solo comodidad) */ } };
 const C_MICRO_GET = 39, C_MICRO_SET = 40, C_FILL_GET = 41, C_FILL_SET = 42, C_LOCK_GET = 37, C_LOCK_SET = 38;
 

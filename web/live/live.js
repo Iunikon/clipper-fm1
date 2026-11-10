@@ -48,8 +48,8 @@ function fmtValue(d, v) {
 const HDR = [0x7D, 0x46, 0x4C];
 const C = { INFO: 1, GET: 2, SET: 3, DUMP: 4, DESC: 5, STEP_GET: 6, STEP_SET: 7, UP_LIST: 16, UP_STORE: 19, WATCH: 22, CHANGED: 23, RELOAD: 24, PING: 25, STEP_CHANGED: 26, TRACK_CHANGED: 32,
   PAGE: 97, FAVS: 98, FAV_GO: 99, FAV_SET: 100, FAVS_CHANGED: 101, LIST: 102, LIST_GO: 103, EDITED: 104, TOOL: 105, PLAY: 106, TRANSPORT: 107,
-  SCOPE: 108 };
-const PUSH = new Set([C.CHANGED, C.RELOAD, C.STEP_CHANGED, C.TRACK_CHANGED, C.FAVS_CHANGED, C.EDITED, C.SCOPE]);
+  SCOPE: 108, X_GET: 109, X_SET: 110, X_CHANGED: 111, STATE: 112, REC: 113 };
+const PUSH = new Set([C.CHANGED, C.RELOAD, C.STEP_CHANGED, C.TRACK_CHANGED, C.FAVS_CHANGED, C.EDITED, C.SCOPE, C.X_CHANGED]);
 const v14 = (v) => { const u = Math.max(-8192, Math.min(8191, Math.round(v))) + 8192; return [u & 127, (u >> 7) & 127]; };
 const u14 = (n) => [n & 127, (n >> 7) & 127];
 const frame = (cmd, args) => [0xF0, ...HDR, cmd & 127, ...args, 0xF7];
@@ -78,6 +78,10 @@ const P = {
     o.cur = r.more ? r.u() : null; if (o.cur === 16383) o.cur = -1; return o; },          /* (cur: the LIST entry playing) */
   entry(r) { return { e: r.b(), k: r.b(), kind: r.s(), name: r.s() }; },
   favs(a) { const r = new Reader(a), n = r.b(), cur = r.b(), list = []; for (let i = 0; i < n; i++) list.push(P.entry(r)); return { cur: cur === 127 ? -1 : cur, list }; },
+  x(a) { const r = new Reader(a), o = { id: r.b(), v: r.v(), fmt: r.b(), min: r.v(), max: r.v(), names: [] }; const has = r.b();   /* (Live 109) a synth page's value */
+    o.label = r.s(); o.unit = r.s(); if (has) while (r.more && o.names.length <= o.max - o.min) o.names.push(r.s());
+    if (o.names.length) o.fmt = F.ENUM; o.def = o.min; return o; },
+  state(a) { return { cpu: a[0], late: a[1] | a[2] << 7, peak: a[3], scale: a[4] | a[5] << 7, rec: a[6], mode: a[7], start: a[8], quant: a[9], empty: a[10] }; },
   step(a) { const r = new Reader(a), o = { index: r.b(), n: r.b(), notes: [r.b(), r.b(), r.b(), r.b()], time: r.b(), flags: r.b(), vel: r.b(), lvl: 0, rat: 0 };
     if (r.more) { const lo = r.b(), hi = r.b(), ra = r.b(); o.lvl = lo | (hi & 1) << 7; o.rat = ra | ((hi >> 1) & 1) << 7; } return o; },
   list(a) { const r = new Reader(a), total = r.u(), start = r.u(), n = r.b(), items = []; for (let i = 0; i < n; i++) items.push(P.entry(r)); return { total, start, items }; },
@@ -123,8 +127,8 @@ function makeMock(onFrame) {
   const steps = Array.from({ length: info.nstep }, (_, i) => { const on = [0, 3, 6, 8, 10, 12, 14].includes(i), n = [36, 36, 48, 39, 36, 41, 43][[0, 3, 6, 8, 10, 12, 14].indexOf(i)];
     return { n: on ? 1 : 0, notes: [on ? n : 0, 0, 0, 0], time: on ? 0 : i === 7 ? 1 : 2, flags: i === 6 ? 1 : i === 10 ? 2 : 0, vel: 100, lvl: 0, rat: 0 }; });
   const stepArgs = (i) => { const st = steps[i]; return [i, st.n, ...st.notes, st.time, st.flags, st.vel, st.lvl & 127, ((st.lvl >> 7) & 1) | (((st.rat >> 7) & 1) << 1), st.rat & 127]; };
-  const sq = { playing: 0, pos: 0, t: 0 };
-  const playArgs = () => [sq.playing, sq.pos & 127, sq.pos >> 7];
+  const sq = { playing: 0, pos: 0, t: 0 }, mrec = { rec: 0, mode: 0, start: 0, quant: 0 };
+  const playArgs = () => [sq.playing, sq.pos & 127, sq.pos >> 7, mrec.rec];
   const relist = () => { D.list = D.list.filter((x) => x[0] < NE).concat(ups.map((u, k) => u && [NE, k, "USER", u.name]).filter(Boolean)); };
   const m = { p: D.dump.p.slice(), g: D.dump.g.slice(), engine: D.dump.engine, preset: D.dump.preset, n: 0, favs: [0, 6, 64, 120, 200, 290],
     page: { home: 1, fam: 0, page: 0, title: "HOME", scope: 0, ids: [] }, watch: false, edited: 0 };
@@ -158,6 +162,12 @@ function makeMock(onFrame) {
       case C.WATCH: m.watch = !!(a[0] & 1); return [a[0] & 3];
       case C.PING: return [0];
       case C.TOOL: return [a[0], [22, 23, 31].includes(a[0]) ? 0 : 1];
+      case C.X_GET: case C.X_SET: { const d = (D.xdesc || {})[a[0]]; if (!d) return [127, ...v14(0), 0, ...v14(0), ...v14(0), 0, 0, 0];
+        if (cmd === C.X_SET) { const v = (a[1] | (a[2] << 7)) - 8192; d.v = d.names[1] === "GO" ? 0 : Math.max(d.min, Math.min(d.max, v)); }
+        return [a[0], ...v14(d.v), d.fmt, ...v14(d.min), ...v14(d.max), d.names.length ? 1 : 0, ...enc.s(d.label), ...enc.s(d.unit || ""), ...d.names.flatMap(enc.s)]; }
+      case C.STATE: return [12 + (Date.now() / 1500 % 7 | 0), 0, 0, 30, 0b10110101 & 127, (0b101011010101 >> 7) & 127, mrec.rec, mrec.mode, mrec.start, mrec.quant, 0];
+      case C.REC: if (a[0] === 0) mrec.rec = mrec.rec ? 0 : sq.playing ? 1 : 2; else if (a[0] === 1) mrec.mode = a[1] & 1; else if (a[0] === 2) mrec.start = a[1] & 1; else if (a[0] === 3) mrec.quant = a[1] & 1;
+        return answer(C.STATE, []);
       case C.STEP_GET: return a[0] < steps.length ? stepArgs(a[0]) : null;
       case C.STEP_SET: { const i = a[0]; if (i >= steps.length) return null;
         steps[i] = { n: Math.min(4, a[1]), notes: a.slice(2, 6), time: Math.min(2, a[6]), flags: a[7] & 3, vel: a[8], lvl: a.length > 9 ? a[9] | (a[10] & 1) << 7 : 0, rat: a.length > 9 ? a[11] | ((a[10] >> 1) & 1) << 7 : 0 };
@@ -231,14 +241,14 @@ function makeMock(onFrame) {
 
 /* ----------------------------------------------------------- the state --- */
 /* M: what the FM-1 says. S: what this screen shows */
-const M = { edited: false, link: null, info: null, pdesc: [], gdesc: [], p: [], g: [], engine: 0, preset: 0, list: [], favs: [], favCur: -1, page: null, homeIds: [127, 127, 127, 127], mock: false };
+const M = { edited: false, link: null, info: null, pdesc: [], gdesc: [], xdesc: [], x: [], state: null, rec: 0, p: [], g: [], engine: 0, preset: 0, list: [], favs: [], favCur: -1, page: null, homeIds: [127, 127, 127, 127], mock: false };
 const S = { folder: "LIVE", follow: true, hot: new Map() };
 const FAM = { 0: "HOME", 1: "ENV", 2: "LFO", 3: "FX", 4: "SEL", 5: "EDIT", 6: "GLO", 7: "SAVE", 8: "ARP", 9: "SEQ" };
-const NAV = [["LIVE", "play"], ["HOME", "home"], ["EDIT", "edit"], ["ENV", "env"], ["LFO", "lfo"], ["FX", "fx"], ["SEL", "sel"], ["ARP", "arp"], ["SEQ", "seq"], ["GLO", "glo"], ["SAVE", "save"], ["ESTUDIO", "studio"]];
+const NAV = [["LIVE", "play"], ["HOME", "home"], ["EDIT", "edit"], ["ENV", "env"], ["LFO", "lfo"], ["FX", "fx"], ["SEL", "sel"], ["ARP", "arp"], ["SEQ", "seq"], ["REC", "rec"], ["GLO", "glo"], ["SAVE", "save"], ["ESTUDIO", "studio"]];
 const ICON = { HOME: "home", EDIT: "edit", ENV: "env", LFO: "lfo", FX: "fx", SEL: "sel", ARP: "arp", SEQ: "seq", GLO: "glo", SAVE: "save" };
 const LAYOUT = JSON.parse($("mockdata").textContent).pages;     /* the device's pages (params.c PAGES), as the firmware lays them out */
-const desc = (s, id) => (s ? M.gdesc[id] : M.pdesc[id]);
-const val = (s, id) => (s ? M.g[id] : M.p[id]);
+const desc = (s, id) => (s === 3 ? M.xdesc[id] : s ? M.gdesc[id] : M.pdesc[id]);   /* (3: a synth page's X_*) */
+const val = (s, id) => (s === 3 ? M.x[id] : s ? M.g[id] : M.p[id]);
 const keyOf = (s, id) => s + ":" + id;
 const frac = (d, v) => (d && d.max > d.min ? (Math.max(d.min, Math.min(d.max, v)) - d.min) / (d.max - d.min) : 0);
 const entryNow = () => (M.page && M.page.cur != null ? M.page.cur : M.list.findIndex((x) => x.e === M.engine && x.k === M.preset));
@@ -302,6 +312,8 @@ async function load() {
     say("Leyendo la lista de sonidos…");
     await readList();
     await readSound(true);
+    await readX();
+    try { sqPlayFrom(await rq(C.PLAY, [], { quiet: true, retries: 0, timeout: 500 })); } catch (e) { /* (older firmware) */ }
     await readFavs();
     await rq(C.WATCH, [3]);
     progress(1);
@@ -310,9 +322,11 @@ async function load() {
     $("conn").classList.remove("off");
     keepAlive();
     if (NAV.some(([n]) => n === QS.get("folder"))) S.folder = QS.get("folder");   /* (?folder= ?mode=edit ?br=1 ?save=1: to open a view straight away) */
-    renderAll();
+    renderAll(); renderTransport(); pollState();
     if (QS.get("mode") === "edit") { S.folder = "HOME"; renderNav(); renderWork(); }   /* (compatibilidad con el enlace viejo) */
     if (QS.get("br") === "1") openBrowser(true);
+    if (QS.get("follow") === "0") { S.follow = false; $("follow").setAttribute("aria-pressed", "false"); }   /* (captures: the example FM-1 turns pages) */
+    if (QS.get("at")) setTimeout(() => document.querySelector(`#edit [data-title="${CSS.escape(QS.get("at"))}"]`)?.scrollIntoView({ block: "start" }), 600);   /* (captures: a page of the folder) */
     if (QS.get("save") === "1") openSave(true);
   } catch (e) {
     console.error(e);
@@ -355,9 +369,10 @@ function onPush(f) {
       paintValue(s, id);
       fromDevice(s, id, old, v);
       logChange(s, id, old, v, "sinte");
-    } else if (f.cmd === C.RELOAD) { SQ.loaded = false; reloadSoon(); }
+    } else if (f.cmd === C.RELOAD) { SQ.loaded = false; reloadSoon(); xSoon(); }
     else if (f.cmd === C.STEP_CHANGED) sqStepChanged(f.a[0]);
-    else if (f.cmd === C.PLAY) sqOnPlay(f.a);
+    else if (f.cmd === C.PLAY) { sqOnPlay(f.a); if (f.a.length > 3) M.rec = f.a[3]; renderTransport(); if (S.folder === "REC") paintRec(); }
+    else if (f.cmd === C.X_CHANGED) xSoon();
     else if (f.cmd === C.FAVS_CHANGED) readFavs().then(renderBar).catch(() => {});
     else if (f.cmd === C.EDITED) { M.edited = !!f.a[0]; renderBar(); }
     else if (f.cmd === C.SCOPE) scopeFrame(f.a);
@@ -401,7 +416,8 @@ const touched = (k) => performance.now() - (sets.get(k) || 0) < 600;
 function setVal(s, id, v) {
   const d = desc(s, id); if (!d || !M.link) return;
   v = Math.max(d.min, Math.min(d.max, Math.round(v)));
-  if (val(s, id) === v) return;
+  if (val(s, id) === v && !(s === 3 && isGo(d))) return;
+  if (s === 3) { setX(id, v); return; }
   if (!undoing) logChange(s, id, val(s, id), v, "tablet");
   (s ? M.g : M.p)[id] = v;
   sets.set(keyOf(s, id), performance.now());
@@ -411,6 +427,28 @@ function setVal(s, id, v) {
     if (!touched(keyOf(s, id)) && r.value !== val(s, id)) { (s ? M.g : M.p)[id] = r.value; paintValue(s, id); }
   }).catch(() => {});
 }
+
+/* ---- the synth pages (X_*, Live 109..111): read them all (a few dozen), again when the device says they changed */
+const isGo = (d) => d && d.names && d.names.length === 2 && d.names[1] === "GO";
+const xIds = () => [...new Set(LAYOUT.filter((p) => p.scope === 3).flatMap((p) => p.ids.filter((i) => i < 127)))];
+async function readX() {
+  for (const i of xIds()) { try { const o = P.x(await rq(C.X_GET, [i], { quiet: true, retries: 0, timeout: 500 })); if (o.id === i) { M.xdesc[i] = o; M.x[i] = o.v; } } catch (e) { if (e.message === "closed") throw e; } }
+  const snd = M.xdesc[1];                                  /* (LAYER's SOUND: a place in the list, shown by its name) */
+  if (snd && snd.label === "SOUND" && M.list.length) { snd.names = M.list.slice(0, snd.max - snd.min + 1).map((x) => x.name); snd.fmt = F.ENUM; }
+}
+let xT = 0;
+function xSoon() { clearTimeout(xT); xT = setTimeout(async () => { try { await readX(); delete PCD.mseq; renderWork(); renderDev(); } catch (e) { /* the next push */ } }, 90); }
+function setX(id, v) {
+  M.x[id] = v; sets.set(keyOf(3, id), performance.now()); paintValue(3, id);
+  rq(C.X_SET, [id, ...v14(v)], { key: "x:" + id }).then((a) => { const o = P.x(a); if (o.id === id) { M.xdesc[id] = o; M.x[id] = o.v; } xSoon(); }).catch(() => {});
+}
+/* the device's state, every 1.5 s: CPU, LATE, PEAK, the scale's notes, REC */
+async function pollState() {
+  if (!M.link || !M.info) return;
+  try { const st = P.state(await rq(C.STATE, [], { key: "state", quiet: true, retries: 0, timeout: 500 })); const scaleCh = !M.state || M.state.scale !== st.scale;
+    M.state = st; M.rec = st.rec; renderTransport(); if (scaleCh && (S.folder === "SEL")) renderWork(); if (S.folder === "REC") paintRec(); } catch (e) { /* (an older firmware: no STATE) */ }
+}
+setInterval(pollState, 1500);
 
 /* ----------------------------------------------------------------- views --- */
 function paintValue(s, id) {
@@ -514,7 +552,10 @@ const again = (el, c) => { el.classList.remove(c); void el.offsetWidth; el.class
 const fade = () => { again($("edit"), "fade"); setTimeout(() => $("edit").classList.remove("fade"), 240); };
 function renderWork() {
   $("edit").dataset.folder = S.folder;   /* (no data-f: la barra de abajo busca [data-f] hacia arriba y se comería todos los toques) */
-  $("edit").innerHTML = S.folder === "SAVE" ? soundsView() : S.folder === "LIVE" ? quickBento() : bentoView(S.folder);
+  const f = S.folder;
+  $("edit").innerHTML = f === "SAVE" ? soundsView() : f === "LIVE" ? cfgView("live", "Live") : f === "HOME" ? homeView() : f === "REC" ? recView()
+    : f === "SEQ" ? `<div class="pgs">${seqBlock()}${LAYOUT.filter((x) => x.title === "PATTERN").map((x) => pageRow({ title: x.title, folder: "SEQ", s: x.scope, ids: x.ids })).join("")}</div>`
+    : folderView(f);
 }
 function flashRowQuiet(title) { document.querySelectorAll(`#edit [data-title="${CSS.escape(title)}"]`).forEach((r) => r.classList.add("dev")); }
 function renderWhere() { $("where").textContent = !M.page ? "" : M.page.home ? "HOME" : M.page.title; renderNav(); renderDev(); }

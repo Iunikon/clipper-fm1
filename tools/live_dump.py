@@ -78,6 +78,17 @@ def desc(sim, scope, i):
     return o
 
 
+def xget(sim, i):                                     # (Live 109) a synth page's value and its range now
+    r = sim.req(109, [i])
+    o = {"id": r.b(), "v": r.v(), "fmt": r.b(), "min": r.v(), "max": r.v(), "names": []}
+    has = r.b()
+    o["label"], o["unit"] = r.s(), r.s()
+    if has:
+        while r.more() and len(o["names"]) <= o["max"] - o["min"]:
+            o["names"].append(r.s())
+    return o
+
+
 def page(sim):
     r = sim.req(97)
     o = {"home": r.b(), "fam": r.b(), "page": r.b(), "title": r.s(), "scope": r.b()}
@@ -129,6 +140,8 @@ def main():
             seen.append(pg["title"])
             pages.append({"folder": name, "title": pg["title"], "scope": pg["scope"], "ids": pg["ids"]})
     out["pages"] = pages
+    xs = sorted({i for pg in pages if pg["scope"] == 3 for i in pg["ids"] if i < 127})
+    out["xdesc"] = {i: xget(sim, i) for i in xs}       # (the mock's values and ranges for the synth pages)
     sim.do("H")
     sim.req(103, [0, 0])
     sim.do("U 3")

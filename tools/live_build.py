@@ -17,7 +17,7 @@ css = (src / "live.css").read_text().replace("__FONT__", font)
 js = (src / "live.js").read_text()
 START = "/* ------------------------------------------------------------------ start --- */"   # (bento.js, seq.js before the start)
 assert js.count(START) == 1
-js = js.replace(START, (src / "bento.js").read_text() + "\n" + (src / "seq.js").read_text() + "\n" + START)
+js = js.replace(START, (src / "bento.js").read_text() + "\n" + (src / "seq.js").read_text() + "\n" + (src / "pages.js").read_text() + "\n" + START)
 html = (src / "live.html").read_text()
 for k, v in (("__CSS__", css), ("__MOCK__", mock), ("__JS__", js)):
     assert html.count(k) == 1, k
