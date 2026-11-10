@@ -343,6 +343,7 @@ async function readSound(full) {
   M.page = P.page(await rq(C.PAGE));
   if (M.page.homeIds) M.homeIds = M.page.homeIds;
   M.edited = !!M.page.edited;
+  if (!M.edited || !M.orig || d.engine !== was || d.preset !== M.orig.preset) M.orig = { preset: d.preset, p: M.p.slice() };   /* (the sound as loaded: double tap) */
 }
 async function readList() {
   const list = [];
