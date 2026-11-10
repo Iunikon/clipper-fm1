@@ -707,7 +707,6 @@ function logChange(s, id, old, v, src) {
 }
 function renderLog() {
   if (!M.info) return;
-  $("chgx").hidden = !LOG.length;
   $("chl").innerHTML = LOG.length ? LOG.map((e, i) => { const d = desc(e.s, e.id); if (!d) return ""; const a = fmtValue(d, e.old), b = fmtValue(d, e.v);
     return `<div class="lg" role="listitem" style="--c:${KC[kOf(e.s, e.id)]}"><span class="l"><i></i>${esc(d.label)}<em>${e.src === "sinte" ? "en el sinte" : "aquí"}</em></span>
       <span class="vv num">${esc(a[0] + a[1])} → ${esc(b[0] + b[1])}</span><button class="ud" data-undo="${i}" aria-label="Deshacer ${esc(d.label)}: volver a ${esc(a[0] + a[1])}"><svg class="i"><use href="#i-undo"/></svg></button></div>`; }).join("")
@@ -723,16 +722,13 @@ function arm(b, txt, ask) {
   setTimeout(() => document.addEventListener("pointerdown", off, true), 0);
 }
 document.addEventListener("click", (e) => {
-  const b = e.target.closest("[data-undo],[data-discard],[data-skind],[data-svfav],#chgx"); if (!b) return;
+  const b = e.target.closest("[data-undo],[data-discard],[data-skind],[data-svfav]"); if (!b) return;
   if (b.dataset.undo) { const i = +b.dataset.undo, x = LOG[i]; if (!x) return; LOG.splice(i, 1); undoing = true; setVal(x.s, x.id, x.old); undoing = false; renderLog(); }
   else if (b.dataset.discard) {
     if (b.dataset.arm !== "1") { arm(b, "Descartar", "¿Seguro?"); return; }
     disarm(b, "Descartar"); const n = entryNow(); if (n >= 0) { LOG.length = 0; listGo(n); toast(-1, "Lo editado se descartó"); } }
   else if (b.dataset.skind) { SV.kind = b.dataset.skind; renderWork(); $("edit").scrollTop = 0; }
   else if (b.dataset.svfav) favToggle();
-  else if (b.id === "chgx") {
-    if (b.dataset.arm !== "1") { arm(b, "Borrar", "¿Seguro?"); return; }
-    disarm(b, "Borrar"); LOG.length = 0; renderLog(); }
 });
 
 /* -------------------------------------------------- Guardar: a user preset --- */
