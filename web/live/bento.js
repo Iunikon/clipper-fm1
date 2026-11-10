@@ -135,7 +135,7 @@ function tileP(s, id, k, pt, tag = pt) {
 /* ---- a module: a page's graph, large, and its readouts */
 function devLive(folder, title) { return M.page && !M.page.home && FAM[M.page.fam] === folder && M.page.title === title; }
 function module(p, kind, opt = {}) {
-  const lv = p.folder === "HOME" ? !!(M.page && M.page.home) : devLive(p.folder, p.title);
+  const lv = opt.nolive ? false : p.folder === "HOME" ? !!(M.page && M.page.home) : devLive(p.folder, p.title);
   const ro = kind === "meters" || kind === "arcs" ? "" : `<div class="ros">${GUSE[kind].filter((k) => p.ids[k] < 127).map((k) => readout(p.s, p.ids[k], k)).join("")}</div>`;
   return `<section class="bx g-${kind}${lv ? " dev" : ""}${opt.cls ? " " + opt.cls : ""}" data-title="${esc(p.title)}" data-g="${kind}">
     ${opt.bare && !lv ? "" : `<header>${opt.bare ? "<span></span>" : `<h3><svg class="i"><use href="#i-${ICON[p.folder] || "edit"}"/></svg>${esc(opt.name || p.title)}</h3>`}${lv ? `<span class="live2">En el sinte</span>` : opt.hint ? `<span class="hint2">${esc(opt.hint)}</span>` : ""}</header>`}
