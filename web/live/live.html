@@ -53,14 +53,13 @@ __CSS__
       <button class="ib" id="fs" hidden aria-label="Pantalla completa"><svg class="i"><use href="#i-fs"/></svg></button>
       <div class="where">En el sinte <b id="where"></b></div>
       <button class="follow" id="follow" aria-pressed="true"><i></i>Seguir</button>
-      <div class="seg" role="group" aria-label="Modo" id="modes"><button aria-pressed="true" data-mode="quick">RÁPIDO</button><button aria-pressed="false" data-mode="edit">EDITAR</button></div>
     </div>
   </header>
 
   <div class="body">
     <aside class="rail l">
       <div class="ph"><h2>Salida</h2><span class="c">AUDIO USB</span></div>
-      <div class="scope"><canvas id="scope"></canvas><button class="src" id="usb"><svg class="i"><use href="#i-usb"/></svg><span id="src">Usar audio USB del FM-1</span></button></div>
+      <div class="scope"><canvas id="scope"></canvas><span class="snone" id="snone">Sin audio del FM-1</span><button class="src" id="usb"><svg class="i"><use href="#i-usb"/></svg><span id="src">Usar audio USB del FM-1</span></button></div>
       <section class="dvp" id="dvp" aria-label="La página del sinte"><p class="dvn">Aquí sale la página que el sinte tiene abierta, con sus 4 knobs.</p></section>
       <section class="chg"><div class="ph"><h2>Cambios</h2><button class="clr" id="chgx" hidden>Borrar</button></div><div class="chl" id="chl" role="list"><p class="dvn">Aquí sale lo que cambies, en el sinte o aquí.</p></div></section>
       <dl class="meta" id="metal"></dl>
@@ -92,7 +91,7 @@ __CSS__
   <div class="brh"><h2 id="brt">Sonidos</h2><span class="c" id="brc"></span>
     <button class="ib" id="brx" aria-label="Cerrar"><svg class="i"><use href="#i-x"/></svg></button></div>
   <div class="brb"><nav class="kinds" id="kinds" aria-label="Carpetas de sonidos"></nav><div class="snds" id="snds" role="list"></div></div>
-  <div class="brf"><span>Toca un sonido para escucharlo en el FM-1; el panel queda abierto.</span>
+  <div class="brf"><span>Toca un sonido para escucharlo. El panel se queda abierto.</span>
     <div class="alg"><button class="btn" data-kstep="-1"><svg class="i"><use href="#i-prev"/></svg>Carpeta anterior</button><button class="btn" data-kstep="1">Carpeta siguiente<svg class="i"><use href="#i-next"/></svg></button></div></div>
 </section>
 <section class="sh" id="sh" role="dialog" aria-modal="true" aria-labelledby="sht">

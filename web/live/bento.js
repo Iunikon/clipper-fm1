@@ -159,21 +159,464 @@ function blocksOf(folder, pages) {
 }
 const isAway = (p) => p.scope === 2 || p.title === "TOOLS" || !live(p.ids).length;
 function block(ps) {
-  const mods = [], tiles = [], away = ps.filter(isAway).map((p) => p.title), many = ps.filter((p) => !isAway(p)).length > 1;
+  const mods = [], tiles = [], rows = [], awayAll = ps.filter(isAway).map((p) => p.title);
+  const extras = awayAll.filter((t) => EXTRA[t]).map((t) => EXTRA[t]()).join("");
+  const away = awayAll.filter((t) => !EXTRA[t] && !HIDE.has(t) && t !== "TOOLS");
   ps.filter((p) => !isAway(p)).forEach((p) => {
     const kind = GRAPH[p.title], used = kind ? GUSE[kind] : [];
     if (kind) mods.push(module(p, kind, { bare: p.title === ps[0].title }));
-    live(p.ids).filter(({ k }) => !used.includes(k)).forEach(({ id, k }) => tiles.push(tileP(p.s, id, k, p.title, many)));
+    live(p.ids).filter(({ k }) => !used.includes(k)).forEach(({ id, k }) => rows.push({ s: p.s, id, k, t: p.title }));
   });
-  if (away.length) tiles.push(`<section class="tp away"><span class="tt"><span class="tlb">${esc(away.join(", "))}</span></span><p>${away.length > 1 ? "Se editan" : "Se edita"} en el sinte o en Estudio.</p>
-    <a class="go2" href="${STUDIO_URL}">Abrir Estudio<svg class="i"><use href="#i-next"/></svg></a></section>`);
+  const pgs = [...new Set(rows.map((r) => r.t))], many = pgs.length > 1;   /* una sola página: su nombre va en la cabecera, no en cada baldosa */
+  rows.forEach((r) => tiles.push(tileP(r.s, r.id, r.k, r.t, many)));
+  const sub = !many && pgs.length && pgs[0] !== ps[0].title ? `<span class="bpg">${esc(pgs[0])}</span>` : "";
+  const awayTxt = away.length ? `${esc(away.join(", "))}: solo en el sinte. El FM-1 no los publica y el editor tampoco tiene comando para ellos.` : "";
+  if (awayTxt && (mods.length || rows.length)) tiles.push(`<section class="tp away"><p>${awayTxt}</p></section>`);
+  if (!mods.length && !tiles.length) return extras + (awayTxt ? `<p class="pce">${awayTxt}</p>` : "");   /* sin contenido propio: una nota, no otra cabecera */
   const lay = mods.length && tiles.length ? "side" : mods.length ? "solo" : "flat";
-  return `<section class="blk" data-blk="${esc(ps[0].title)}"><header class="bh"><h2><svg class="i"><use href="#i-${ICON[ps[0].folder] || "edit"}"/></svg>${esc(ps[0].title)}</h2></header>
-    <div class="bb ${lay}">${mods.join("")}${tiles.length ? `<div class="tz${tiles.length === 1 ? " one" : ""}">${tiles.join("")}</div>` : ""}</div></section>`;
+  return `<section class="blk" data-blk="${esc(ps[0].title)}"><header class="bh"><h2><svg class="i"><use href="#i-${ICON[ps[0].folder] || "edit"}"/></svg>${esc(ps[0].title)}</h2>${sub}</header>
+    <div class="bb ${lay}">${mods.join("")}${tiles.length ? `<div class="tz${tiles.length === 1 ? " one" : ""}">${tiles.join("")}</div>` : ""}</div></section>${extras}`;
 }
+/* ===================================================================== PC ====
+   Lo que el editor de Estudio ya sabe pedir al FM-1 y Live todavía no. Los formatos están leídos del editor
+   publicado (isod89.github.io/clipper-fm1/webapp/editor). Regla: las LECTURAS y las escrituras cuyo formato se
+   leyó entero van conectadas; las escrituras con formato a medio leer quedan en PC.pend() — una escritura con un
+   formato adivinado puede estropear datos de verdad en el sinte. Todo esto se prueba en casa con el FM-1. */
+const CE = { UP_ERASE: 21, SMP_ERASE: 14, SMP_INFO: 15, TRACK: 27, TRACK_MIX: 28, BK_LIST: 34, DSYN_LIST: 72, DSYN_PLAY: 76,
+  MSEQ_GET: 93, MSEQ_PUT: 94, TUNE_GET: 95, TUNE_PUT: 96, PROJECT: 9 };
+const PCD = {};                                 /* lo leído: undefined sin pedir, "…" pidiendo, null no contestó, o los datos */
+const u35 = (r) => { let v = 0; for (let i = 0; i < 5; i++) v += r.b() * 2 ** (7 * i); return v; };
+const PCP = {                                   /* las respuestas, tal como las lee el editor */
+  smp(a) { const r = new Reader(a), o = { nslots: r.b(), slotKiB: r.b(), slots: [] };
+    for (let i = 0; i < o.nslots; i++) o.slots.push({ zones: r.b(), name: r.s(), kib: r.b() }); return o; },
+  kits(a) { const r = new Reader(a), o = { factory: r.b(), user: r.b(), stored: !!r.b(), names: [], kits: [] };
+    for (let i = 0; i < o.factory; i++) o.names.push(r.s());
+    for (let i = 0; i < o.user; i++) o.kits.push({ name: r.s(), src: r.b() }); return o; },
+  banks(a) { const r = new Reader(a), rc = r.b(), n = r.b(), items = [];
+    for (let i = 0; i < n; i++) items.push({ id: r.b(), len: u35(r), crc: u35(r) }); return { rc, items }; },
+  tracks(a) { const r = new Reader(a), o = { sel: r.b(), ntrk: r.b(), tracks: [] };
+    for (let i = 0; i < o.ntrk; i++) o.tracks.push({ engine: r.b(), preset: r.b(), level: r.v(), mute: r.b(), armed: r.b() });
+    o.solo = r.more ? r.b() : 0; return o; },
+  mseq(a) { return { part: a[0], rc: a[1], steps: a[1] ? null : Array.from(a.slice(2, 66), (x) => x - 8) }; },
+  tune(a) { const u21 = (k) => a[k] | (a[k + 1] << 7) | (a[k + 2] << 14), n = a[3] || 0;
+    return { rc: a[0], sys: a[1], root: a[2], n, period: u21(4), deg: [0, ...Array.from({ length: Math.max(0, n - 1) }, (_, i) => u21(7 + 3 * i))] }; },
+};
+const PCV = new Set(["LFO", "GLO", "SEQ", "SAVE"]);  /* las vistas que muestran algo de aquí */
+const PC = {
+  load(key, cmd, args, parse) {                 /* una vez por sesión; al llegar, se vuelve a pintar la vista */
+    if (PCD[key] !== undefined) return PCD[key];
+    PCD[key] = "…";
+    let pr; try { pr = rq(cmd, args, { key: "pc-" + key, quiet: true, retries: 0, timeout: 650 }); } catch (e) { PCD[key] = null; return null; }
+    pr.then((a) => { try { PCD[key] = parse(a); } catch (e) { PCD[key] = null; } }, () => { PCD[key] = null; })
+      .finally(() => { if (PCV.has(S.folder)) renderWork(); });
+    return "…";
+  },
+  again(key) { delete PCD[key]; renderWork(); },
+  async act(cmd, args, ok) {                    /* escrituras con formato leído entero */
+    try { await rq(cmd, args, { quiet: true, retries: 0, timeout: 900 }); if (ok) toast(-1, ok); return true; }
+    catch (e) { toast(-1, "El FM-1 no contestó"); return false; }
+  },
+  pend(what) { toast(-1, `<b>Pendiente</b> ${esc(what)} — se termina en el PC`); },
+};
+/* el hueco honesto: pidiendo, o el sinte no contestó a esto */
+const pcEmpty = (v, what) => v === "…" ? `<p class="pce">Leyendo ${esc(what)} del FM-1…</p>`
+  : `<p class="pce">El FM-1 no contestó a esto. ${M.mock ? "El FM-1 de ejemplo no lo sabe hacer; " : ""}con el sinte de verdad sale aquí.</p>`;
+const blk = (title, icon, body, cls = "") => `<section class="blk${cls ? " " + cls : ""}" data-blk="${esc(title)}">
+  <header class="bh"><h2><svg class="i"><use href="#i-${icon}"/></svg>${esc(title)}</h2></header>${body}</section>`;
+
+/* ---- MATRIX: 12 ranuras de origen → destino → cantidad. Ya están en pdesc y en el DUMP: funcionan ---- */
+const MX = [60, 63, 66, 69, 72, 75, 100, 103, 106, 109, 112, 115];   /* el SRC de cada ranura; DST +1, AMT +2 */
+function matrixBlock() {
+  if (!desc(0, MX[0])) return "";
+  const row = (src, i) => `<div class="mxr${val(0, src) ? "" : " off"}" data-src="${src}"><span class="mxn num">${String(i + 1).padStart(2, "0")}</span>
+    ${tileP(0, src, 0, "MATRIX", false)}<span class="mxa" aria-hidden="true">→</span>${tileP(0, src + 1, 1, "MATRIX", false)}${tileP(0, src + 2, 2, "MATRIX", false)}</div>`;
+  return blk("MATRIX", "lfo", `<div class="mx">${MX.map(row).join("")}</div>`, "wide");
+}
+/* ---- LAYER: LVL, TRIM, MUTE — los tres parámetros de sonido que no publica ninguna página ---- */
+function layerBlock() {
+  const ids = [[0, 0], [8, 1], [40, 3]].filter(([id]) => desc(0, id));
+  if (!ids.length) return "";
+  return blk("LAYER", "edit", `<div class="bb flat"><div class="tz">${ids.map(([id, k]) => tileP(0, id, k, "LAYER", false)).join("")}</div></div>`);
+}
+/* ---- MOD SEQ: 4 carriles de 16 pasos, de −8 a 7. Se pinta arrastrando el dedo; se manda al soltar (MSEQ_PUT) ---- */
+const mssStyle = (x) => `--t:${x > 0 ? 50 - x / 8 * 50 : 50}%;--h:${Math.abs(x) / 8 * 50}%`;
+function mseqBlock() {
+  const v = PC.load("mseq", CE.MSEQ_GET, [0], PCP.mseq);
+  if (!v || v === "…" || !v.steps) return blk("MOD SEQ", "lfo", pcEmpty(v && v.steps === null ? null : v, "la secuencia de modulación"), "wide");
+  return blk("MOD SEQ", "lfo", `<div class="msq" data-msq="1">${[0, 1, 2, 3].map((l) => `<div class="msl" style="--c:${KC[l]}"><span class="msn num">${l + 1}</span>
+      ${v.steps.slice(l * 16, l * 16 + 16).map((x, i) => `<div class="mss" data-l="${l}" data-i="${i}" style="${mssStyle(x)}"><i></i></div>`).join("")}</div>`).join("")}</div>
+    <p class="msh">Arrastra el dedo por los pasos: arriba sube, abajo baja. Se manda al soltar.</p>`, "wide");
+}
+/* ---- TUNING: la raíz con ‹ ›, cada grado se arrastra en horizontal (1 cent por píxel); se manda al soltar (TUNE_PUT) ---- */
+function tuningBlock() {
+  const v = PC.load("tune", CE.TUNE_GET, [], PCP.tune);
+  if (!v || v === "…" || v.rc) return blk("TUNING", "glo", pcEmpty(v && v.rc ? null : v, "la afinación"));
+  const c = (x) => (x / 16).toFixed(1);
+  return blk("TUNING", "glo", `<div class="tun">
+    <div class="tnh"><span><small>Sistema</small><b class="num">${v.sys}</b></span>
+      <span class="tnr"><small>Raíz</small><span class="arw"><button data-tune="-1" aria-label="Raíz anterior"><svg class="i"><use href="#i-prev"/></svg></button><b class="num">${NOTE_NAMES[v.root % 12]}</b><button data-tune="1" aria-label="Raíz siguiente"><svg class="i"><use href="#i-next"/></svg></button></span></span>
+      <span><small>Grados</small><b class="num">${v.n}</b></span><span><small>Periodo</small><b class="num">${c(v.period)}<small>ct</small></b></span></div>
+    <div class="tng">${v.deg.map((d, i) => `<div class="tnd${i ? "" : " fix"}" data-deg="${i}"><small class="num">${i + 1}</small><b class="num">${c(d)}</b></div>`).join("")}</div>
+    <p class="msh">Arrastra un grado a izquierda o derecha para afinarlo. El primero es la raíz y no se mueve.</p></div>`);
+}
+const tunePut = (v) => { const u21 = (x) => [x & 127, (x >> 7) & 127, (x >> 14) & 127];
+  return PC.act(CE.TUNE_PUT, [v.sys & 127, v.root & 127, v.deg.length & 127, ...u21(v.period), ...v.deg.slice(1).flatMap(u21)]); };
+
+const EXTRA = { MATRIX: matrixBlock, "MOD SEQ": mseqBlock, LAYER: layerBlock, TUNING: tuningBlock };
+const HIDE = new Set(["MIDI", "MIDI 2"]);      /* sus parámetros ya salen en SYSTEM: la tarjeta mentía */
+
+/* ---- SEQ: las pistas (TRACK). Tocar una la elige y el secuenciador pasa a editarla; el nivel se arrastra; MUTE alterna (TRACK_MIX) ---- */
+const trLv = (l) => Math.max(0, Math.min(1, (l + 64) / 127));
+function tracksBlock() {
+  const v = PC.load("tracks", CE.TRACK, [], PCP.tracks);
+  if (!v || v === "…") return blk("PISTAS", "seq", pcEmpty(v, "las pistas"), "wide");
+  return blk("PISTAS", "seq", `<div class="trk">${v.tracks.map((t, i) => `<div class="trr${t.mute ? " mute" : ""}${i === v.sel ? " sel" : ""}">
+      <button class="trs" data-trk="${i}" aria-pressed="${i === v.sel}"><span class="trn num">${i + 1}</span><span class="tre"><b>${esc(M.info.engines[t.engine] || "—")}</b><small class="num">${t.preset + 1}</small></span></button>
+      <div class="trl" data-trl="${i}" role="slider" aria-label="Nivel de la pista ${i + 1}" aria-valuenow="${t.level}" style="--f:${trLv(t.level)}"><i></i><span class="num">${t.level}</span></div>
+      <button class="trm" data-trm="${i}" aria-pressed="${!!t.mute}">MUTE</button>${t.armed ? '<span class="tra">REC</span>' : "<span></span>"}</div>`).join("")}</div>
+    <p class="msh">Toca una pista para editar sus pasos arriba. El nivel se arrastra en horizontal.</p>`, "wide");
+}
+async function trackMix(i, level, mute) {
+  const v = PCD.tracks; if (!v || v === "…") return;
+  const t = v.tracks[i]; t.level = level; t.mute = mute ? 1 : 0;
+  try { await rq(CE.TRACK_MIX, [i & 127, ...v14(level), mute ? 1 : 0], { key: "trmix:" + i, quiet: true, retries: 0, timeout: 900 }); }
+  catch (e) { toast(-1, "El FM-1 no contestó"); }
+}
+async function trackPick(i) {
+  try {
+    PCD.tracks = PCP.tracks(await rq(CE.TRACK, [i & 127], { quiet: true, retries: 0, timeout: 900 }));
+    SQ.loaded = false; SQX.loaded = false; SQ.sel = 0; SQ.r0 = SQ.r1 = 0;
+    toast(-1, `<b>Pista ${i + 1}</b> en el secuenciador`); renderWork();
+  } catch (e) { toast(-1, "El FM-1 no contestó"); }
+}
+function songBlock() {          /* el formato de la canción (ARR: 16 pasos, hasta 64 compases) aún no tiene comando leído */
+  return blk("CANCIÓN", "seq", `<div class="sng">${Array.from({ length: 16 }, (_, i) => `<button class="sgs" data-pend="la canción (ARR)"><span class="num">${i + 1}</span><b>—</b></button>`).join("")}</div>
+    <p class="pce">Dieciséis pasos de canción, hasta 64 compases cada uno. Falta leer cómo la guarda el editor; la interfaz ya está.</p>`, "wide");
+}
+
+const SMP = { SLOT_SIZE: 0x14000, DATA_OFF: 512, RATE: 22050, HDR_LEN: 32 + 16 * 28, MAX_ZONES: 16 };
+SMP.MAX_DATA = SMP.SLOT_SIZE - SMP.DATA_OFF;
+
+/* groups of up to 7 bytes, each preceded by their top bits */
+function pack7(b) {
+  const out = [];
+  for (let i = 0; i < b.length; i += 7) {
+    const g = Array.from(b.slice(i, i + 7));
+    out.push(g.reduce((m, x, j) => m | (((x >> 7) & 1) << j), 0));
+    for (const x of g) out.push(x & 0x7F);
+  }
+  return out;
+}
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+  return t;
+})();
+function crc32(b) { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = CRC_TABLE[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+
+const IMA_STEP = [7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60, 66, 73, 80, 88,
+  97, 107, 118, 130, 143, 157, 173, 190, 209, 230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658,
+  724, 796, 876, 963, 1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066, 2272, 2499, 2749, 3024, 3327, 3660,
+  4026, 4428, 4871, 5358, 5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899, 15289, 16818,
+  18500, 20350, 22385, 24623, 27086, 29794, 32767];
+const IMA_IDX = [-1, -1, -1, -1, 2, 4, 6, 8];
+/* IMA ADPCM, 4 bit, low nibble first, from predictor 0 / index 0 -> {data, pred, idx} (state at loopStart) */
+function imaEncode(s, loopStart = 0) {
+  let pred = 0, idx = 0, atLoop = [0, 0];
+  const nib = new Uint8Array(s.length + (s.length & 1));
+  for (let n = 0; n < s.length; n++) {
+    if (n === loopStart) atLoop = [pred, idx];
+    const step = IMA_STEP[idx];
+    let diff = s[n] - pred, code = 0;
+    if (diff < 0) { code = 8; diff = -diff; }
+    let vd = step >> 3;
+    if (diff >= step) { code |= 4; diff -= step; vd += step; }
+    if (diff >= step >> 1) { code |= 2; diff -= step >> 1; vd += step >> 1; }
+    if (diff >= step >> 2) { code |= 1; vd += step >> 2; }
+    pred = Math.max(-32768, Math.min(32767, code & 8 ? pred - vd : pred + vd));
+    idx = Math.max(0, Math.min(88, idx + IMA_IDX[code & 7]));
+    nib[n] = code;
+  }
+  const out = new Uint8Array(nib.length >> 1);
+  for (let k = 0; k < nib.length; k += 2) out[k >> 1] = nib[k] | (nib[k + 1] << 4);
+  return { data: out, pred: atLoop[0], idx: atLoop[1] };
+}
+
+/* WAV: PCM 8/16/24/32 or float, any channel count, mixed to mono -> {sr, x} (gen_samples.read_any_wav) */
+function parseWav(buf) {
+  const d = new Uint8Array(buf), v = new DataView(d.buffer, d.byteOffset, d.byteLength);
+  const id = (i) => String.fromCharCode(d[i], d[i + 1], d[i + 2], d[i + 3]);
+  if (d.length < 12 || id(0) !== "RIFF" || id(8) !== "WAVE") throw new Error("not a WAV file");
+  let i = 12, fmt = null, data = null, loop = null;
+  while (i + 8 <= d.length) {
+    const cid = id(i), n = v.getUint32(i + 4, true);
+    if (cid === "fmt ") {
+      let tag = v.getUint16(i + 8, true);
+      const ch = v.getUint16(i + 10, true), sr = v.getUint32(i + 12, true), bits = v.getUint16(i + 22, true);
+      if (tag === 0xFFFE) tag = v.getUint16(i + 32, true);
+      fmt = { tag, ch, sr, bits };
+    } else if (cid === "data") {
+      data = [i + 8, Math.min(d.length, i + 8 + n)];
+    } else if (cid === "smpl" && n >= 60 && i + 8 + 60 <= d.length && v.getUint32(i + 8 + 28, true)) {
+      loop = [v.getUint32(i + 8 + 44, true), v.getUint32(i + 8 + 48, true)];   /* (0.7, after SLOOP 2.7) its first loop, frames */
+    }
+    i += 8 + n + (n & 1);
+  }
+  if (!fmt || !data) throw new Error("WAV without fmt/data");
+  const { tag, ch, sr, bits } = fmt, bps = bits >> 3, frame = bps * ch;
+  if (!(tag === 1 || tag === 3) || !bps || !ch) throw new Error("unsupported WAV format");
+  const nfr = Math.floor((data[1] - data[0]) / frame), x = new Float64Array(nfr);
+  for (let f = 0; f < nfr; f++) {
+    let acc = 0;
+    for (let c = 0; c < ch; c++) {
+      const o = data[0] + f * frame + c * bps;
+      let s;
+      if (tag === 3) s = bps === 4 ? v.getFloat32(o, true) : v.getFloat64(o, true);
+      else if (bps === 2) s = v.getInt16(o, true) / 32768;
+      else if (bps === 3) s = (((d[o] | (d[o + 1] << 8) | (d[o + 2] << 16)) << 8) >> 8) / 8388608;
+      else if (bps === 4) s = v.getInt32(o, true) / 2147483648;
+      else s = (d[o] - 128) / 128;
+      acc += s;
+    }
+    x[f] = acc / ch;
+  }
+  return { sr, x, loop };
+}
+
+/* Clipper 0.2: a wavetable for WAVE (firmware eng_wave.c): a WAV of single cycles one after the other (Serum's 2048
+   points a frame, its "clm " chunk says so; else 2048, 1024 or 256 by the length; a short file is one cycle), 16 frames
+   picked evenly, each one's harmonics 1..128 (a DFT: the cosine and sine terms, Q15), normalised to a peak of 0.9 over
+   the band-limited copies the firmware builds (as tools/gen_wavetables.py). Sent to a user slot as a sample is
+   (SMP_BEGIN, SMP_WRITE at +512, SMP_END) with an "FWTB" header; SMP_INFO shows it as 127 zones. */
+function resample(x, sr, to) {
+  if (sr === to) return Array.from(x);
+  if (sr > to) {
+    const k = Math.max(1, pyRound(sr / to));
+    if (k > 1) {
+      const y = new Array(x.length);
+      for (let i = 0; i < x.length; i++) { let s = 0; for (let j = i; j < Math.min(x.length, i + k); j++) s += x[j]; y[i] = s / k; }
+      x = y;
+    }
+  }
+  const step = sr / to, out = [];
+  let p = 0;
+  while (p < x.length - 1) { const i = Math.floor(p), f = p - i; out.push(x[i] * (1 - f) + x[i + 1] * f); p += step; }
+  return out;
+}
+function pyRound(v) { const f = Math.floor(v), r = v - f; return r > 0.5 ? f + 1 : r < 0.5 ? f : (f % 2 ? f + 1 : f); }
+
+/* mono float -> int16, peak normalised to 30000 */
+function normalize(x) {
+  let pk = 1e-9;
+  for (const v of x) pk = Math.max(pk, Math.abs(v));
+  return Int16Array.from(x, (v) => Math.max(-32768, Math.min(32767, Math.trunc(v / pk * 30000))));
+}
+
+/* root from a file name like "piano_C4" or "F#3" (C4 = 60), else 60 (sampleio.note_from_name) */
+function rootFromName(name) {
+  const m = /(?<![A-Za-z])([A-G])([#b]?)(-?\d)(?!\d)/.exec(name);
+  if (!m) return 60;
+  const n = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[m[1]] + (m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0) + (parseInt(m[3], 10) + 1) * 12;
+  return Math.max(0, Math.min(127, n));
+}
+
+/* zones: [{s: Int16Array (22050 Hz), root, lo?, hi?}] -> {hdr (480 B), data, zones} (sampleio.user_slot) */
+/* 0.7 (after SLOOP 2.7): a file's loop (the Samples page): 0 ONE SHOT; 1 LOOP, the whole file again while the key is
+   held, let go it ends its round; 2 LOOP+TAIL, the start, then [ls, le] again while held, let go the rest to the end.
+   Both are the zone's looped = 2 (SMP_LOOP_HELD, firmware eng_sample.c) */
+const LOOP = {
+  NAMES: ["ONE SHOT", "LOOP", "LOOP+TAIL"], MIN: 64, SNAP: 512,
+  range(z) {                                          /* the loop's [ls, le] of a file of n samples */
+    const n = z.s.length;
+    if (z.loop === 1 || n < 2 * LOOP.MIN) return [0, n - 1];
+    const ls = Math.max(0, Math.min(n - LOOP.MIN - 1, Math.round(z.ls ?? 0)));
+    return [ls, Math.max(ls + LOOP.MIN - 1, Math.min(n - 1, Math.round(z.le ?? n - 1)))];
+  },
+  snap(s, i) {                                        /* the nearest rising zero crossing to i, within SNAP samples, else i */
+    for (let d = 0; d <= LOOP.SNAP; d++)
+      for (const j of d ? [i - d, i + d] : [i])
+        if (j >= 1 && j < s.length && s[j - 1] < 0 && s[j] >= 0) return j;
+    return i;
+  },
+  snapRange(s, ls, le) {                              /* both points on crossings: the jump back lands where the wave goes */
+    const n = s.length, a = Math.max(0, Math.min(n - LOOP.MIN - 1, LOOP.snap(s, ls)));
+    let b = LOOP.snap(s, le + 1) - 1;
+    if (b < a + LOOP.MIN - 1 || b > n - 1) b = Math.max(a + LOOP.MIN - 1, Math.min(n - 1, le));
+    return [a, b];
+  },
+  preview(z) {                                        /* what a held key plays: the start, the loop twice more, the tail */
+    if (!z.loop) return z.s;
+    const [a, b] = LOOP.range(z), seg = z.s.slice(a, b + 1);
+    const out = new Int16Array((b + 1) + 2 * seg.length + (z.loop === 2 ? z.s.length - b - 1 : 0));
+    out.set(z.s.slice(0, b + 1), 0);
+    out.set(seg, b + 1);
+    out.set(seg, b + 1 + seg.length);
+    if (z.loop === 2) out.set(z.s.slice(b + 1), b + 1 + 2 * seg.length);
+    return out;
+  },
+};
+
+function buildSlot(name, zonesIn) {
+  const zones = [], parts = [];
+  let len = 0;
+  for (const z of zonesIn) {
+    const [ls, le] = z.loop ? LOOP.range(z) : [0, z.s.length - 1];
+    const e = imaEncode(z.s, ls);                    /* (the decoder's state at the loop start) */
+    zones.push({ off: len, n: z.s.length, ls, le, looped: z.loop ? 2 : 0, root: z.root, lo: z.lo ?? null, hi: z.hi ?? null,
+      pred: e.pred, idx: e.idx });
+    parts.push(e.data);
+    len += e.data.length;
+  }
+  const data = new Uint8Array(len);
+  let o = 0;
+  for (const p of parts) { data.set(p, o); o += p.length; }
+  if (len > SMP.MAX_DATA) throw new Error(`too long: ${len} B (max ${SMP.MAX_DATA} B)`);
+  if (!zones.length || zones.length > SMP.MAX_ZONES) throw new Error("1..16 files per slot");
+  zones.sort((a, b) => a.root - b.root);
+  zones.forEach((z, j) => {
+    if (z.lo == null) {
+      z.lo = j === 0 ? 0 : Math.floor((zones[j - 1].root + z.root) / 2) + 1;
+      z.hi = j === zones.length - 1 ? 127 : Math.floor((z.root + zones[j + 1].root) / 2);
+    }
+  });
+  const hdr = new Uint8Array(SMP.HDR_LEN), v = new DataView(hdr.buffer);
+  v.setUint32(0, 0x504D5346, true);
+  v.setUint16(4, 1, true);
+  hdr[6] = zones.length;
+  const nm = String(name).toUpperCase().replace(/[^\x20-\x7E]/g, "").slice(0, 8);
+  for (let i = 0; i < nm.length; i++) hdr[8 + i] = nm.charCodeAt(i);
+  v.setUint32(16, len, true);
+  v.setUint32(20, crc32(data), true);
+  const rate = pyRound(SMP.RATE / 44100 * 65536);
+  zones.forEach((z, j) => {
+    const b = 32 + j * 28;
+    [z.off, z.n, z.ls, z.le, rate].forEach((x, k) => v.setUint32(b + k * 4, x >>> 0, true));
+    v.setInt16(b + 20, z.root * 16, true);
+    v.setInt16(b + 22, z.pred, true);
+    hdr[b + 24] = z.idx; hdr[b + 25] = z.lo; hdr[b + 26] = z.hi; hdr[b + 27] = z.looped || 0;
+  });
+  return { hdr, data, zones };
+}
+
+/* ------------------------------------------------------------------- chop --- */
+/* Chopping a recording into a slot (the CHOP block of the samples tab). All at SMP.RATE, positions
+   in samples. These are pure: test_web.mjs runs them. */
+/* ===================================================================== SAMPLES ====
+   Subir un WAV a una ranura de usuario, como el editor de Estudio. Lo de arriba es su código sin cambios (parseWav,
+   resample, normalize, rootFromName, LOOP, IMA ADPCM, crc32 y buildSlot): un archivo es una nota, a 22 050 Hz, y su raíz
+   sale del nombre del archivo («PIANO A4» → A4). Luego SMP_BEGIN, la carga en trozos de 256 bytes (SMP_WRITE) y SMP_END. */
+const SMPUP = { k: -1, done: 0, total: 0 };
+async function smpDecode(f) {
+  const buf = await f.arrayBuffer(); let x;
+  try { const w = parseWav(buf); x = resample(w.x, w.sr, SMP.RATE); }
+  catch (e) {                                       /* no es un WAV corriente: que lo descodifique el navegador */
+    const Ctx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    const ab = await new Ctx(1, 1, SMP.RATE).decodeAudioData(buf.slice(0)); x = new Float64Array(ab.length);
+    for (let c = 0; c < ab.numberOfChannels; c++) { const d = ab.getChannelData(c); for (let i = 0; i < d.length; i++) x[i] += d[i] / ab.numberOfChannels; }
+  }
+  if (!x.length) throw new Error("el archivo no tiene audio");
+  return { s: normalize(x), root: rootFromName(f.name.replace(/\.[^.]*$/, "")) };
+}
+function smpProg() {
+  const el = document.querySelector(`.dvs[data-smp="${SMPUP.k}"] small`);
+  if (el) el.textContent = `Subiendo ${SMPUP.done} / ${SMPUP.total}`;
+  const bar = document.querySelector(`.dvs[data-smp="${SMPUP.k}"] .upb i`); if (bar) bar.style.width = (SMPUP.done / SMPUP.total * 100) + "%";
+}
+async function smpUpload(k, file) {
+  if (SMPUP.k >= 0) { toast(-1, "Ya hay una subida en marcha"); return; }
+  const name = file.name.replace(/\.[^.]*$/, "").toUpperCase().replace(/[^\x20-\x7E]/g, "").slice(0, 8) || "SAMPLE";
+  Object.assign(SMPUP, { k, done: 0, total: 1 }); renderWork();
+  try {
+    const z = await smpDecode(file), { hdr, data } = buildSlot(name, [z]);
+    if (data.length > SMP.MAX_DATA) throw new Error(`no cabe: ${Math.round(data.length / 1024)} KiB de ${Math.round(SMP.MAX_DATA / 1024)}`);
+    SMPUP.total = Math.ceil(data.length / 256); smpProg();
+    const o = { quiet: true, retries: 0, timeout: 1500 };
+    let r = await rq(11, [k & 127], o); if (r[1]) throw new Error(`el FM-1 no aceptó empezar (${r[1]})`);      /* SMP_BEGIN */
+    for (let off = 0; off < data.length; off += 256) {                                                       /* SMP_WRITE */
+      const a = SMP.DATA_OFF + off, w = await rq(12, [k & 127, a & 127, (a >> 7) & 127, (a >> 14) & 127, ...pack7(data.subarray(off, off + 256))], { ...o, retries: 1 });
+      if (w[4]) throw new Error(`falló el trozo ${SMPUP.done + 1} (${w[4]})`);
+      SMPUP.done++; smpProg();
+    }
+    r = await rq(13, [k & 127, ...pack7(hdr)], { ...o, timeout: 2500 });                                    /* SMP_END */
+    if (r[1]) throw new Error(`el FM-1 no cerró la ranura (${r[1]})`);
+    toast(-1, `<b>${esc(name)}</b> subido a S${String(k + 1).padStart(2, "0")}`);
+  } catch (e) { toast(-1, "No se subió: " + esc(e.message || String(e))); }
+  SMPUP.k = -1; PC.again("smp");
+}
+document.addEventListener("change", (e) => {
+  const inp = e.target.closest && e.target.closest("[data-smpup]"); if (!inp || !inp.files || !inp.files[0]) return;
+  smpUpload(+inp.dataset.smpup, inp.files[0]); inp.value = "";
+});
+
+/* ---- SAVE > Dispositivo: biblioteca, samples, kits y proyectos ---- */
+const DEV = [["SMP", "Samples"], ["KIT", "Drum kits"], ["LIB", "Biblioteca"], ["PRJ", "Proyectos"]];
+const KIT = { k: 0 };
+function devView(kind) {
+  if (kind === "SMP") {
+    const v = PC.load("smp", CE.SMP_INFO, [], PCP.smp);
+    if (!v || v === "…") return pcEmpty(v, "los samples");
+    const up = (i) => `<input type="file" accept="audio/*,.wav,.aif,.aiff,.mp3" data-smpup="${i}" hidden>`;
+    return `<div class="dvc">${v.slots.map((x, i) => SMPUP.k === i
+        ? `<div class="dvs busy" data-smp="${i}"><span class="num">S${String(i + 1).padStart(2, "0")}</span><b>Subiendo…</b><small class="num">${SMPUP.done} / ${SMPUP.total}</small><span class="upb"><i style="width:${SMPUP.done / SMPUP.total * 100}%"></i></span></div>`
+      : x.name ? `<div class="dvs" data-smp="${i}"><span class="num">S${String(i + 1).padStart(2, "0")}</span><b>${esc(x.name)}</b>
+        <small class="num">${x.zones} ${x.zones === 1 ? "zona" : "zonas"} · ${x.kib} KiB</small>
+        <span class="dva"><button class="btn" data-pc="smp-repl" data-n="${i}">Reemplazar</button><button class="dsc" data-pc="smp-erase" data-n="${i}">Borrar</button></span>${up(i)}</div>`
+      : `<div class="dvs free" data-smp="${i}"><span class="num">S${String(i + 1).padStart(2, "0")}</span><b>Libre</b><small class="num">${v.slotKiB} KiB</small>
+        <span class="dva"><label class="btn">Subir WAV${up(i)}</label></span></div>`).join("")}</div>
+      <p class="msh">Un archivo por ranura, mono a 22 050 Hz; la raíz sale del nombre del archivo (por ejemplo «PIANO A4»). Cabe hasta ${Math.round(SMP.MAX_DATA / 1024)} KiB comprimidos.</p>`;
+  }
+  if (kind === "KIT") {
+    const v = PC.load("kits", CE.DSYN_LIST, [], PCP.kits);
+    if (!v || v === "…") return pcEmpty(v, "los kits");
+    const all = [...v.names.map((n, i) => ({ n, k: i })), ...v.kits.map((x, i) => ({ n: x.name || `USER ${i + 1}`, k: 64 + i }))];
+    const cur = all.find((x) => x.k === KIT.k) || all[0];
+    return `<div class="kts">${all.map((x) => `<button class="kf" data-pc="kit" data-n="${x.k}" aria-current="${cur && x.k === cur.k}"><span>${esc(x.n)}</span></button>`).join("")}</div>
+      <div class="pads" role="group" aria-label="Pads de ${esc(cur ? cur.n : "")}">${Array.from({ length: 16 }, (_, l) => `<button class="pad" data-pc="pad" data-n="${l}" style="--c:${KC[l % 4]}"><span class="num">${l + 1}</span></button>`).join("")}</div>`;
+  }
+  if (kind === "LIB") {
+    const v = PC.load("banks", CE.BK_LIST, [], PCP.banks);
+    if (!v || v === "…") return pcEmpty(v, "la biblioteca");
+    return `<div class="dvc">${v.items.map((x) => `<div class="dvs"><span class="num">B${String(x.id + 1).padStart(2, "0")}</span><b>Banco ${x.id + 1}</b>
+      <small class="num">${(x.len / 1024).toFixed(1)} KiB</small><button class="btn" data-pend="BK_GET · BK_PUT">Abrir</button></div>`).join("")}</div>`;
+  }
+  /* PROYECTOS: 4 ranuras (PROJECT: 2 consulta, 0 carga, 1 guarda) */
+  const ps = [0, 1, 2, 3].map((k) => PC.load("prj" + k, CE.PROJECT, [2, k], (a) => ({ slot: a[1], used: !!a[2], busy: a[3] === 1 })));
+  if (ps.some((p) => p === "…")) return pcEmpty("…", "los proyectos");
+  if (ps.every((p) => p === null)) return pcEmpty(null, "los proyectos");
+  return `<div class="dvc">${ps.map((p, k) => `<div class="dvs${p && p.used ? "" : " free"}"><span class="num">P${k + 1}</span><b>${p && p.used ? `Proyecto ${k + 1}` : "Libre"}</b>
+      <small>${p && p.used ? "Ocupado" : "Vacío"}</small>
+      <span class="dva">${p && p.used ? `<button class="btn" data-pc="prj-load" data-n="${k}">Cargar</button>` : ""}<button class="btn" data-pc="prj-save" data-n="${k}">${p && p.used ? "Guardar encima" : "Guardar aquí"}</button></span></div>`).join("")}</div>
+    <p class="msh">Cargar sustituye el proyecto que suena. Guardar encima borra el que había. Las dos piden un segundo toque.</p>`;
+}
+
+/* las acciones: dos toques para borrar, un toque para sonar */
+document.addEventListener("click", (e) => {
+  const pend = e.target.closest("[data-pend]"); if (pend) { PC.pend(pend.dataset.pend); return; }
+  const b = e.target.closest("[data-pc]"); if (!b) return;
+  const n = +b.dataset.n;
+  if (b.dataset.pc === "kit") { KIT.k = n; renderWork(); }
+  else if (b.dataset.pc === "pad") PC.act(76, [KIT.k & 127, n & 127, 110]);                       /* DSYN_PLAY */
+  else if (b.dataset.pc === "smp-repl") {
+    if (b.dataset.arm !== "1") { arm(b, "Reemplazar", "¿Seguro?"); return; }
+    disarm(b, "Reemplazar"); document.querySelector(`input[data-smpup="${n}"]`)?.click();
+  } else if (b.dataset.pc === "smp-erase") {
+    if (b.dataset.arm !== "1") { arm(b, "Borrar", "¿Seguro?"); return; }
+    disarm(b, "Borrar"); PC.act(CE.SMP_ERASE, [n & 127], "Sample borrado").then((ok) => ok && PC.again("smp"));
+  } else if (b.dataset.pc === "up-erase") {
+    if (b.dataset.arm !== "1") { arm(b, "Borrar", "¿Seguro?"); return; }
+    disarm(b, "Borrar"); PC.act(CE.UP_ERASE, [n & 127], "Sonido de usuario borrado").then((ok) => ok && reloadSoon());
+  } else if (b.dataset.pc === "prj-load" || b.dataset.pc === "prj-save") {
+    const load = b.dataset.pc === "prj-load", lab = load ? "Cargar" : b.textContent;
+    if (b.dataset.arm !== "1") { arm(b, lab, "¿Seguro?"); return; }
+    disarm(b, lab);
+    PC.act(CE.PROJECT, [load ? 0 : 1, n & 3], load ? `Proyecto <b class="num">${n + 1}</b> cargado` : `Guardado en el proyecto <b class="num">${n + 1}</b>`)
+      .then((ok) => { if (!ok) return; if (load) reloadSoon(); PC.again("prj" + n); });
+  }
+});
+
 function bentoView(folder) {
   const pages = pagesOf(folder);
-  if (folder === "SEQ") return `<div class="blks">${seqBlock()}${blocksOf(folder, pages.filter((p) => p.title !== "NOTES")).map(block).join("")}</div>`;   /* (NOTES: seq.js) */
+  if (folder === "SEQ") return `<div class="blks">${seqBlock()}${blocksOf(folder, pages.filter((p) => p.title !== "NOTES")).map(block).join("")}${tracksBlock()}${songBlock()}</div>`;   /* (NOTES: seq.js) */
   if (folder !== "HOME") return `<div class="blks">${blocksOf(folder, pages).map(block).join("")}</div>`;
   const out = [];                                          /* (HOME in EDITAR: one bento, a look at all of it) */
   pages.forEach((p) => {
@@ -189,7 +632,7 @@ function bentoView(folder) {
 function quickBento() {
   const T = (id, s = 0) => QSPEC.get(keyOf(s, id));
   const box = (q, size) => `<div class="qb ${size}">${tile(q)}</div>`;
-  return `<div class="qhead"><h2>Rápido</h2><button class="more" data-mode-go="edit">Editar más<svg class="i"><use href="#i-next"/></svg></button></div>
+  return `<div class="qhead"><h2>Live</h2><button class="more" data-f="HOME">Editar más<svg class="i"><use href="#i-next"/></svg></button></div>
   <div class="bento quick2">
     ${module({ title: "FILTER", folder: "FX", s: 0, ids: [50, 127, 127, 127] }, "filt", { cls: "q-filt", name: "Filtro", hint: "LP ← OFF → HP" })}
     ${module({ title: "FX", folder: "FX", s: 0, ids: [33, 34, 35, 36] }, "meters", { cls: "q-fx", name: "Efectos", hint: "Toca el nombre para encender o apagar", toggles: true })}
@@ -238,7 +681,7 @@ $("edit").addEventListener("pointerdown", (e) => {
   const el = mtr || arc || fd; if (!el) return;
   const [s, id] = (el.dataset.k || el.dataset.fd).split(":").map(Number), d = desc(s, id); if (!d) return;
   bdrag = { el, dir: mtr ? "abs" : arc ? "v" : "h", s, id, d, x0: e.clientX, y0: e.clientY, v0: val(s, id), on: !fd, pid: e.pointerId };
-  if (!fd) { el.setPointerCapture(e.pointerId); e.preventDefault(); if (mtr) barAt(e); }
+  if (!fd) { el.setPointerCapture(e.pointerId); e.preventDefault(); }
 });
 $("edit").addEventListener("pointermove", (e) => {
   if (!bdrag) return;
@@ -251,7 +694,7 @@ $("edit").addEventListener("pointermove", (e) => {
     return;
   }
   const span = bdrag.d.max - bdrag.d.min;
-  if (bdrag.dir === "abs") barAt(e);
+  if (bdrag.dir === "abs") { if (!bdrag.armed) { if (Math.abs(dy) < 6) return; bdrag.armed = true; bdrag.el.classList.add("held"); } barAt(e); }
   else if (bdrag.dir === "v") setVal(bdrag.s, bdrag.id, bdrag.v0 + dy * span / 220);
   else setVal(bdrag.s, bdrag.id, bdrag.v0 + dx * span / Math.max(220, bdrag.el.getBoundingClientRect().width * 1.4));
 });
