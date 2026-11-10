@@ -30,12 +30,16 @@
  *  112 STATE          -> cpu % (the audio load), late (2 x 7: halves rendered late since power-on), peak % (the worst
  *                        half lately), the scale's 12 notes (2 x 7, bit 0 the root), rec (bit 0 recording, 1 armed,
  *                        2 a free take, 3 the count-in runs), the REC screen's MODE (0 FREE 1 TEMPO), START (0 NOTE 1
- *                        COUNT), QUANT (0 ON 1 OFF), the project empty (1)
+ *                        COUNT), QUANT (0 ON 1 OFF), the project empty (1), the keys' octave + 8 (OCT - / +)
  *  113 REC op [v]     -> STATE: 0 the REC button (arm / record / stop recording), 1 MODE v, 2 START v, 3 QUANT v
+ *  108 SCOPE on      -> seq, peak (2 x 7), 240 points 0..126 (63 the zero, 0 the top): the trace HOME's scope draws
+ *                        (graph_scope: from a rising zero, scaled to the loudest, never under 1500). on 1: also pushed
+ *                        while asked again within 3 s (the tablet asks every 2), at most 20 a second, after everything
+ *                        else; 2: stop; 0: this one only
  * PAGE's scope 3: a synth page, its 4 ids X_* (X_GET); PLAY ends with STATE's rec byte, and is pushed when it changes
  * Included by editor.c after ui.c (fav_list, preset_go, fav_toggle). */
 enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO, ED_EDITED, ED_TOOL, ED_PLAY, ED_TRANSPORT,
-       ED_X_GET = 109, ED_X_SET, ED_X_CHANGED, ED_STATE, ED_REC };
+       ED_SCOPE = 108, ED_X_GET = 109, ED_X_SET, ED_X_CHANGED, ED_STATE, ED_REC };
 #define ED_LV_EDITED ((uint8_t)(hist_edited && !hist_cmp_on))
 static struct {
     uint8_t home, page, edited;
@@ -161,6 +165,32 @@ UI_SMALL static void ed_lv_x(uint32_t id)                          /* X_GET's re
             ed_str(d->names[i], 8);
 }
 #endif
+static struct { uint8_t on, seq; uint32_t asked, sent; } ed_sc;
+UI_SMALL static void ed_lv_scope(void)                            /* SCOPE's frame: graph_scope's trace, 0..126 */
+{
+    static int16_t snap[SCOPE_N];
+    uint32_t w = scope_w, i, trig = 0;
+    int32_t peak = 1500;
+    for (i = 0; i < SCOPE_N; i++) {
+        snap[i] = scope_buf[(w + i) & (SCOPE_N - 1u)];
+        if (snap[i] > peak)
+            peak = snap[i];
+        else if (-snap[i] > peak)
+            peak = -snap[i];
+    }
+    for (i = 1; i < SCOPE_N - 240u; i++)
+        if (snap[i - 1] < 0 && snap[i] >= 0) {
+            trig = i;
+            break;
+        }
+    ed_b(ed_sc.seq);
+    ed_sc.seq = (uint8_t)((ed_sc.seq + 1u) & 127u);
+    ed_b((uint32_t)peak & 127u);
+    ed_b(((uint32_t)peak >> 7) & 127u);
+    for (i = 0; i < 240u; i++)
+        ed_b((uint32_t)clamp(63 - snap[trig + i] * 62 / peak, 0, 126));
+    ed_sc.sent = fm1_ms;
+}
 UI_SMALL static void ed_lv_state(void)
 {
     uint32_t m = is_drum(TSEL) ? 0u : scale_mask(TSEL);
@@ -175,6 +205,7 @@ UI_SMALL static void ed_lv_state(void)
     ed_b(rec_count);
     ed_b(rec_quant_off);
     ed_b((uint32_t)project_empty());
+    ed_b((uint32_t)(song.octave + 8));               /* (the keys' octave, OCT - / +: -3..3) */
 }
 UI_SMALL static int ed_lv_sync(void)                               /* while watched: 1 = a push went out */
 {
@@ -216,6 +247,14 @@ UI_SMALL static int ed_lv_sync(void)                               /* while watc
     if (h != ed_lv.fsig) {
         ed_lv.fsig = h;
         ed_begin(ED_FAVS_CHANGED);
+        ed_send();
+        return 1;
+    }
+    if (ed_sc.on && fm1_ms - ed_sc.asked > 3000u)
+        ed_sc.on = 0;                                /* (nobody asked again: the tablet went) */
+    if (ed_sc.on && fm1_ms - ed_sc.sent >= 50u) {   /* the scope: last, at most 20 a second */
+        ed_begin(ED_SCOPE);
+        ed_lv_scope();
         ed_send();
         return 1;
     }
@@ -290,6 +329,12 @@ UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   
         return 1;
     }
 #endif
+    case ED_SCOPE:                                  /* on -> a frame (1: and more while asked) */
+        i = na ? a[0] : 1u;
+        ed_sc.on = i == 1u;
+        ed_sc.asked = fm1_ms;
+        ed_lv_scope();
+        return 1;
     case ED_STATE:
         ed_lv_state();
         return 1;

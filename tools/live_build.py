@@ -5,6 +5,8 @@
 #   python3 tools/live_build.py [out]      (default: web/live.html)
 #   python3 tools/live_build.py --site DIR (a folder to host, as on Vercel: index.html, the same page as clipper-live.html
 #                                          for its download button, and the classic editor its Estudio button opens)
+import base64
+import gzip
 import re
 import sys
 from pathlib import Path
@@ -17,9 +19,10 @@ css = (src / "live.css").read_text().replace("__FONT__", font)
 js = (src / "live.js").read_text()
 START = "/* ------------------------------------------------------------------ start --- */"   # (bento.js, seq.js before the start)
 assert js.count(START) == 1
-js = js.replace(START, (src / "bento.js").read_text() + "\n" + (src / "seq.js").read_text() + "\n" + (src / "pages.js").read_text() + "\n" + START)
+js = js.replace(START, (src / "bento.js").read_text() + "\n" + (src / "seq.js").read_text() + "\n" + (src / "pages.js").read_text() + "\n" + (src / "studio.js").read_text() + "\n" + START)
 html = (src / "live.html").read_text()
-for k, v in (("__CSS__", css), ("__MOCK__", mock), ("__JS__", js)):
+studio = base64.b64encode(gzip.compress((ROOT / "web" / "editor.html").read_bytes(), 9, mtime=0)).decode()   # (Estudio inside, offline)
+for k, v in (("__CSS__", css), ("__MOCK__", mock), ("__STUDIO__", studio), ("__JS__", js)):
     assert html.count(k) == 1, k
     html = html.replace(k, v)
 if len(sys.argv) > 2 and sys.argv[1] == "--site":

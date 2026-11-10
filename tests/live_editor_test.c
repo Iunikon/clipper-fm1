@@ -240,7 +240,7 @@ int main(void)
     {
         uint8_t q[2];
         ed(ED_STATE, a, 0);
-        check(rx_last[4] == ED_STATE && rx_n == 5u + 11u + 1u && arg()[0] <= 100u, "STATE: cpu, late, peak, scale, rec, the REC screen, empty");
+        check(rx_last[4] == ED_STATE && rx_n == 5u + 12u + 1u && arg()[0] <= 100u, "STATE: cpu, late, peak, scale, rec, the REC screen, empty");
         song.playing = 0; song.rec = 0; rec_wait = 0;
         q[0] = 0; ed(ED_REC, q, 1);
         check(rec_wait && (arg()[6] & 2u), "REC stopped: armed, as the button");
@@ -249,6 +249,23 @@ int main(void)
         q[0] = 2; q[1] = 1; ed(ED_REC, q, 2);
         check(rec_count == 1u && arg()[8] == 1u, "REC START COUNT");
         q[1] = 0; ed(ED_REC, q, 2);
+    }
+    /* SCOPE: a frame of the trace HOME draws, then pushed while asked, never past 3 s */
+    {
+        uint8_t q[1];
+        uint32_t k2, ok = 1;
+        for (k2 = 0; k2 < SCOPE_N; k2++)
+            scope_buf[k2] = (int16_t)((k2 % 64u) < 32u ? 8000 : -8000);
+        q[0] = 0; ed(ED_SCOPE, q, 1);
+        for (k2 = 0; k2 < 240u; k2++)
+            ok &= arg()[3 + k2] <= 126u;
+        check(rx_last[4] == ED_SCOPE && rx_n == 5u + 3u + 240u + 1u && ok && (arg()[1] | arg()[2] << 7) == 8000u, "SCOPE 0: one frame, 240 points 0..126, peak 8000");
+        q[0] = 1; ed(ED_SCOPE, q, 1);
+        q[0] = 1; ed(ED_SCOPE, q, 1);                       /* (the pushes themselves: 83 packets, more than the host's
+                                                             * queue holds before the device's USB drains it) */
+        check(ed_sc.on == 1u && arg()[0] != 0u, "SCOPE 1: on, a frame now, more while asked");
+        q[0] = 2; ed(ED_SCOPE, q, 1);
+        check(ed_sc.on == 0u, "SCOPE 2: off");
     }
     printf("live: %s\n", fails ? "FAILED" : "all passed");
     return fails != 0;

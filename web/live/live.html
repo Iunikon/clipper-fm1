@@ -24,6 +24,7 @@ __CSS__
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 5v14l11-7z"/></symbol>
   <symbol id="i-stop" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></symbol>
   <symbol id="i-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></symbol>
+  <symbol id="i-favs" viewBox="0 0 24 24"><path d="M15 4v16M4 4h16v16H4z"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></symbol>
   <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v14M12 3l-2.5 3M12 3l2.5 3M12 13l-4-2.5V8M12 15l4-2.5V10"/><circle cx="12" cy="19" r="2"/></symbol>
@@ -51,7 +52,8 @@ __CSS__
       <button class="svb" id="saveb" data-save="1"><svg class="i"><use href="#i-disk"/></svg><span>Guardar</span></button>
     </div>
     <div class="right">
-      <div class="trn" id="trn"></div><span class="cpu" id="cpu"></span>
+      <span class="tmp" id="tmp"></span><div class="trn" id="trn"></div><span class="cpu" id="cpu"></span>
+      <button class="ib" id="favh" aria-pressed="true" aria-label="Mostrar u ocultar los favoritos"><svg class="i"><use href="#i-favs"/></svg></button>
       <button class="ib" id="fs" hidden aria-label="Pantalla completa"><svg class="i"><use href="#i-fs"/></svg></button>
       <div class="where">En el sinte <b id="where"></b></div>
       <button class="follow" id="follow" aria-pressed="true"><i></i>Seguir</button>
@@ -63,8 +65,7 @@ __CSS__
       <div class="ph"><h2>Salida</h2><span class="c">AUDIO USB</span></div>
       <div class="scope"><canvas id="scope"></canvas><span class="snone" id="snone">Sin audio del FM-1</span><button class="src" id="usb"><svg class="i"><use href="#i-usb"/></svg><span id="src">Usar audio USB del FM-1</span></button></div>
       <section class="dvp" id="dvp" aria-label="La página del sinte"><p class="dvn">Aquí sale la página que el sinte tiene abierta, con sus 4 knobs.</p></section>
-      <section class="chg"><div class="ph"><h2>Cambios</h2><button class="clr" id="chgx" hidden>Borrar</button></div><div class="chl" id="chl" role="list"><p class="dvn">Aquí sale lo que cambies, en el sinte o aquí.</p></div></section>
-      <dl class="meta" id="metal"></dl>
+      <section class="chg"><div class="ph"><h2>Cambios</h2><button class="clr" id="chgx" hidden>Borrar</button></div><div class="chs" id="metal"></div><div class="chl" id="chl" role="list"><p class="dvn">Aquí sale lo que cambies, en el sinte o aquí.</p></div></section>
     </aside>
 
     <section class="gate" id="gate" aria-labelledby="gt">
@@ -109,6 +110,7 @@ __CSS__
 <div class="toast" id="toast" role="status" aria-live="polite"><i id="tq"></i><span id="tt"></span></div>
 
 <script type="application/json" id="mockdata">__MOCK__</script>
+<script type="application/octet-stream" id="studiogz">__STUDIO__</script>
 <script>
 __JS__
 </script>

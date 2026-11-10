@@ -81,7 +81,7 @@ const P = {
   x(a) { const r = new Reader(a), o = { id: r.b(), v: r.v(), fmt: r.b(), min: r.v(), max: r.v(), names: [] }; const has = r.b();   /* (Live 109) a synth page's value */
     o.label = r.s(); o.unit = r.s(); if (has) while (r.more && o.names.length <= o.max - o.min) o.names.push(r.s());
     if (o.names.length) o.fmt = F.ENUM; o.def = o.min; return o; },
-  state(a) { return { cpu: a[0], late: a[1] | a[2] << 7, peak: a[3], scale: a[4] | a[5] << 7, rec: a[6], mode: a[7], start: a[8], quant: a[9], empty: a[10] }; },
+  state(a) { return { cpu: a[0], late: a[1] | a[2] << 7, peak: a[3], scale: a[4] | a[5] << 7, rec: a[6], mode: a[7], start: a[8], quant: a[9], empty: a[10], oct: a.length > 11 ? a[11] - 8 : 0 }; },
   step(a) { const r = new Reader(a), o = { index: r.b(), n: r.b(), notes: [r.b(), r.b(), r.b(), r.b()], time: r.b(), flags: r.b(), vel: r.b(), lvl: 0, rat: 0 };
     if (r.more) { const lo = r.b(), hi = r.b(), ra = r.b(); o.lvl = lo | (hi & 1) << 7; o.rat = ra | ((hi >> 1) & 1) << 7; } return o; },
   list(a) { const r = new Reader(a), total = r.u(), start = r.u(), n = r.b(), items = []; for (let i = 0; i < n; i++) items.push(P.entry(r)); return { total, start, items }; },
@@ -165,7 +165,7 @@ function makeMock(onFrame) {
       case C.X_GET: case C.X_SET: { const d = (D.xdesc || {})[a[0]]; if (!d) return [127, ...v14(0), 0, ...v14(0), ...v14(0), 0, 0, 0];
         if (cmd === C.X_SET) { const v = (a[1] | (a[2] << 7)) - 8192; d.v = d.names[1] === "GO" ? 0 : Math.max(d.min, Math.min(d.max, v)); }
         return [a[0], ...v14(d.v), d.fmt, ...v14(d.min), ...v14(d.max), d.names.length ? 1 : 0, ...enc.s(d.label), ...enc.s(d.unit || ""), ...d.names.flatMap(enc.s)]; }
-      case C.STATE: return [12 + (Date.now() / 1500 % 7 | 0), 0, 0, 30, 0b10110101 & 127, (0b101011010101 >> 7) & 127, mrec.rec, mrec.mode, mrec.start, mrec.quant, 0];
+      case C.STATE: return [12 + (Date.now() / 1500 % 7 | 0), 0, 0, 30, 0b10110101 & 127, (0b101011010101 >> 7) & 127, mrec.rec, mrec.mode, mrec.start, mrec.quant, 0, 8];
       case C.REC: if (a[0] === 0) mrec.rec = mrec.rec ? 0 : sq.playing ? 1 : 2; else if (a[0] === 1) mrec.mode = a[1] & 1; else if (a[0] === 2) mrec.start = a[1] & 1; else if (a[0] === 3) mrec.quant = a[1] & 1;
         return answer(C.STATE, []);
       case C.STEP_GET: return a[0] < steps.length ? stepArgs(a[0]) : null;
@@ -274,6 +274,7 @@ async function connectMidi() {
     try { await rq(C.INFO, [], { timeout: 600, retries: 3, quiet: true }); }
     catch (e) { link.close(); pr.input.onmidimessage = null; continue; }
     M.midiOut = pr.output;                           /* (the panic's all notes off: plain MIDI on the same port) */
+    M.port = pr;                                     /* (Estudio unhooks it while open) */
     access.onstatechange = (e) => { if (e.port === pr.input && e.port.state === "disconnected") lost(); };
     $("cname").textContent = pr.input.name.replace(/ MIDI.*$/, "") || "FM-1";
     return load();
@@ -456,7 +457,7 @@ function paintValue(s, id) {
   paintTile(s, id);
   paintCards(s, id);
   renderDev();
-  if (id === 0 || id === 25 || id === 26) renderMeta();
+  renderTransport();                                       /* (the bar: BPM, TRN) */
 }
 /* RÁPIDO: what a player reaches for. Each tile's colour: the knob that turns it on its page of the FM-1. s: 0 the sound, 1 global.
    kind: toggle (its off value <-> the last value it had), amount (0 <-> the last level; a bar), bipolar (0 <-> the last; a bar from
@@ -551,6 +552,7 @@ function panic() {
 const again = (el, c) => { el.classList.remove(c); void el.offsetWidth; el.classList.add(c); };
 const fade = () => { again($("edit"), "fade"); setTimeout(() => $("edit").classList.remove("fade"), 240); };
 function renderWork() {
+  if (S.folder === "ESTUDIO") return;                      /* (the editor stays as it is) */
   $("edit").dataset.folder = S.folder;   /* (no data-f: la barra de abajo busca [data-f] hacia arriba y se comería todos los toques) */
   const f = S.folder;
   $("edit").innerHTML = f === "SAVE" ? soundsView() : f === "LIVE" ? cfgView("live", "Live") : f === "HOME" ? homeView() : f === "REC" ? recView()
@@ -563,10 +565,9 @@ function renderNav() {
   const dev = M.page ? (M.page.home ? "HOME" : FAM[M.page.fam]) : "";
   $("nav").innerHTML = NAV.map(([n, ic]) => `<button class="nb${n === dev ? " dev" : ""}${n === "ESTUDIO" ? " est" : ""}" ${n === S.folder ? 'aria-current="page"' : ""} data-f="${n}"><svg class="i"><use href="#i-${ic}"/></svg>${n}</button>`).join("");
 }
-function renderMeta() {
-  const d = (s, id) => (desc(s, id) ? fmtValue(desc(s, id), val(s, id))[0] : "--"), n = entryNow();
-  $("metal").innerHTML = `<dt>Tonalidad</dt><dd>${esc(d(0, 25))} ${esc(d(0, 26))}</dd><dt>Tempo</dt><dd class="num">${esc(d(1, 0))} BPM</dd>
-    <dt>Estado</dt><dd>${M.edited ? `<span class="edtx">Editado</span> <button class="dsc" data-save="1">Guardar</button>${n >= 0 ? ` <button class="dsc" data-discard="1">Descartar</button>` : ""}` : "Sin cambios"}</dd>`;
+function renderMeta() {                                   /* (the sound edited: keep it or go back, by the changes) */
+  const n = entryNow();
+  $("metal").innerHTML = M.edited ? `<span class="edtx">Editado</span><button class="btn" data-save="1"><svg class="i"><use href="#i-disk"/></svg>Guardar</button>${n >= 0 ? `<button class="btn" data-discard="1"><svg class="i"><use href="#i-undo"/></svg>Descartar</button>` : ""}` : "";
 }
 function renderBar() {
   const n = entryNow(), x = M.list[n], fav = M.favCur >= 0;
@@ -816,7 +817,7 @@ async function favToggle() {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && B.open) { openBrowser(false); $("now").focus(); } });
 $("scrim").addEventListener("click", () => openBrowser(false));
 document.addEventListener("click", (e) => {
-  const b = e.target.closest("#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-qtog],[data-qstep],[data-qn],[data-tap],[data-panic],#prev,#next,#favt,#usb,#follow,[data-f]");
+  const b = e.target.closest("#favh,#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-qtog],[data-qstep],[data-qn],[data-tap],[data-panic],#prev,#next,#favt,#usb,#follow,[data-f]");
   if (!b) return;
   if (b.id === "now") openBrowser(!B.open);
   else if (b.id === "brx") openBrowser(false);
@@ -835,9 +836,10 @@ document.addEventListener("click", (e) => {
   }
   else if (b.id === "favt") { favToggle(); again(b, "pop"); }
   else if (b.id === "usb") usbAudio();
+  else if (b.id === "favh") { const on = document.body.classList.toggle("nofav"); b.setAttribute("aria-pressed", !on); store.set("nofav", on); }
   else if (b.id === "follow") { S.follow = !S.follow; b.setAttribute("aria-pressed", S.follow); if (S.follow && M.page) followPage(); }
-  else if (b.dataset.f === "ESTUDIO") location.href = STUDIO_URL;
-  else if (b.dataset.f) { S.folder = b.dataset.f; renderNav(); renderWork(); $("edit").scrollTop = 0; fade(); }
+  else if (b.dataset.f === "ESTUDIO") openStudio();
+  else if (b.dataset.f) { if (S.folder === "ESTUDIO") closeStudio(); S.folder = b.dataset.f; renderNav(); renderWork(); $("edit").scrollTop = 0; fade(); }
 });
 
 
@@ -914,7 +916,7 @@ function drawScope(cv) {
   const caja = document.querySelector(".scope");
   if (caja) caja.classList.toggle("on", !!(propia || an));
   if (propia) {                                                    /* su traza, punto por punto, tal cual la dibuja él */
-    $("snone").textContent = "Onda del FM-1";
+    $("snone").textContent = "Onda del FM-1"; caja?.classList.add("fm1");   /* (its own trace: no USB audio, no permission) */
     g.strokeStyle = KH[0]; g.lineWidth = dpr; g.lineJoin = "miter"; g.beginPath();
     for (let x = 0; x < SCOPE_N; x++) g.lineTo(x / (SCOPE_N - 1) * w, scTrace[x] / 126 * h);
     g.stroke(); return;
@@ -940,6 +942,6 @@ $("fs").onclick = () => (document.fullscreenElement ? document.exitFullscreen()
   : document.documentElement.requestFullscreen().then(() => screen.orientation?.lock?.("landscape"))).catch(() => {});   /* (always landscape) */
 document.addEventListener("fullscreenchange", () => $("fs").setAttribute("aria-pressed", !!document.fullscreenElement));   /* (served, as on Vercel: the same file to keep offline) */
 $("conn").classList.add("off");
-document.querySelector(".rail.l .chg")?.before($("toast"));   /* el aviso vive donde ya está la lista de Cambios */
+if (store.get("nofav")) { document.body.classList.add("nofav"); $("favh").setAttribute("aria-pressed", "false"); }
 renderNav();                                        /* (empty until the FM-1 is connected: Conectar in the middle) */
 if (QS.get("mock") === "1") connectMock();
