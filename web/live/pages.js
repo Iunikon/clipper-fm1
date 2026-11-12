@@ -222,6 +222,7 @@ document.addEventListener("click", (e) => {
 });
 /* reorder: in edit, a card lifts and follows the finger (a ghost), the others make room as it passes (FLIP: they slide
    from where they were), and on release it settles into its place */
+const zf = () => +getComputedStyle(document.documentElement).getPropertyValue("--z") || 1;   /* (a PC screen: the app zoomed, live.css) */
 function cfgFlip(which, change) {
   const cg = document.querySelector(`.cg[data-cg="${which}"]`), before = new Map();
   cg?.querySelectorAll(".ci[data-ci]").forEach((el) => before.set(el.dataset.uid, el.getBoundingClientRect()));
@@ -229,21 +230,21 @@ function cfgFlip(which, change) {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   document.querySelectorAll(`.cg[data-cg="${which}"] .ci[data-ci]`).forEach((el) => {
     const r0 = before.get(el.dataset.uid); if (!r0 || reduce) return;
-    const r1 = el.getBoundingClientRect(), dx = r0.left - r1.left, dy = r0.top - r1.top; if (!dx && !dy) return;
+    const r1 = el.getBoundingClientRect(), z = zf(), dx = (r0.left - r1.left) / z, dy = (r0.top - r1.top) / z; if (!dx && !dy) return;
     el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 180, easing: "cubic-bezier(.2, .8, .2, 1)" });
   });
 }
 document.addEventListener("pointerdown", (e) => {
   const c = e.target.closest(".cg.editing .ci[data-ci]"); if (!c || e.target.closest("[data-cx],[data-csz]")) return;
   const r = c.getBoundingClientRect(), g = c.cloneNode(true);
-  g.className = "ci ghost"; Object.assign(g.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+  const z = zf(); g.className = "ci ghost"; Object.assign(g.style, { left: r.left / z + "px", top: r.top / z + "px", width: r.width / z + "px", height: r.height / z + "px" });
   document.body.append(g);
   CFG.drag = { from: +c.dataset.ci, which: c.closest(".cg").dataset.cg, uid: c.dataset.uid, ghost: g, dx: e.clientX - r.left, dy: e.clientY - r.top, pid: e.pointerId };
   c.classList.add("hole"); e.preventDefault();
 }, true);
 document.addEventListener("pointermove", (e) => {
   const d = CFG.drag; if (!d) return;
-  d.ghost.style.left = e.clientX - d.dx + "px"; d.ghost.style.top = e.clientY - d.dy + "px";
+  const z = zf(); d.ghost.style.left = (e.clientX - d.dx) / z + "px"; d.ghost.style.top = (e.clientY - d.dy) / z + "px";
   const over = document.elementFromPoint(e.clientX, e.clientY)?.closest(".cg.editing .ci[data-ci]"); if (!over) return;
   const to = +over.dataset.ci; if (to === d.from) return;
   cfgFlip(d.which, () => { const arr = CFG[d.which], [it] = arr.splice(d.from, 1); arr.splice(to, 0, it); d.from = to; cfgSave(d.which); renderWork(); });
@@ -254,8 +255,8 @@ document.addEventListener("pointerup", () => {
   const home = document.querySelector(`.cg.editing .ci[data-uid="${d.uid}"]`), g = d.ghost;
   if (!home || matchMedia("(prefers-reduced-motion: reduce)").matches) { g.remove(); home?.classList.remove("hole"); return; }
   setTimeout(() => { if (g.isConnected) { g.remove(); home.classList.remove("hole"); } }, 400);   /* (an animation that never ran: a hidden page) */
-  const r = home.getBoundingClientRect();
-  g.animate([{ left: g.style.left, top: g.style.top, width: g.style.width, height: g.style.height }, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" }],
+  const r = home.getBoundingClientRect(), z = zf();
+  g.animate([{ left: g.style.left, top: g.style.top, width: g.style.width, height: g.style.height }, { left: r.left / z + "px", top: r.top / z + "px", width: r.width / z + "px", height: r.height / z + "px" }],
     { duration: 160, easing: "cubic-bezier(.2, .8, .2, 1)", fill: "forwards" }).onfinish = () => { g.remove(); home.classList.remove("hole"); home.animate([{ transform: "scale(1.03)" }, { transform: "none" }], { duration: 140 }); };
 }, true);
 
