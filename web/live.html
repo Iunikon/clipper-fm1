@@ -4331,6 +4331,35 @@ function livePage(i) { CFG.lp = Math.max(0, Math.min(CFG.lpages.length - 1, i));
 const ACT = { play: ["PLAY", "Arranca o para el patrón"], rec: ["REC", "Como el botón REC"], favnext: ["Fav. siguiente", ""], favprev: ["Fav. anterior", ""], discard: ["Descartar", "Lo editado vuelve a como se cargó"] };
 const GITEM = { filt: ["Filtro", "FILTER", "filt", 0, [50, 127, 127, 127]], fx: ["Efectos", "FX", "meters", 0, [33, 34, 35, 36]], env: ["ENV", "ENV", "env", 0, [1, 2, 3, 4]], lfo: ["LFO", "LFO", "lfo", 0, [9, 10, 11, 12]] };
 function cfgSave(which) { if (which === "live") { CFG.lpages[CFG.lp].items = CFG.live; store.set("cfg:lpages", CFG.lpages); store.set("cfg:lp", CFG.lp); } else store.set("cfg:" + which, CFG[which]); }
+/* ---- a JSON file: given to the viewer (their downloads), or one they pick */
+function saveJson(name, obj) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 1)], { type: "application/json" })), a = document.createElement("a");
+  a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function pickJson() {
+  return new Promise((ok, no) => {
+    const i = Object.assign(document.createElement("input"), { type: "file", accept: ".json,application/json" });
+    i.onchange = async () => { try { ok(JSON.parse(await i.files[0].text())); } catch (e) { no(e); } };
+    i.click();
+  });
+}
+const today = () => new Date().toISOString().slice(0, 10);
+/* LIVE's pages to a file and back (Edit: Exportar / Importar). An import adds its pages after the ones here: nothing is lost */
+const LPF = { FORMAT: "clipper-live-pages", VERSION: 1 };
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-lpio]"); if (!b) return;
+  if (b.dataset.lpio === "out") { cfgSave("live"); saveJson(`clipper-live-paginas-${today()}.json`, { format: LPF.FORMAT, version: LPF.VERSION, exported: new Date().toISOString(), pages: CFG.lpages }); toast(-1, `<b>${CFG.lpages.length}</b> ${CFG.lpages.length === 1 ? "página exportada" : "páginas exportadas"}`); return; }
+  let j; try { j = await pickJson(); } catch (er) { toast(-1, "Ese archivo no se puede leer"); return; }
+  const got = j && j.format === LPF.FORMAT && Array.isArray(j.pages) ? j.pages.filter((p) => p && Array.isArray(p.items)) : null;
+  if (!got || !got.length) { toast(-1, "Ese archivo no tiene páginas de LIVE"); return; }
+  const names = new Set(CFG.lpages.map((p) => p.name)), first = CFG.lpages.length;
+  for (const p of got) {
+    let n = String(p.name || "LIVE").slice(0, 16).toUpperCase(), k = 2; const base = n;
+    while (names.has(n)) n = `${base.slice(0, 13)} ${k++}`;
+    names.add(n); CFG.lpages.push({ name: n, items: p.items.filter((x) => x && typeof x === "object") });
+  }
+  livePage(first); cfgSave("live"); renderWork(); toast(-1, `<b>${got.length}</b> ${got.length === 1 ? "página importada" : "páginas importadas"}`);
+});
 /* LIVE's pages: a tab each (in Edit: rename by a tap on the open one, × removes, + adds) */
 function lpTabs() {
   const ed = CFG.edit === "live";
@@ -4375,7 +4404,7 @@ function cfgView(which, title) {
   const ed = CFG.edit === which, lock = which === "live" && S.lock;
   document.body.classList.toggle("cfgediting", !!CFG.edit);
   const head = `<div class="qhead"><h2>${title}</h2>${ed ? `<span class="hint2">Arrastra una tarjeta para ordenar · × quita · elige el tamaño abajo</span>` : ""}<div class="qtools">${ed
-    ? `<button data-creset="${which}"><svg class="i"><use href="#i-undo"/></svg>Restablecer</button><button class="pri" data-cedit=""><svg class="i"><use href="#i-check"/></svg>Listo</button>`
+    ? `${which === "live" ? `<button data-lpio="out"><svg class="i"><use href="#i-dl"/></svg>Exportar</button><button data-lpio="in">Importar</button>` : ""}<button data-creset="${which}"><svg class="i"><use href="#i-undo"/></svg>Restablecer</button><button class="pri" data-cedit=""><svg class="i"><use href="#i-check"/></svg>Listo</button>`
     : `${which === "live" ? `<button class="${lock ? "on" : ""}" data-lock="1" aria-pressed="${lock}"><svg class="i"><use href="#i-${lock ? "lock" : "unlock"}"/></svg>${lock ? "Bloqueado" : "Bloquear"}</button>` : ""}${lock ? "" : `<button data-cedit="${which}"><svg class="i"><use href="#i-edit"/></svg>Editar</button>`}`}</div></div>`;
   return `<div class="cfgwrap${ed ? " editing" : ""}"><div class="cfgw">${head}${which === "live" ? lpTabs() : ""}${cfgGrid(which, which === "live" ? "lg4" : "lg4 short")}</div>${ed ? catalog(which) : ""}</div>`;
 }
@@ -4628,8 +4657,29 @@ function systemView() {
       ${row("Sonidos de usuario", `${users} de 32`)}${row("Favoritos", `${M.favs.length} de 16`)}${row("Pasos del patrón", i.nstep || "—")}
       ${st ? row("CPU", st.cpu + " %") + row("LATE", st.late) + row("PEAK", st.peak + " %") : ""}${row("Puerto MIDI", $("cname").textContent)}</div>
     <div class="syl"><span>Idioma · Language</span><button class="btn${LANG.cur !== "en" ? " pri" : ""}" data-lang="es">Español</button><button class="btn${LANG.cur === "en" ? " pri" : ""}" data-lang="en">English</button></div>
+    <div class="syl"><span>Ajustes de Live</span><button class="btn" data-cfgio="out"><svg class="i"><use href="#i-dl"/></svg>Exportar</button><button class="btn" data-cfgio="in">Importar</button></div>
+    <p class="msh">Las páginas de LIVE, HOME, la Biblioteca, el idioma y el resto de ajustes se guardan en este navegador, en este aparato: no en el FM-1. La página de Vercel y el archivo descargado guardan cada uno los suyos, y se pierden si borras los datos del sitio. Exporta para tener una copia o pasarlos a otro aparato.</p>
     <p class="msh">MIDI, sincronía y afinación se ajustan en GLO.</p></section>`;
 }
+/* every setting of Live (localStorage, "clipperlive:"), the parameters' cache left out, to a file and back. An import
+   replaces what is here, then the app starts again with it */
+const CSF = { FORMAT: "clipper-live-settings", VERSION: 1, PRE: "clipperlive:" };
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-cfgio]"); if (!b) return;
+  if (b.dataset.cfgio === "out") {
+    const data = {};
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith(CSF.PRE) && !k.startsWith(CSF.PRE + "desc:")) data[k.slice(CSF.PRE.length)] = localStorage.getItem(k); } } catch (er) { /* (what could be read) */ }   /* (each as it is kept: the language is plain text) */
+    saveJson(`clipper-live-ajustes-${today()}.json`, { format: CSF.FORMAT, version: CSF.VERSION, exported: new Date().toISOString(), data });
+    toast(-1, "<b>Ajustes</b> exportados"); return;
+  }
+  if (b.dataset.arm !== "1") { arm(b, "Importar", "¿Reemplazar los de aquí?"); return; }
+  disarm(b, "Importar");
+  let j; try { j = await pickJson(); } catch (er) { toast(-1, "Ese archivo no se puede leer"); return; }
+  if (!j || j.format !== CSF.FORMAT || !j.data || typeof j.data !== "object") { toast(-1, "Ese archivo no son ajustes de Live"); return; }
+  try { for (const [k, v] of Object.entries(j.data)) if (!k.startsWith("desc:") && typeof v === "string") localStorage.setItem(CSF.PRE + k, v); }
+  catch (er) { toast(-1, "No se pudieron guardar los ajustes en este navegador"); return; }
+  toast(-1, "<b>Ajustes</b> importados: vuelvo a empezar…"); setTimeout(() => location.reload(), 900);
+});
 
 /* before a project replaces the one playing: that one (and the settings) to a file first, so a wrong tap loses nothing */
 async function autoBackupProject() {
@@ -4989,7 +5039,10 @@ const DICT = {
   "Arrastra una tarjeta para ordenar · × quita · elige el tamaño abajo": "Drag a card to reorder · × removes · pick the size below", "Antes, una copia de lo que hay ahora (por si acaso)…": "First, a backup of what is there now (just in case)…",
   "Comprobando la copia…": "Checking the backup…", "Restaurado. El FM-1 tiene ahora lo de la copia.": "Restored. The FM-1 now has the backup's.", "Guardando el proyecto de ahora, por si acaso…": "Saving the project playing, just in case…",
   "No pude copiar el proyecto de ahora: no cargo": "Couldn't back up the project playing: not loading", "Nombre de la página": "Page name", "Ese archivo no se puede leer.": "That file can't be read.",
-  "Herramientas": "Tools", "Cada una pide un segundo toque": "Each asks for a second tap", "Quitar la página": "Remove the page", "Páginas de LIVE": "LIVE pages", "Guardar el sonido actual": "Save the current sound", "Exportar": "Export", "Importar": "Import", "Etiquetas": "Tags", "A USER…": "To USER…", "Todas": "All",
+  "Ajustes de Live": "Live settings", "No se pudieron guardar los ajustes en este navegador": "The settings couldn't be kept in this browser", "¿Reemplazar los de aquí?": "Replace the ones here?", "Ese archivo no se puede leer": "That file can't be read",
+  "Ese archivo no tiene páginas de LIVE": "That file has no LIVE pages", "Ese archivo no son ajustes de Live": "That file isn't Live settings", "exportados": "exported",
+  "Las páginas de LIVE, HOME, la Biblioteca, el idioma y el resto de ajustes se guardan en este navegador, en este aparato: no en el FM-1. La página de Vercel y el archivo descargado guardan cada uno los suyos, y se pierden si borras los datos del sitio. Exporta para tener una copia o pasarlos a otro aparato.": "LIVE's pages, HOME, the Library, the language and the other settings are kept in this browser, on this device: not on the FM-1. The Vercel page and the downloaded file each keep their own, and they go if you clear the site's data. Export to keep a copy or to move them to another device.",
+  "importados: vuelvo a empezar…": "imported: starting again…", "Herramientas": "Tools", "Cada una pide un segundo toque": "Each asks for a second tap", "Quitar la página": "Remove the page", "Páginas de LIVE": "LIVE pages", "Guardar el sonido actual": "Save the current sound", "Exportar": "Export", "Importar": "Import", "Etiquetas": "Tags", "A USER…": "To USER…", "Todas": "All",
   "Buscar por nombre o motor": "Search by name or engine", "¿En qué ranura USER?": "Which USER slot?", "Ningún sonido con eso.": "No sound matches.",
   "Aún no hay nada. Guarda el sonido que suena o importa una biblioteca del editor.": "Nothing yet. Save the sound playing or import a library from the editor.",
   "Se guarda en esta tablet, no en el FM-1. «A USER…» lo escribe en una ranura de usuario del sinte; desde ahí lo cargas en SAVE.": "Kept on this tablet, not on the FM-1. “To USER…” writes it to one of the synth's user slots; load it from there in SAVE.",
@@ -5016,6 +5069,7 @@ const RX = [
   [/^(\d+) sonidos? en esta tablet$/, (m, n) => `${n} sound${n === "1" ? "" : "s"} on this tablet`], [/^Ver las (\d+)$/, "Show all $1"], [/^(U\d+) ¿encima\?$/, "$1 over it?"],
   [/^(\d+) sonidos? importados?$/, (m, n) => `${n} sound${n === "1" ? "" : "s"} imported`], [/^Ese archivo no se puede leer: (.+)$/, "That file can't be read: $1"],
   [/^Este sonido usa (.+)\. Carga un sonido HYBRID para editar sus osciladores, filtros y matriz aquí\.$/, "This sound uses $1. Load a HYBRID sound to edit its oscillators, filters and matrix here."],
+  [/^(\d+) páginas? exportadas?$/, (m, n) => `${n} page${n === "1" ? "" : "s"} exported`], [/^(\d+) páginas? importadas?$/, (m, n) => `${n} page${n === "1" ? "" : "s"} imported`],
   [/^No pude leer el patch: (.+)$/, "Couldn't read the patch: $1"], [/^¿Quitar la página «(.+)»\?$/, "Remove the page “$1”?"],
   [/^(.+), editado: abrir sonidos$/, "$1, edited: open sounds"], [/^(.+): abrir sonidos$/, "$1: open sounds"], [/^Pista (\d+)$/, "Track $1"],
 ];

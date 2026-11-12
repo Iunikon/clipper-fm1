@@ -176,6 +176,10 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 
 **Comandos SysEx de Live (protocolo 15):** 97 PAGE … 104 EDITED, 105 TOOL, 106 PLAY, 107 TRANSPORT, 108 SCOPE, 109–111 X_GET/X_SET/X_CHANGED, 112 STATE, 113 REC. Del editor: UP_* 16–21, HY_GET/HY_PUT 77/78, BK_* 34–36, SMP_* 11–14. Detalle en `web/EDITOR_PROTOCOL.md`.
 
+**Dónde se guardan los ajustes:** en el `localStorage` del navegador, con el prefijo `clipperlive:`. Ahí van las páginas de LIVE (`cfg:lpages`, `cfg:lp`), HOME (`cfg:home`), la Biblioteca (`lib`), el idioma, el candado y la barra de favoritos. Cada aparato y cada dirección guarda los suyos (la página de Vercel y el archivo descargado no se ven entre sí), y se borran con los datos del sitio.
+- **LIVE > Editar > Exportar / Importar:** solo las páginas de LIVE (`clipper-live-pages` v1). Importar las **añade** detrás de las que hay.
+- **Estudio > Sistema > Ajustes de Live:** todo (`clipper-live-settings` v1), cada valor tal cual se guarda. Importar **reemplaza** (pide un segundo toque) y recarga la app.
+
 **Rendimiento (reglas):**
 - Un valor que cambia se pinta **una vez por fotograma** (`paintValue` → `paintFlush`).
 - Lo que no cambió no se reescribe (`setHtml`).

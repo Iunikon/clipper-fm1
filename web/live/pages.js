@@ -148,6 +148,35 @@ function livePage(i) { CFG.lp = Math.max(0, Math.min(CFG.lpages.length - 1, i));
 const ACT = { play: ["PLAY", "Arranca o para el patrón"], rec: ["REC", "Como el botón REC"], favnext: ["Fav. siguiente", ""], favprev: ["Fav. anterior", ""], discard: ["Descartar", "Lo editado vuelve a como se cargó"] };
 const GITEM = { filt: ["Filtro", "FILTER", "filt", 0, [50, 127, 127, 127]], fx: ["Efectos", "FX", "meters", 0, [33, 34, 35, 36]], env: ["ENV", "ENV", "env", 0, [1, 2, 3, 4]], lfo: ["LFO", "LFO", "lfo", 0, [9, 10, 11, 12]] };
 function cfgSave(which) { if (which === "live") { CFG.lpages[CFG.lp].items = CFG.live; store.set("cfg:lpages", CFG.lpages); store.set("cfg:lp", CFG.lp); } else store.set("cfg:" + which, CFG[which]); }
+/* ---- a JSON file: given to the viewer (their downloads), or one they pick */
+function saveJson(name, obj) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 1)], { type: "application/json" })), a = document.createElement("a");
+  a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function pickJson() {
+  return new Promise((ok, no) => {
+    const i = Object.assign(document.createElement("input"), { type: "file", accept: ".json,application/json" });
+    i.onchange = async () => { try { ok(JSON.parse(await i.files[0].text())); } catch (e) { no(e); } };
+    i.click();
+  });
+}
+const today = () => new Date().toISOString().slice(0, 10);
+/* LIVE's pages to a file and back (Edit: Exportar / Importar). An import adds its pages after the ones here: nothing is lost */
+const LPF = { FORMAT: "clipper-live-pages", VERSION: 1 };
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-lpio]"); if (!b) return;
+  if (b.dataset.lpio === "out") { cfgSave("live"); saveJson(`clipper-live-paginas-${today()}.json`, { format: LPF.FORMAT, version: LPF.VERSION, exported: new Date().toISOString(), pages: CFG.lpages }); toast(-1, `<b>${CFG.lpages.length}</b> ${CFG.lpages.length === 1 ? "página exportada" : "páginas exportadas"}`); return; }
+  let j; try { j = await pickJson(); } catch (er) { toast(-1, "Ese archivo no se puede leer"); return; }
+  const got = j && j.format === LPF.FORMAT && Array.isArray(j.pages) ? j.pages.filter((p) => p && Array.isArray(p.items)) : null;
+  if (!got || !got.length) { toast(-1, "Ese archivo no tiene páginas de LIVE"); return; }
+  const names = new Set(CFG.lpages.map((p) => p.name)), first = CFG.lpages.length;
+  for (const p of got) {
+    let n = String(p.name || "LIVE").slice(0, 16).toUpperCase(), k = 2; const base = n;
+    while (names.has(n)) n = `${base.slice(0, 13)} ${k++}`;
+    names.add(n); CFG.lpages.push({ name: n, items: p.items.filter((x) => x && typeof x === "object") });
+  }
+  livePage(first); cfgSave("live"); renderWork(); toast(-1, `<b>${got.length}</b> ${got.length === 1 ? "página importada" : "páginas importadas"}`);
+});
 /* LIVE's pages: a tab each (in Edit: rename by a tap on the open one, × removes, + adds) */
 function lpTabs() {
   const ed = CFG.edit === "live";
@@ -192,7 +221,7 @@ function cfgView(which, title) {
   const ed = CFG.edit === which, lock = which === "live" && S.lock;
   document.body.classList.toggle("cfgediting", !!CFG.edit);
   const head = `<div class="qhead"><h2>${title}</h2>${ed ? `<span class="hint2">Arrastra una tarjeta para ordenar · × quita · elige el tamaño abajo</span>` : ""}<div class="qtools">${ed
-    ? `<button data-creset="${which}"><svg class="i"><use href="#i-undo"/></svg>Restablecer</button><button class="pri" data-cedit=""><svg class="i"><use href="#i-check"/></svg>Listo</button>`
+    ? `${which === "live" ? `<button data-lpio="out"><svg class="i"><use href="#i-dl"/></svg>Exportar</button><button data-lpio="in">Importar</button>` : ""}<button data-creset="${which}"><svg class="i"><use href="#i-undo"/></svg>Restablecer</button><button class="pri" data-cedit=""><svg class="i"><use href="#i-check"/></svg>Listo</button>`
     : `${which === "live" ? `<button class="${lock ? "on" : ""}" data-lock="1" aria-pressed="${lock}"><svg class="i"><use href="#i-${lock ? "lock" : "unlock"}"/></svg>${lock ? "Bloqueado" : "Bloquear"}</button>` : ""}${lock ? "" : `<button data-cedit="${which}"><svg class="i"><use href="#i-edit"/></svg>Editar</button>`}`}</div></div>`;
   return `<div class="cfgwrap${ed ? " editing" : ""}"><div class="cfgw">${head}${which === "live" ? lpTabs() : ""}${cfgGrid(which, which === "live" ? "lg4" : "lg4 short")}</div>${ed ? catalog(which) : ""}</div>`;
 }
