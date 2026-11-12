@@ -204,7 +204,7 @@ const PCP = {                                   /* las respuestas, tal como las 
   tune(a) { const u21 = (k) => a[k] | (a[k + 1] << 7) | (a[k + 2] << 14), n = a[3] || 0;
     return { rc: a[0], sys: a[1], root: a[2], n, period: u21(4), deg: [0, ...Array.from({ length: Math.max(0, n - 1) }, (_, i) => u21(7 + 3 * i))] }; },
 };
-const PCV = new Set(["LFO", "GLO", "SEQ", "SAVE"]);  /* las vistas que muestran algo de aquí */
+const PCV = new Set(["LFO", "GLO", "SEQ", "SAVE", "ESTUDIO"]);  /* las vistas que muestran algo de aquí */
 const PC = {
   load(key, cmd, args, parse) {                 /* una vez por sesión; al llegar, se vuelve a pintar la vista */
     if (PCD[key] !== undefined) return PCD[key];

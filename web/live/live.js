@@ -274,7 +274,6 @@ async function connectMidi() {
     try { await rq(C.INFO, [], { timeout: 600, retries: 3, quiet: true }); }
     catch (e) { link.close(); pr.input.onmidimessage = null; continue; }
     M.midiOut = pr.output;                           /* (the panic's all notes off: plain MIDI on the same port) */
-    M.port = pr;                                     /* (Estudio unhooks it while open) */
     access.onstatechange = (e) => { if (e.port === pr.input && e.port.state === "disconnected") lost(); };
     $("cname").textContent = pr.input.name.replace(/ MIDI.*$/, "") || "FM-1";
     return load();
@@ -323,6 +322,7 @@ async function load() {
     $("conn").classList.remove("off");
     keepAlive();
     if (NAV.some(([n]) => n === QS.get("folder"))) S.folder = QS.get("folder");   /* (?folder= ?mode=edit ?br=1 ?save=1: to open a view straight away) */
+    if (QS.get("stab")) STU.tab = QS.get("stab");                                   /* (captures: an Estudio tab) */
     renderAll(); renderTransport(); pollState();
     if (QS.get("mode") === "edit") { S.folder = "HOME"; renderNav(); renderWork(); }   /* (compatibilidad con el enlace viejo) */
     if (QS.get("br") === "1") openBrowser(true);
@@ -553,10 +553,10 @@ function panic() {
 const again = (el, c) => { el.classList.remove(c); void el.offsetWidth; el.classList.add(c); };
 const fade = () => { again($("edit"), "fade"); setTimeout(() => $("edit").classList.remove("fade"), 240); };
 function renderWork() {
-  if (S.folder === "ESTUDIO") return;                      /* (the editor stays as it is) */
   $("edit").dataset.folder = S.folder;   /* (no data-f: la barra de abajo busca [data-f] hacia arriba y se comería todos los toques) */
   const f = S.folder;
-  $("edit").innerHTML = f === "SAVE" ? soundsView() : f === "LIVE" ? cfgView("live", "Live") : f === "HOME" ? homeView() : f === "REC" ? recView()
+  if (f !== "ESTUDIO") SQ.full = false;                     /* (the advanced sequencer: Estudio's) */
+  $("edit").innerHTML = f === "ESTUDIO" ? studioView() : f === "SAVE" ? soundsView() : f === "LIVE" ? cfgView("live", "Live") : f === "HOME" ? homeView() : f === "REC" ? recView()
     : f === "SEQ" ? `<div class="pgs">${seqBlock()}${LAYOUT.filter((x) => x.title === "PATTERN").map((x) => pageRow({ title: x.title, folder: "SEQ", s: x.scope, ids: x.ids })).join("")}</div>`
     : folderView(f);
 }
@@ -842,7 +842,7 @@ document.addEventListener("click", (e) => {
   else if (b.id === "favh") { const on = document.body.classList.toggle("nofav"); b.setAttribute("aria-pressed", !on); store.set("nofav", on); }
   else if (b.id === "follow") { S.follow = !S.follow; b.setAttribute("aria-pressed", S.follow); if (S.follow && M.page) followPage(); }
   else if (b.dataset.f === "ESTUDIO") openStudio();
-  else if (b.dataset.f) { if (S.folder === "ESTUDIO") closeStudio(); S.folder = b.dataset.f; renderNav(); renderWork(); $("edit").scrollTop = 0; fade(); }
+  else if (b.dataset.f) { S.folder = b.dataset.f; renderNav(); renderWork(); $("edit").scrollTop = 0; fade(); }
 });
 
 

@@ -23,7 +23,7 @@ async function sqLoad() {
       const p = await rq(C.PLAY); sqPlayFrom(p);
     } catch (e) { /* the next visit asks again */ }
     SQ.loading = null;
-    if (S.folder === "SEQ") renderWork();
+    if (S.folder === "SEQ" || S.folder === "ESTUDIO") renderWork();
   })();
   return SQ.loading;
 }
@@ -83,7 +83,7 @@ function seqBlock() {
   for (let i = 0; i < rows * 16 && i < SQ.steps.length; i++) cells.push(sqCell(i, len));
   const lv = M.page && !M.page.home && M.page.title === "NOTES";
   return `<section class="blk sqb${lv ? " dev" : ""}" data-title="NOTES"><header class="bh"><h2><svg class="i"><use href="#i-seq"/></svg>NOTES</h2>
-      <span class="c num">${len} pasos</span><button class="sqst" data-f="ESTUDIO">Avanzado en Estudio</button><button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
+      <span class="c num">${len} pasos</span>${SQ.full ? "" : `<button class="sqst" data-stab="seq" data-stgo="1">Avanzado en Estudio</button>`}<button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
     ${SQ.full ? sqFullBody(len, cells.join("")) : `<div class="sqg" role="group" aria-label="Pasos">${cells.join("")}</div>`}${sqEditor()}${SQ.full ? sqLib() : ""}</section>`;
 }
 function sqPaint(i) {
@@ -121,7 +121,7 @@ async function sqxLoad() {
   if (l) { const r = new Reader(l), o = []; r.b(); const n = r.b(); for (let i = 0; i < n; i++) o.push({ step: r.b(), param: r.b(), value: r.v() }); SQX.locks = o; }
   else SQX.locks = null;
   SQX.loaded = true; SQX.loading = false;
-  if (S.folder === "SEQ") renderWork();
+  if (S.folder === "SEQ" || S.folder === "ESTUDIO") renderWork();
 }
 const sqFill = (i) => (SQX.fill ? ((SQX.fill[i >> 2] || 0) >> (2 * (i & 3))) & 3 : 0);
 const sqRange = () => { const len = sqLen(); return [Math.max(0, Math.min(SQ.r0, SQ.r1)), Math.min(len - 1, Math.max(SQ.r0, SQ.r1))]; };

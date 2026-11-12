@@ -859,8 +859,6 @@
   .scope.fm1 .src { display: none; }
 
   /* ==== ESTUDIO inside: the editor over the whole work area ==== */
-  body.studio .body { grid-template-columns: 0 minmax(0, 1fr) 0; } body.studio .rail { display: none; }
-  #edit[data-folder="ESTUDIO"] { padding: 0; overflow: hidden; }
   .stu { display: flex; flex-direction: column; height: 100%; }
   .stub { display: flex; align-items: center; gap: 14px; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--tx-2); }
   .stub > b { font-size: 16px; color: var(--tx); } .stub .more { margin-left: auto; }
@@ -879,3 +877,15 @@
   /* the bar, full: the conn narrower, Guardar an icon until there is room */
   .bar { grid-template-columns: 190px minmax(0, 1fr) auto; }
   @media (max-width: 1599px) { .svb span { display: none; } .svb { padding: 0 10px; } .where { display: none; } }
+
+  /* ==== ESTUDIO, Live's own: tabs, then the tab ==== */
+  .stv { display: flex; flex-direction: column; gap: 14px; }
+  .stt { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, auto); gap: 4px; border-bottom: 2px solid var(--line-2); padding-bottom: 8px; }
+  .stt button { height: 44px; padding: 0 10px; white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--tx-2); background: var(--panel); border: 1px solid var(--line); }
+  .stt button svg { width: 16px; height: 16px; } .stt button[aria-current="true"] { background: var(--k1); color: #000; border-color: var(--k1); }
+  .bkr { display: flex; gap: 10px; margin: 12px 0; } .bkr .btn { padding: 0 18px; height: 52px; cursor: pointer; } .bkr .btn.dis { opacity: .4; pointer-events: none; }
+  .bkbar { height: 6px; background: var(--raised); } .bkbar b { display: block; height: 100%; background: var(--k1); }
+  .bkm { font-size: 14px; color: var(--tx-2); margin-top: 8px; min-height: 20px; }
+  .sys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .syr { background: var(--panel); border: 1px solid var(--line); padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .syr span { font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--tx-3); } .syr b { font-size: 24px; font-weight: 400; -webkit-font-smoothing: none; }
