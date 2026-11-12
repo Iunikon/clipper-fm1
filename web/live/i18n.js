@@ -58,16 +58,42 @@ const DICT = {
   "como se cargó": "as loaded", "por defecto": "default", "Guardado": "Saved", "Mostrar u ocultar los favoritos": "Show or hide the favourites", "Pantalla completa": "Full screen",
   "La página del sinte": "The synth's page", "Carpetas": "Folders", "Carpetas de sonidos": "Sound folders", "Cerrar": "Close", "Favorito": "Favourite", "Favorito anterior": "Previous favourite", "Favorito siguiente": "Next favourite",
   "Quitar": "Remove", "Esta página se usa en el sinte.": "This page is used on the synth.",
+  "+ Página": "+ Page", "Páginas de LIVE": "LIVE pages", "Pánico: cortar todas las notas": "Panic: cut all notes", "en el sinte": "on the synth", "aquí": "here",
+  "Aún no hay patrones guardados aquí. «Guardar este» copia el patrón del FM-1 a la tablet, para volver a él cuando quieras.": "No patterns saved here yet. \u201cSave this one\u201d copies the FM-1's pattern to the tablet, to come back to it whenever you like.",
+  "Mover el rango a la izquierda": "Move the range left", "Mover el rango a la derecha": "Move the range right",
+  "Un archivo por ranura, mono a 22 050 Hz; la raíz sale del nombre del archivo (por ejemplo «PIANO A4»). Cabe hasta 80 KiB comprimidos.": "One file a slot, mono at 22 050 Hz; the root comes from the file's name (for example \u201cPIANO A4\u201d). Up to 80 KiB compressed.",
+  "Guardar aquí": "Save here", "Cargar sustituye el proyecto que suena. Guardar encima borra el que había. Las dos piden un segundo toque.": "Load replaces the project playing. Save over erases the one there was. Both ask for a second tap.",
+  "Arrastra una tarjeta para ordenar · × quita · elige el tamaño abajo": "Drag a card to reorder · × removes · pick the size below", "Antes, una copia de lo que hay ahora (por si acaso)…": "First, a backup of what is there now (just in case)…",
+  "Comprobando la copia…": "Checking the backup…", "Restaurado. El FM-1 tiene ahora lo de la copia.": "Restored. The FM-1 now has the backup's.", "Guardando el proyecto de ahora, por si acaso…": "Saving the project playing, just in case…",
+  "No pude copiar el proyecto de ahora: no cargo": "Couldn't back up the project playing: not loading", "Nombre de la página": "Page name", "Ese archivo no se puede leer.": "That file can't be read.",
+  "Quitar la página": "Remove the page", "Páginas de LIVE": "LIVE pages", "Guardar el sonido actual": "Save the current sound", "Exportar": "Export", "Importar": "Import", "Etiquetas": "Tags", "A USER…": "To USER…", "Todas": "All",
+  "Buscar por nombre o motor": "Search by name or engine", "¿En qué ranura USER?": "Which USER slot?", "Ningún sonido con eso.": "No sound matches.",
+  "Aún no hay nada. Guarda el sonido que suena o importa una biblioteca del editor.": "Nothing yet. Save the sound playing or import a library from the editor.",
+  "Se guarda en esta tablet, no en el FM-1. «A USER…» lo escribe en una ranura de usuario del sinte; desde ahí lo cargas en SAVE.": "Kept on this tablet, not on the FM-1. “To USER…” writes it to one of the synth's user slots; load it from there in SAVE.",
+  "Etiquetas, separadas por comas": "Tags, separated by commas", "Nombre (hasta 12 letras)": "Name (up to 12 letters)", "en la biblioteca": "in the library", "fuera de la biblioteca": "out of the library",
+  "Leyendo las ranuras…": "Reading the slots…", "BIBLIOTECA": "LIBRARY", "Fábrica…": "Factory…", "Volver a leer": "Read again", "Leyendo el patch…": "Reading the patch…",
+  "Osciladores": "Oscillators", "Filtros": "Filters", "Envolventes y LFO": "Envelopes and LFOs", "Matriz": "Matrix", "Solo las que se usan": "Only the ones in use",
+  "Cada cambio suena ya en el FM-1. Es el patch del sonido hasta que gires PTCH o cargues otro; guárdalo con Guardar.": "Every change plays on the FM-1 right away. It is the sound's patch until you turn PTCH or load another; keep it with Save.",
+  "Nombre del patch": "Patch name", "Cargar un patch de fábrica": "Load a factory patch", "en el FM-1": "on the FM-1", "importado": "imported",
+  "El FM-1 no aceptó el patch HYBRID": "The FM-1 didn't take the HYBRID patch", "Ese archivo no es un patch HYBRID": "That file is not a HYBRID patch", "No pude leer ese patch de fábrica": "Couldn't read that factory patch",
+  "Pidiendo la lista al FM-1…": "Asking the FM-1 for the list…", "Biblioteca de la tablet": "Tablet library", "Bancos del FM-1": "FM-1 banks",
+
 };
 const RX = [
   [/^(.+): anterior$/, "$1: previous"], [/^(.+): siguiente$/, "$1: next"], [/^(.+): apagado$/, "$1: off"], [/^(.+): encendido$/, "$1: on"], [/^(.+): menos$/, "$1: less"], [/^(.+): más$/, "$1: more"], [/^(.+): nivel$/, "$1: level"],
   [/^Paso (\d+): vacío$/, "Step $1: empty"], [/^Paso (\d+): ligado$/, "Step $1: tied"], [/^Paso (\d+): (.+)$/, "Step $1: $2"], [/^Deshacer (.+): volver a (.+)$/, "Undo $1: back to $2"],
-  [/^Editar (.+)$/, "Edit $1"], [/^Abrir (.+)$/, "Open $1"], [/^(\d+) pasos$/, "$1 steps"], [/^(\d+) sonidos$/, "$1 sounds"], [/^(\d+) de (\d+)$/, "$1 of $2"],
+  [/^Editar (.+)$/, (m, x) => `Edit ${DICT[x] || x}`], [/^Abrir (.+)$/, (m, x) => `Open ${DICT[x] || x}`], [/^(\d+) pasos$/, "$1 steps"], [/^(\d+) sonidos$/, "$1 sounds"], [/^(\d+) de (\d+)$/, "$1 of $2"],
   [/^(\d+) zonas? · (.+)$/, (m, n, k) => `${n} zone${n === "1" ? "" : "s"} · ${k}`], [/^Anterior en (.+)$/, "Previous in $1"], [/^Banco (\d+)$/, "Bank $1"], [/^Proyecto (\d+)$/, "Project $1"],
   [/^Acorde de (\d+) notas$/, "Chord of $1 notes"], [/^Favorito (\d+): quitar$/, "Favourite $1: remove"], [/^Favorito (\d+) de (\d+)$/, "Favourite $1 of $2"], [/^Guardar en (U\d+)$/, "Save to $1"], [/^Reemplazar (U\d+)$/, "Replace $1"],
   [/^Se reemplaza (.+)\.$/, "Replaces $1."], [/^Guarda encima de (.+), el que suena\.$/, "Saves over $1, the one playing."], [/^Hasta 12 letras\. Sin nombre se llama (.+)\.$/, "Up to 12 letters. Without a name it is called $1."],
   [/^Poner (.+)$/, "Put $1"], [/^Generar en (.+)$/, "Generate in $1"], [/^Leyendo (.+) del FM-1…$/, "Reading $1 from the FM-1…"], [/^(.+) como se cargó (.+)$/, "$1 as loaded $2"],
   [/^Leyendo (\d+) de (\d+) KiB…$/, "Reading $1 of $2 KiB…"], [/^Escribiendo (.+)$/, "Writing $1"], [/^Copia guardada: (\d+) KiB\. Está en tus descargas\.$/, "Backup saved: $1 KiB. It is in your downloads."], [/^No se pudo: (.+)$/, "Couldn't: $1"],
+  [/^([A-G]#?-?\d+), paso (\d+)(, suena)?$/, (m, n, k, on) => `${n}, step ${k}${on ? ", sounding" : ""}`],
+  [/^No pude hacer la copia de lo de ahora, así que no restauro: (.+)$/, "Couldn't back up what is there now, so not restoring: $1"], [/^Copia del proyecto de ahora en tus descargas \((.+)\)$/, "Backup of the project playing in your downloads ($1)"],
+  [/^(\d+) sonidos? en esta tablet$/, (m, n) => `${n} sound${n === "1" ? "" : "s"} on this tablet`], [/^Ver las (\d+)$/, "Show all $1"], [/^(U\d+) ¿encima\?$/, "$1 over it?"],
+  [/^(\d+) sonidos? importados?$/, (m, n) => `${n} sound${n === "1" ? "" : "s"} imported`], [/^Ese archivo no se puede leer: (.+)$/, "That file can't be read: $1"],
+  [/^Este sonido usa (.+)\. Carga un sonido HYBRID para editar sus osciladores, filtros y matriz aquí\.$/, "This sound uses $1. Load a HYBRID sound to edit its oscillators, filters and matrix here."],
+  [/^No pude leer el patch: (.+)$/, "Couldn't read the patch: $1"], [/^¿Quitar la página «(.+)»\?$/, "Remove the page “$1”?"],
   [/^(.+), editado: abrir sonidos$/, "$1, edited: open sounds"], [/^(.+): abrir sonidos$/, "$1: open sounds"], [/^Pista (\d+)$/, "Track $1"],
 ];
 function tr(t) {
@@ -89,6 +115,7 @@ const trObs = new MutationObserver((ms) => { if (LANG.cur !== "en") return; for 
 function setLang(l) {
   const was = LANG.cur; LANG.cur = l; try { localStorage.setItem("clipperlive:lang", l); } catch (e) { /* (asked again next time) */ }
   document.documentElement.lang = l;
+  document.documentElement.style.setProperty("--fine-txt", l === "en" ? '"FINE ×¼"' : '"FINO ×¼"');
   if (l === "en") { trNode(document.body); trObs.observe(document.body, { childList: true, subtree: true, characterData: true }); }
   else if (was === "en") { trObs.disconnect(); location.reload(); }   /* (back to Spanish: the page as written) */
 }
@@ -101,3 +128,4 @@ function langAsk() {
   g.querySelector(".box").prepend(box);
 }
 document.addEventListener("click", (e) => { const b = e.target.closest("[data-lang]"); if (!b) return; const l = b.dataset.lang; document.querySelector(".langq")?.remove(); if (l !== LANG.cur) setLang(l); });
+const trUi = (t) => (LANG.cur === "en" ? tr(t) : t);   /* (what the DOM does not show: a prompt's question) */

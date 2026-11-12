@@ -17,6 +17,7 @@ const F = { INT: 0, PCT: 1, BIPCT: 2, TIME: 3, LFOHZ: 4, CUTOFF: 5, DB: 6, SEMI:
   SWING: 14, FILT: 15, CDB: 16, SPLIT: 17 };
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 function fmtValue(d, v) {
+  if (d.txt) return d.txt(v);                          /* (a value with its own reading: the HYBRID patch's) */
   const sign = (x) => (x > 0 ? "+" + x : String(x));
   switch (d.fmt) {
     case F.PCT: return [String(d.max > 0 ? Math.trunc((v * 100 + Math.trunc(d.max / 2)) / d.max) : v), "%"];
@@ -46,8 +47,8 @@ function fmtValue(d, v) {
 
 /* ---------------------------------------------------------------- protocol --- */
 const HDR = [0x7D, 0x46, 0x4C];
-const C = { INFO: 1, GET: 2, SET: 3, DUMP: 4, DESC: 5, STEP_GET: 6, STEP_SET: 7, UP_LIST: 16, UP_STORE: 19, WATCH: 22, CHANGED: 23, RELOAD: 24, PING: 25, STEP_CHANGED: 26, TRACK_CHANGED: 32,
-  PAGE: 97, FAVS: 98, FAV_GO: 99, FAV_SET: 100, FAVS_CHANGED: 101, LIST: 102, LIST_GO: 103, EDITED: 104, TOOL: 105, PLAY: 106, TRANSPORT: 107,
+const C = { INFO: 1, GET: 2, SET: 3, DUMP: 4, DESC: 5, STEP_GET: 6, STEP_SET: 7, UP_LIST: 16, UP_PUT: 18, UP_STORE: 19, WATCH: 22, CHANGED: 23, RELOAD: 24, PING: 25, STEP_CHANGED: 26, TRACK_CHANGED: 32,
+  HY_GET: 77, HY_PUT: 78, PAGE: 97, FAVS: 98, FAV_GO: 99, FAV_SET: 100, FAVS_CHANGED: 101, LIST: 102, LIST_GO: 103, EDITED: 104, TOOL: 105, PLAY: 106, TRANSPORT: 107,
   SCOPE: 108, X_GET: 109, X_SET: 110, X_CHANGED: 111, STATE: 112, REC: 113 };
 const PUSH = new Set([C.CHANGED, C.RELOAD, C.STEP_CHANGED, C.TRACK_CHANGED, C.FAVS_CHANGED, C.EDITED, C.SCOPE, C.X_CHANGED]);
 const v14 = (v) => { const u = Math.max(-8192, Math.min(8191, Math.round(v))) + 8192; return [u & 127, (u >> 7) & 127]; };
@@ -123,6 +124,16 @@ class Link {
    does what a player would on the FM-1: opens a page, turns a knob */
 function makeMock(onFrame) {
   const D = JSON.parse($("mockdata").textContent), info = D.info, pe0 = info.pe0;
+  let mhy = null;
+  const xd = (id, label, fmt, min, max, v, names = [], unit = "") => [id, { id, v, fmt, min, max, names, label, unit }];
+  const FMXD = Object.fromEntries([   /* (ui_synth.c X_F*: the FMX pages a dump on another engine leaves out) */
+    xd(19, "OP", 0, 1, 6, 1), xd(20, "WAVE", 8, 0, 9, 0, ["SINE", "TRI", "SAW", "SQR", "HALF", "ABS", "QUART", "PULSE", "SIN8", "NOISE"]),
+    xd(21, "MODE", 8, 0, 2, 0, ["PM", "FM", "RING"]), xd(22, "RATIO", 8, 0, 31, 1, ["0.5", ...Array.from({ length: 31 }, (_, i) => String(i + 1))]),
+    xd(23, "FINE", 0, 0, 99, 0), xd(24, "LEVEL", 0, 0, 127, 127), xd(25, "VEL", 1, 0, 127, 0), xd(26, "KSC", 1, 0, 127, 0),
+    xd(27, "ATK", 3, 0, 127, 0), xd(28, "DEC", 3, 0, 127, 70), xd(29, "SUS", 1, 0, 127, 127), xd(30, "REL", 3, 0, 127, 40),
+    xd(31, "TO", 0, 1, 6, 1), xd(32, "FROM", 0, 1, 6, 2), xd(33, "AMT", 0, 0, 127, 0), xd(34, "OUT", 0, 0, 127, 0),
+    xd(35, "DTN", 0, -7, 7, 0), xd(36, "FREQ", 8, 0, 1, 0, ["RATIO", "FIX"]), xd(37, "PEG", 2, -64, 63, 0), xd(38, "PTIM", 3, 0, 127, 40),
+    xd(39, "SLOT", 0, 1, 27, 1), xd(40, "STORE", 8, 0, 1, 0, ["--", "GO"])]);
   const ups = Array.from({ length: 32 }, () => null), NE = info.nengines;
   const steps = Array.from({ length: info.nstep }, (_, i) => { const on = [0, 3, 6, 8, 10, 12, 14].includes(i), n = [36, 36, 48, 39, 36, 41, 43][[0, 3, 6, 8, 10, 12, 14].indexOf(i)];
     return { n: on ? 1 : 0, notes: [on ? n : 0, 0, 0, 0], time: on ? 0 : i === 7 ? 1 : 2, flags: i === 6 ? 1 : i === 10 ? 2 : 0, vel: 100, lvl: 0, rat: 0 }; });
@@ -162,9 +173,13 @@ function makeMock(onFrame) {
       case C.WATCH: m.watch = !!(a[0] & 1); return [a[0] & 3];
       case C.PING: return [0];
       case C.TOOL: return [a[0], [22, 23, 31].includes(a[0]) ? 0 : 1];
-      case C.X_GET: case C.X_SET: { const d = (D.xdesc || {})[a[0]]; if (!d) return [127, ...v14(0), 0, ...v14(0), ...v14(0), 0, 0, 0];
+      case C.X_GET: case C.X_SET: { const d = (D.xdesc || {})[a[0]] || FMXD[a[0]]; if (!d) return [127, ...v14(0), 0, ...v14(0), ...v14(0), 0, 0, 0];
         if (cmd === C.X_SET) { const v = (a[1] | (a[2] << 7)) - 8192; d.v = d.names[1] === "GO" ? 0 : Math.max(d.min, Math.min(d.max, v)); }
         return [a[0], ...v14(d.v), d.fmt, ...v14(d.min), ...v14(d.max), d.names.length ? 1 : 0, ...enc.s(d.label), ...enc.s(d.unit || ""), ...d.names.flatMap(enc.s)]; }
+      case C.HY_GET: { if (a[0] === 1) { const f = HY.init(); f.name = "F" + (a[1] + 1); f.osc[1] = { type: 6, coarse: 12, level: 90, shape: 40 }; return [1, a[1], 0, ...pack7(HY.pack(f))]; }
+        if (!mhy) { const f = HY.init(); f.name = "CLIPPER"; f.osc[1] = { type: 2, coarse: -12, level: 100, shape: 64 }; f.mod[0] = { src: 4, dst: 12, amt: 20 }; mhy = HY.pack(f); }
+        return [0, a[1], 0, ...pack7(Array.from(mhy))]; }
+      case C.HY_PUT: mhy = Uint8Array.from(unpack7(a.slice(2)).slice(0, 128)); return [0, a[1], 0];
       case C.STATE: return [12 + (Date.now() / 1500 % 7 | 0), 0, 0, 30, 0b10110101 & 127, (0b101011010101 >> 7) & 127, mrec.rec, mrec.mode, mrec.start, mrec.quant, 0, 8];
       case C.REC: if (a[0] === 0) mrec.rec = mrec.rec ? 0 : sq.playing ? 1 : 2; else if (a[0] === 1) mrec.mode = a[1] & 1; else if (a[0] === 2) mrec.start = a[1] & 1; else if (a[0] === 3) mrec.quant = a[1] & 1;
         return answer(C.STATE, []);
@@ -178,6 +193,7 @@ function makeMock(onFrame) {
         else { sq.pos = 0; if (m.watch) push(C.PLAY, playArgs()); }
         return [sq.playing];
       case C.UP_LIST: { const st = Math.min(a[0], 32), n = Math.min(a[1], 16, 32 - st); return [st, n, 32, ...Array.from({ length: n }, (_, i) => { const u = ups[st + i]; return [u ? 1 : 0, u ? u.engine : 0, ...enc.s(u ? u.name : "")]; }).flat()]; }
+      case C.UP_PUT: { const k = a[0], z = a.indexOf(0, 2), nm = String.fromCharCode(...a.slice(2, z)); if (k >= 32 || !nm || nm.length > 12) return [k, 1]; ups[k] = { engine: a[1], name: nm }; return [k, 0]; }
       case C.UP_STORE: { const k = a[0], nm = String.fromCharCode(...a.slice(1, a.indexOf(0, 1) < 0 ? a.length : a.indexOf(0, 1))); if (k >= 32 || nm.length > 12) return [k, 1];
         ups[k] = { engine: m.engine, name: nm || `${info.engines[m.engine]} ${String(k + 1).padStart(2, "0")}` }; relist(); return [k, 0]; }
       case C.PAGE: return pageArgs();
@@ -247,8 +263,15 @@ const FAM = { 0: "HOME", 1: "ENV", 2: "LFO", 3: "FX", 4: "SEL", 5: "EDIT", 6: "G
 const NAV = [["LIVE", "play"], ["HOME", "home"], ["EDIT", "edit"], ["ENV", "env"], ["LFO", "lfo"], ["FX", "fx"], ["SEL", "sel"], ["ARP", "arp"], ["SEQ", "seq"], ["REC", "rec"], ["GLO", "glo"], ["SAVE", "save"], ["ESTUDIO", "studio"]];
 const ICON = { HOME: "home", EDIT: "edit", ENV: "env", LFO: "lfo", FX: "fx", SEL: "sel", ARP: "arp", SEQ: "seq", GLO: "glo", SAVE: "save" };
 const LAYOUT = JSON.parse($("mockdata").textContent).pages;     /* the device's pages (params.c PAGES), as the firmware lays them out */
-const desc = (s, id) => (s === 3 ? M.xdesc[id] : s ? M.gdesc[id] : M.pdesc[id]);   /* (3: a synth page's X_*) */
-const val = (s, id) => (s === 3 ? M.x[id] : s ? M.g[id] : M.p[id]);
+/* FMX's own pages (params.c GR_FMX, ui_synth.c X_F*): the device shows them on FMX only, so a dump made on another engine
+   has none; they go after EDIT 2, as on the device */
+const FMXP = [["OP", [19, 20, 21, 22]], ["OP 2", [23, 24, 25, 26]], ["OP ENV", [27, 28, 29, 30]], ["ROUTE", [31, 32, 33, 34]], ["FMX", [35, 36, 37, 38]], ["STORE", [39, 40, 127, 127]]];
+if (!LAYOUT.some((x) => x.title === "OP")) { const at = LAYOUT.findIndex((x) => x.title === "EDIT 2") + 1; LAYOUT.splice(at, 0, ...FMXP.map(([title, ids]) => ({ folder: "EDIT", title, scope: 3, ids, fmx: true }))); }
+else LAYOUT.forEach((x) => { if (FMXP.some(([t]) => t === x.title)) x.fmx = true; });
+const isFmx = () => M.info && M.info.engines[M.engine] === "FMX";
+const pageOn = (x) => !x.fmx || isFmx();
+const desc = (s, id) => (s === 4 ? hyDesc(id) : s === 3 ? M.xdesc[id] : s ? M.gdesc[id] : M.pdesc[id]);   /* (3: a synth page's X_*) */
+const val = (s, id) => (s === 4 ? hyVal(id) : s === 3 ? M.x[id] : s ? M.g[id] : M.p[id]);
 const keyOf = (s, id) => s + ":" + id;
 const frac = (d, v) => (d && d.max > d.min ? (Math.max(d.min, Math.min(d.max, v)) - d.min) / (d.max - d.min) : 0);
 const entryNow = () => (M.page && M.page.cur != null ? M.page.cur : M.list.findIndex((x) => x.e === M.engine && x.k === M.preset));
@@ -339,6 +362,7 @@ async function readSound(full) {
   const was = M.engine, pe0 = M.info.pe0, d = P.dump(await rq(C.DUMP), M.info);
   if (d.engine !== was || d.preset !== M.preset) LOG.length = 0;
   M.engine = d.engine; M.preset = d.preset; M.p = d.p; M.g = d.g;
+  if (d.engine !== was && (isFmx() || M.info.engines[was] === "FMX")) xSoon();   /* (FMX's pages come and go with the engine) */
   if (full || d.engine !== was) for (let k = 0; k < 8; k++) M.pdesc[pe0 + k] = await descOrNull(0, pe0 + k);
   M.page = P.page(await rq(C.PAGE));
   if (M.page.homeIds) M.homeIds = M.page.homeIds;
@@ -421,6 +445,7 @@ function setVal(s, id, v) {
   v = Math.max(d.min, Math.min(d.max, Math.round(v)));
   if (val(s, id) === v && !(s === 3 && isGo(d))) return;
   if (s === 3) { setX(id, v); return; }
+  if (s === 4) { hySet(id, v); return; }               /* (the HYBRID patch: studio.js) */
   if (!undoing) logChange(s, id, val(s, id), v, "tablet");
   (s ? M.g : M.p)[id] = v;
   sets.set(keyOf(s, id), performance.now());
@@ -433,7 +458,7 @@ function setVal(s, id, v) {
 
 /* ---- the synth pages (X_*, Live 109..111): read them all (a few dozen), again when the device says they changed */
 const isGo = (d) => d && d.names && d.names.length === 2 && d.names[1] === "GO";
-const xIds = () => [...new Set(LAYOUT.filter((p) => p.scope === 3).flatMap((p) => p.ids.filter((i) => i < 127)))];
+const xIds = () => [...new Set(LAYOUT.filter((p) => p.scope === 3 && pageOn(p)).flatMap((p) => p.ids.filter((i) => i < 127)))];
 async function readX() {
   for (const i of xIds()) { try { const o = P.x(await rq(C.X_GET, [i], { quiet: true, retries: 0, timeout: 500 })); if (o.id === i) { M.xdesc[i] = o; M.x[i] = o.v; } } catch (e) { if (e.message === "closed") throw e; } }
   const snd = M.xdesc[1];                                  /* (LAYER's SOUND: a place in the list, shown by its name) */
@@ -454,10 +479,20 @@ async function pollState() {
 setInterval(pollState, 1500);
 
 /* ----------------------------------------------------------------- views --- */
+/* a value changed: drawn once a frame, however many came (a finger dragging sends dozens a second) */
+const PV = { keys: new Set(), raf: 0 };
 function paintValue(s, id) {
-  if (!s && MX.includes(id)) document.querySelector(`.mxr[data-src="${id}"]`)?.classList.toggle("off", !val(0, id));
-  paintTile(s, id);
-  paintCards(s, id);
+  PV.keys.add(keyOf(s, id));
+  if (!PV.raf) PV.raf = requestAnimationFrame(paintFlush);
+}
+function paintFlush() {
+  PV.raf = 0; const keys = [...PV.keys]; PV.keys.clear();
+  for (const k of keys) {
+    const [s, id] = k.split(":").map(Number);
+    if (!s && MX.includes(id)) document.querySelector(`.mxr[data-src="${id}"]`)?.classList.toggle("off", !val(0, id));
+    paintTile(s, id);
+    paintCards(s, id);
+  }
   renderDev();
   renderTransport();                                       /* (the bar: BPM, TRN) */
 }
@@ -711,7 +746,7 @@ function logChange(s, id, old, v, src) {
   if (top && top.s === s && top.id === id && top.src === src && now - top.t < 2500) { top.v = v; top.t = now; if (top.v === top.old) LOG.shift(); }
   else LOG.unshift({ s, id, old, v, src, t: now });
   if (LOG.length > 24) LOG.length = 24;
-  renderLog();
+  if (!PV.lraf) PV.lraf = requestAnimationFrame(() => { PV.lraf = 0; renderLog(); });   /* (once a frame) */
 }
 function renderLog() {
   if (!M.info) return;

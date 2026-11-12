@@ -945,6 +945,54 @@
   .ci.ghost .cx, .ci.ghost .csz, .ci.ghost .cgrip { display: none; }
   .ci.hole > * { visibility: hidden; } .ci.hole { outline: 2px dashed var(--k1); outline-offset: -2px; background: rgba(40, 124, 255, .08); }
 
+  /* LIVE's pages */
+  .lpt { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+  .lpt button { height: 38px; padding: 0 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: .04em; color: var(--tx-2); background: var(--panel); border: 1px solid var(--line); }
+  .lpt button[aria-current="true"] { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .lpx { width: 22px; height: 22px; display: grid; place-items: center; background: var(--fav); color: #000; }
+  .lpadd { border-style: dashed !important; color: var(--tx-3) !important; }
+  /* fine: held still while dragging */
+  .fine { outline: 2px solid var(--k3) !important; outline-offset: -2px; }
+  body.finemode::after { content: var(--fine-txt, "FINO ×¼"); position: fixed; top: 72px; left: 50%; transform: translateX(-50%); z-index: 31; font: 800 13px var(--sans); letter-spacing: .08em; background: var(--k3); color: #000; padding: 6px 12px; pointer-events: none; }
+
+  /* ESTUDIO > HYBRID: the patch's name, its tools, its pages */
+  .hyb .bh { flex-wrap: wrap; }
+  .hyn { height: 44px; width: 12ch; padding: 0 12px; background: var(--page); border: 1px solid var(--line-2); color: var(--tx); font-family: var(--num); font-size: 26px; letter-spacing: .04em; text-transform: uppercase; -webkit-font-smoothing: none; outline: none; }
+  .hyn:focus { border-color: var(--tx-3); }
+  .hyt { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+  .hyt .btn { padding: 0 14px; cursor: pointer; }
+  .hyt select.btn { appearance: none; padding-right: 14px; color: var(--tx); font-family: inherit; }
+  .hyh { font-size: 13px; font-weight: 800; letter-spacing: .06em; color: var(--tx-3); margin-top: 14px; }
+  .hyb .prow .tp { min-height: 112px; }
+  .hyall { align-self: flex-start; padding: 0 16px; cursor: pointer; }
+  .hyb .tp, .hyb .ro { --c: var(--tx-3) !important; }   /* (no knob plays these: no knob colours) */
+  .hyb .pgr.tall { height: 170px; }
+
+  /* ESTUDIO > Biblioteca: the tablet's sounds, their tags, a USER slot to send one to */
+  .tlib .bh .c { color: var(--tx-3); font-size: 14px; }
+  .lflt { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .lq { height: 44px; width: 260px; padding: 0 12px; background: var(--page); border: 1px solid var(--line-2); color: var(--tx); font: inherit; font-size: 15px; outline: none; }
+  .lq:focus { border-color: var(--tx-3); }
+  .tg2 { height: 36px; padding: 0 14px; background: var(--raised); border: 1px solid var(--line); color: var(--tx-2); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .tg2.on { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .lrows { display: flex; flex-direction: column; gap: 6px; }
+  .lrow { display: grid; grid-template-columns: minmax(0, 1.2fr) 90px minmax(0, 1fr) 96px auto; align-items: center; gap: 12px; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); }
+  .lrow > b { font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lrow .e { color: var(--eng); font-size: 13px; font-weight: 700; }
+  .lrow small { color: var(--tx-3); font-size: 13px; }
+  .ltg { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+  .ltg span { padding: 2px 8px; border: 1px solid var(--line-2); color: var(--tx-2); font-size: 12px; }
+  .lrow .dva { display: flex; gap: 6px; }
+  .lrow .dva .btn, .lrow .dva .dsc { padding: 0 12px; cursor: pointer; }
+  .lsl { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .lsl > .c { grid-column: 1 / -1; color: var(--tx-3); font-size: 13px; }
+  .lsl .btn { height: 52px; flex-direction: column; gap: 2px; cursor: pointer; }
+  .lsl .btn small { font-size: 11px; color: var(--tx-3); font-weight: 500; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lsl .btn.used { border-color: var(--line-2); }
+  .lsl .btn:last-child { grid-column: span 2; }
+  .tlib .bh { flex-wrap: wrap; }
+  .hyb .t-arr .pos { display: none; }   /* (seven across: the name needs the room) */
+
 </style>
 </head>
 <body class="off">
@@ -1071,6 +1119,7 @@ const F = { INT: 0, PCT: 1, BIPCT: 2, TIME: 3, LFOHZ: 4, CUTOFF: 5, DB: 6, SEMI:
   SWING: 14, FILT: 15, CDB: 16, SPLIT: 17 };
 const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 function fmtValue(d, v) {
+  if (d.txt) return d.txt(v);                          /* (a value with its own reading: the HYBRID patch's) */
   const sign = (x) => (x > 0 ? "+" + x : String(x));
   switch (d.fmt) {
     case F.PCT: return [String(d.max > 0 ? Math.trunc((v * 100 + Math.trunc(d.max / 2)) / d.max) : v), "%"];
@@ -1100,8 +1149,8 @@ function fmtValue(d, v) {
 
 /* ---------------------------------------------------------------- protocol --- */
 const HDR = [0x7D, 0x46, 0x4C];
-const C = { INFO: 1, GET: 2, SET: 3, DUMP: 4, DESC: 5, STEP_GET: 6, STEP_SET: 7, UP_LIST: 16, UP_STORE: 19, WATCH: 22, CHANGED: 23, RELOAD: 24, PING: 25, STEP_CHANGED: 26, TRACK_CHANGED: 32,
-  PAGE: 97, FAVS: 98, FAV_GO: 99, FAV_SET: 100, FAVS_CHANGED: 101, LIST: 102, LIST_GO: 103, EDITED: 104, TOOL: 105, PLAY: 106, TRANSPORT: 107,
+const C = { INFO: 1, GET: 2, SET: 3, DUMP: 4, DESC: 5, STEP_GET: 6, STEP_SET: 7, UP_LIST: 16, UP_PUT: 18, UP_STORE: 19, WATCH: 22, CHANGED: 23, RELOAD: 24, PING: 25, STEP_CHANGED: 26, TRACK_CHANGED: 32,
+  HY_GET: 77, HY_PUT: 78, PAGE: 97, FAVS: 98, FAV_GO: 99, FAV_SET: 100, FAVS_CHANGED: 101, LIST: 102, LIST_GO: 103, EDITED: 104, TOOL: 105, PLAY: 106, TRANSPORT: 107,
   SCOPE: 108, X_GET: 109, X_SET: 110, X_CHANGED: 111, STATE: 112, REC: 113 };
 const PUSH = new Set([C.CHANGED, C.RELOAD, C.STEP_CHANGED, C.TRACK_CHANGED, C.FAVS_CHANGED, C.EDITED, C.SCOPE, C.X_CHANGED]);
 const v14 = (v) => { const u = Math.max(-8192, Math.min(8191, Math.round(v))) + 8192; return [u & 127, (u >> 7) & 127]; };
@@ -1177,6 +1226,16 @@ class Link {
    does what a player would on the FM-1: opens a page, turns a knob */
 function makeMock(onFrame) {
   const D = JSON.parse($("mockdata").textContent), info = D.info, pe0 = info.pe0;
+  let mhy = null;
+  const xd = (id, label, fmt, min, max, v, names = [], unit = "") => [id, { id, v, fmt, min, max, names, label, unit }];
+  const FMXD = Object.fromEntries([   /* (ui_synth.c X_F*: the FMX pages a dump on another engine leaves out) */
+    xd(19, "OP", 0, 1, 6, 1), xd(20, "WAVE", 8, 0, 9, 0, ["SINE", "TRI", "SAW", "SQR", "HALF", "ABS", "QUART", "PULSE", "SIN8", "NOISE"]),
+    xd(21, "MODE", 8, 0, 2, 0, ["PM", "FM", "RING"]), xd(22, "RATIO", 8, 0, 31, 1, ["0.5", ...Array.from({ length: 31 }, (_, i) => String(i + 1))]),
+    xd(23, "FINE", 0, 0, 99, 0), xd(24, "LEVEL", 0, 0, 127, 127), xd(25, "VEL", 1, 0, 127, 0), xd(26, "KSC", 1, 0, 127, 0),
+    xd(27, "ATK", 3, 0, 127, 0), xd(28, "DEC", 3, 0, 127, 70), xd(29, "SUS", 1, 0, 127, 127), xd(30, "REL", 3, 0, 127, 40),
+    xd(31, "TO", 0, 1, 6, 1), xd(32, "FROM", 0, 1, 6, 2), xd(33, "AMT", 0, 0, 127, 0), xd(34, "OUT", 0, 0, 127, 0),
+    xd(35, "DTN", 0, -7, 7, 0), xd(36, "FREQ", 8, 0, 1, 0, ["RATIO", "FIX"]), xd(37, "PEG", 2, -64, 63, 0), xd(38, "PTIM", 3, 0, 127, 40),
+    xd(39, "SLOT", 0, 1, 27, 1), xd(40, "STORE", 8, 0, 1, 0, ["--", "GO"])]);
   const ups = Array.from({ length: 32 }, () => null), NE = info.nengines;
   const steps = Array.from({ length: info.nstep }, (_, i) => { const on = [0, 3, 6, 8, 10, 12, 14].includes(i), n = [36, 36, 48, 39, 36, 41, 43][[0, 3, 6, 8, 10, 12, 14].indexOf(i)];
     return { n: on ? 1 : 0, notes: [on ? n : 0, 0, 0, 0], time: on ? 0 : i === 7 ? 1 : 2, flags: i === 6 ? 1 : i === 10 ? 2 : 0, vel: 100, lvl: 0, rat: 0 }; });
@@ -1216,9 +1275,13 @@ function makeMock(onFrame) {
       case C.WATCH: m.watch = !!(a[0] & 1); return [a[0] & 3];
       case C.PING: return [0];
       case C.TOOL: return [a[0], [22, 23, 31].includes(a[0]) ? 0 : 1];
-      case C.X_GET: case C.X_SET: { const d = (D.xdesc || {})[a[0]]; if (!d) return [127, ...v14(0), 0, ...v14(0), ...v14(0), 0, 0, 0];
+      case C.X_GET: case C.X_SET: { const d = (D.xdesc || {})[a[0]] || FMXD[a[0]]; if (!d) return [127, ...v14(0), 0, ...v14(0), ...v14(0), 0, 0, 0];
         if (cmd === C.X_SET) { const v = (a[1] | (a[2] << 7)) - 8192; d.v = d.names[1] === "GO" ? 0 : Math.max(d.min, Math.min(d.max, v)); }
         return [a[0], ...v14(d.v), d.fmt, ...v14(d.min), ...v14(d.max), d.names.length ? 1 : 0, ...enc.s(d.label), ...enc.s(d.unit || ""), ...d.names.flatMap(enc.s)]; }
+      case C.HY_GET: { if (a[0] === 1) { const f = HY.init(); f.name = "F" + (a[1] + 1); f.osc[1] = { type: 6, coarse: 12, level: 90, shape: 40 }; return [1, a[1], 0, ...pack7(HY.pack(f))]; }
+        if (!mhy) { const f = HY.init(); f.name = "CLIPPER"; f.osc[1] = { type: 2, coarse: -12, level: 100, shape: 64 }; f.mod[0] = { src: 4, dst: 12, amt: 20 }; mhy = HY.pack(f); }
+        return [0, a[1], 0, ...pack7(Array.from(mhy))]; }
+      case C.HY_PUT: mhy = Uint8Array.from(unpack7(a.slice(2)).slice(0, 128)); return [0, a[1], 0];
       case C.STATE: return [12 + (Date.now() / 1500 % 7 | 0), 0, 0, 30, 0b10110101 & 127, (0b101011010101 >> 7) & 127, mrec.rec, mrec.mode, mrec.start, mrec.quant, 0, 8];
       case C.REC: if (a[0] === 0) mrec.rec = mrec.rec ? 0 : sq.playing ? 1 : 2; else if (a[0] === 1) mrec.mode = a[1] & 1; else if (a[0] === 2) mrec.start = a[1] & 1; else if (a[0] === 3) mrec.quant = a[1] & 1;
         return answer(C.STATE, []);
@@ -1232,6 +1295,7 @@ function makeMock(onFrame) {
         else { sq.pos = 0; if (m.watch) push(C.PLAY, playArgs()); }
         return [sq.playing];
       case C.UP_LIST: { const st = Math.min(a[0], 32), n = Math.min(a[1], 16, 32 - st); return [st, n, 32, ...Array.from({ length: n }, (_, i) => { const u = ups[st + i]; return [u ? 1 : 0, u ? u.engine : 0, ...enc.s(u ? u.name : "")]; }).flat()]; }
+      case C.UP_PUT: { const k = a[0], z = a.indexOf(0, 2), nm = String.fromCharCode(...a.slice(2, z)); if (k >= 32 || !nm || nm.length > 12) return [k, 1]; ups[k] = { engine: a[1], name: nm }; return [k, 0]; }
       case C.UP_STORE: { const k = a[0], nm = String.fromCharCode(...a.slice(1, a.indexOf(0, 1) < 0 ? a.length : a.indexOf(0, 1))); if (k >= 32 || nm.length > 12) return [k, 1];
         ups[k] = { engine: m.engine, name: nm || `${info.engines[m.engine]} ${String(k + 1).padStart(2, "0")}` }; relist(); return [k, 0]; }
       case C.PAGE: return pageArgs();
@@ -1301,8 +1365,15 @@ const FAM = { 0: "HOME", 1: "ENV", 2: "LFO", 3: "FX", 4: "SEL", 5: "EDIT", 6: "G
 const NAV = [["LIVE", "play"], ["HOME", "home"], ["EDIT", "edit"], ["ENV", "env"], ["LFO", "lfo"], ["FX", "fx"], ["SEL", "sel"], ["ARP", "arp"], ["SEQ", "seq"], ["REC", "rec"], ["GLO", "glo"], ["SAVE", "save"], ["ESTUDIO", "studio"]];
 const ICON = { HOME: "home", EDIT: "edit", ENV: "env", LFO: "lfo", FX: "fx", SEL: "sel", ARP: "arp", SEQ: "seq", GLO: "glo", SAVE: "save" };
 const LAYOUT = JSON.parse($("mockdata").textContent).pages;     /* the device's pages (params.c PAGES), as the firmware lays them out */
-const desc = (s, id) => (s === 3 ? M.xdesc[id] : s ? M.gdesc[id] : M.pdesc[id]);   /* (3: a synth page's X_*) */
-const val = (s, id) => (s === 3 ? M.x[id] : s ? M.g[id] : M.p[id]);
+/* FMX's own pages (params.c GR_FMX, ui_synth.c X_F*): the device shows them on FMX only, so a dump made on another engine
+   has none; they go after EDIT 2, as on the device */
+const FMXP = [["OP", [19, 20, 21, 22]], ["OP 2", [23, 24, 25, 26]], ["OP ENV", [27, 28, 29, 30]], ["ROUTE", [31, 32, 33, 34]], ["FMX", [35, 36, 37, 38]], ["STORE", [39, 40, 127, 127]]];
+if (!LAYOUT.some((x) => x.title === "OP")) { const at = LAYOUT.findIndex((x) => x.title === "EDIT 2") + 1; LAYOUT.splice(at, 0, ...FMXP.map(([title, ids]) => ({ folder: "EDIT", title, scope: 3, ids, fmx: true }))); }
+else LAYOUT.forEach((x) => { if (FMXP.some(([t]) => t === x.title)) x.fmx = true; });
+const isFmx = () => M.info && M.info.engines[M.engine] === "FMX";
+const pageOn = (x) => !x.fmx || isFmx();
+const desc = (s, id) => (s === 4 ? hyDesc(id) : s === 3 ? M.xdesc[id] : s ? M.gdesc[id] : M.pdesc[id]);   /* (3: a synth page's X_*) */
+const val = (s, id) => (s === 4 ? hyVal(id) : s === 3 ? M.x[id] : s ? M.g[id] : M.p[id]);
 const keyOf = (s, id) => s + ":" + id;
 const frac = (d, v) => (d && d.max > d.min ? (Math.max(d.min, Math.min(d.max, v)) - d.min) / (d.max - d.min) : 0);
 const entryNow = () => (M.page && M.page.cur != null ? M.page.cur : M.list.findIndex((x) => x.e === M.engine && x.k === M.preset));
@@ -1393,6 +1464,7 @@ async function readSound(full) {
   const was = M.engine, pe0 = M.info.pe0, d = P.dump(await rq(C.DUMP), M.info);
   if (d.engine !== was || d.preset !== M.preset) LOG.length = 0;
   M.engine = d.engine; M.preset = d.preset; M.p = d.p; M.g = d.g;
+  if (d.engine !== was && (isFmx() || M.info.engines[was] === "FMX")) xSoon();   /* (FMX's pages come and go with the engine) */
   if (full || d.engine !== was) for (let k = 0; k < 8; k++) M.pdesc[pe0 + k] = await descOrNull(0, pe0 + k);
   M.page = P.page(await rq(C.PAGE));
   if (M.page.homeIds) M.homeIds = M.page.homeIds;
@@ -1475,6 +1547,7 @@ function setVal(s, id, v) {
   v = Math.max(d.min, Math.min(d.max, Math.round(v)));
   if (val(s, id) === v && !(s === 3 && isGo(d))) return;
   if (s === 3) { setX(id, v); return; }
+  if (s === 4) { hySet(id, v); return; }               /* (the HYBRID patch: studio.js) */
   if (!undoing) logChange(s, id, val(s, id), v, "tablet");
   (s ? M.g : M.p)[id] = v;
   sets.set(keyOf(s, id), performance.now());
@@ -1487,7 +1560,7 @@ function setVal(s, id, v) {
 
 /* ---- the synth pages (X_*, Live 109..111): read them all (a few dozen), again when the device says they changed */
 const isGo = (d) => d && d.names && d.names.length === 2 && d.names[1] === "GO";
-const xIds = () => [...new Set(LAYOUT.filter((p) => p.scope === 3).flatMap((p) => p.ids.filter((i) => i < 127)))];
+const xIds = () => [...new Set(LAYOUT.filter((p) => p.scope === 3 && pageOn(p)).flatMap((p) => p.ids.filter((i) => i < 127)))];
 async function readX() {
   for (const i of xIds()) { try { const o = P.x(await rq(C.X_GET, [i], { quiet: true, retries: 0, timeout: 500 })); if (o.id === i) { M.xdesc[i] = o; M.x[i] = o.v; } } catch (e) { if (e.message === "closed") throw e; } }
   const snd = M.xdesc[1];                                  /* (LAYER's SOUND: a place in the list, shown by its name) */
@@ -1508,10 +1581,20 @@ async function pollState() {
 setInterval(pollState, 1500);
 
 /* ----------------------------------------------------------------- views --- */
+/* a value changed: drawn once a frame, however many came (a finger dragging sends dozens a second) */
+const PV = { keys: new Set(), raf: 0 };
 function paintValue(s, id) {
-  if (!s && MX.includes(id)) document.querySelector(`.mxr[data-src="${id}"]`)?.classList.toggle("off", !val(0, id));
-  paintTile(s, id);
-  paintCards(s, id);
+  PV.keys.add(keyOf(s, id));
+  if (!PV.raf) PV.raf = requestAnimationFrame(paintFlush);
+}
+function paintFlush() {
+  PV.raf = 0; const keys = [...PV.keys]; PV.keys.clear();
+  for (const k of keys) {
+    const [s, id] = k.split(":").map(Number);
+    if (!s && MX.includes(id)) document.querySelector(`.mxr[data-src="${id}"]`)?.classList.toggle("off", !val(0, id));
+    paintTile(s, id);
+    paintCards(s, id);
+  }
   renderDev();
   renderTransport();                                       /* (the bar: BPM, TRN) */
 }
@@ -1765,7 +1848,7 @@ function logChange(s, id, old, v, src) {
   if (top && top.s === s && top.id === id && top.src === src && now - top.t < 2500) { top.v = v; top.t = now; if (top.v === top.old) LOG.shift(); }
   else LOG.unshift({ s, id, old, v, src, t: now });
   if (LOG.length > 24) LOG.length = 24;
-  renderLog();
+  if (!PV.lraf) PV.lraf = requestAnimationFrame(() => { PV.lraf = 0; renderLog(); });   /* (once a frame) */
 }
 function renderLog() {
   if (!M.info) return;
@@ -2137,7 +2220,7 @@ function module(p, kind, opt = {}) {
 }
 function pagesOf(folder) {
   if (folder === "HOME") return [{ title: "HOME", folder: "HOME", s: 0, ids: M.homeIds }, ...["ENV", "FILTER", "LFO", "FX", "MACROS"].map((t) => { const x = LAYOUT.find((y) => y.title === t); return { title: t, folder: x.folder, s: x.scope, ids: x.ids }; })];
-  return LAYOUT.filter((x) => x.folder === folder).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
+  return LAYOUT.filter((x) => x.folder === folder && pageOn(x)).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
 }
 /* a folder in blocks: an effect, an LFO, an envelope… each with its pages (named by its first, as on the device) */
 const BLOCKS = {
@@ -2570,12 +2653,7 @@ function devView(kind) {
     return `<div class="kts">${all.map((x) => `<button class="kf" data-pc="kit" data-n="${x.k}" aria-current="${cur && x.k === cur.k}"><span>${esc(x.n)}</span></button>`).join("")}</div>
       <div class="pads" role="group" aria-label="Pads de ${esc(cur ? cur.n : "")}">${Array.from({ length: 16 }, (_, l) => `<button class="pad" data-pc="pad" data-n="${l}" style="--c:${KC[l % 4]}"><span class="num">${l + 1}</span></button>`).join("")}</div>`;
   }
-  if (kind === "LIB") {
-    const v = PC.load("banks", CE.BK_LIST, [], PCP.banks);
-    if (!v || v === "…") return pcEmpty(v, "la biblioteca");
-    return `<div class="dvc">${v.items.map((x) => `<div class="dvs"><span class="num">B${String(x.id + 1).padStart(2, "0")}</span><b>Banco ${x.id + 1}</b>
-      <small class="num">${(x.len / 1024).toFixed(1)} KiB</small><button class="btn" data-pend="BK_GET · BK_PUT">Abrir</button></div>`).join("")}</div>`;
-  }
+  if (kind === "LIB") return libView();                     /* (the tablet's: studio.js) */
   /* PROYECTOS: 4 ranuras (PROJECT: 2 consulta, 0 carga, 1 guarda) */
   const ps = [0, 1, 2, 3].map((k) => PC.load("prj" + k, CE.PROJECT, [2, k], (a) => ({ slot: a[1], used: !!a[2], busy: a[3] === 1 })));
   if (ps.some((p) => p === "…")) return pcEmpty("…", "los proyectos");
@@ -2587,7 +2665,7 @@ function devView(kind) {
 }
 
 /* las acciones: dos toques para borrar, un toque para sonar */
-document.addEventListener("click", (e) => {
+document.addEventListener("click", async (e) => {
   const pend = e.target.closest("[data-pend]"); if (pend) { PC.pend(pend.dataset.pend); return; }
   const b = e.target.closest("[data-pc]"); if (!b) return;
   const n = +b.dataset.n;
@@ -2606,6 +2684,7 @@ document.addEventListener("click", (e) => {
     const load = b.dataset.pc === "prj-load", lab = load ? "Cargar" : b.textContent;
     if (b.dataset.arm !== "1") { arm(b, lab, "¿Seguro?"); return; }
     disarm(b, lab);
+    if (load && !M.mock && !(await autoBackupProject())) return;
     PC.act(CE.PROJECT, [load ? 0 : 1, n & 3], load ? `Proyecto <b class="num">${n + 1}</b> cargado` : `Guardado en el proyecto <b class="num">${n + 1}</b>`)
       .then((ok) => { if (!ok) return; if (load) reloadSoon(); PC.again("prj" + n); });
   }
@@ -2680,8 +2759,19 @@ $("edit").addEventListener("pointerdown", (e) => {
   bdrag = { el, dir: mtr ? "abs" : arc ? "v" : "h", s, id, d, x0: e.clientX, y0: e.clientY, v0: val(s, id), on: !fd, pid: e.pointerId };
   if (!fd) { el.setPointerCapture(e.pointerId); e.preventDefault(); }
 });
-$("edit").addEventListener("pointermove", (e) => {
+/* fine: the finger held still a moment while dragging, the moves count a quarter from there (a badge says so) */
+function fineArm(raw, eff) {
+  clearTimeout(bdrag.ft);
+  bdrag.ft = setTimeout(() => { if (!bdrag || bdrag.fine || !(bdrag.kind || bdrag.on)) return;
+    bdrag.fine = { ax: raw.x, ay: raw.y, ex: eff.clientX, ey: eff.clientY }; bdrag.el.classList.add("fine"); document.body.classList.add("finemode"); }, 380);
+}
+function effPt(e) {
+  const f = bdrag.fine; if (!f) return { clientX: e.clientX, clientY: e.clientY };
+  return { clientX: f.ex + (e.clientX - f.ax) * 0.25, clientY: f.ey + (e.clientY - f.ay) * 0.25 };
+}
+$("edit").addEventListener("pointermove", (ev) => {
   if (!bdrag) return;
+  const e = effPt(ev); fineArm({ x: ev.clientX, y: ev.clientY }, e);
   if (bdrag.kind) { graphDrag(e); return; }
   const dx = e.clientX - bdrag.x0, dy = bdrag.y0 - e.clientY;
   if (!bdrag.on) {                                       /* a fader: it is a slide once it goes sideways */
@@ -2695,7 +2785,7 @@ $("edit").addEventListener("pointermove", (e) => {
   else if (bdrag.dir === "v") setVal(bdrag.s, bdrag.id, bdrag.v0 + dy * span / 220);
   else setVal(bdrag.s, bdrag.id, bdrag.v0 + dx * span / Math.max(220, bdrag.el.getBoundingClientRect().width * 1.4));
 });
-const bend = () => { if (bdrag && bdrag.el) bdrag.el.classList.remove("held"); bdrag = null; };
+const bend = () => { if (bdrag && bdrag.el) { bdrag.el.classList.remove("held", "fine"); clearTimeout(bdrag.ft); } document.body.classList.remove("finemode"); bdrag = null; };
 $("edit").addEventListener("pointerup", bend); $("edit").addEventListener("pointercancel", bend);
 function barAt(e) {
   const r = bdrag.el.getBoundingClientRect(), d = bdrag.d;
@@ -3924,8 +4014,8 @@ document.addEventListener("keydown", (e) => {
    their X_* values (Live 109..111), turned here or by the knobs on the device */
 const PGRAPH = { ENV: "env", "ENV 2": "env", LFO: "lfo", "LFO 2": "lfo", "LFO 3": "lfo", FX: "meters", FILTER: "filt", DLY: "echo",
   REVERB: "verb", "EQ+COMP": "eq", MACROS: "meters", SEL: "scale", "SEL 2": "scale", LAYER: "layer", "LAYER 2": "layer",
-  MORPH: "morph", UNDO: "hist", MATRIX: "matrix", "MOD SEQ": "mseq" };
-const ESTUDIO_ONLY = new Set(["TRACKS", "SONG", "DRUMS", "SLICER", "OP", "OP 2", "OP ENV", "ROUTE", "FMX", "STORE", "PRESETS", "USER", "FAVS", "PROJECT", "TOOLS", "NOTES", "REV/CHO"]);
+  MORPH: "morph", UNDO: "hist", MATRIX: "matrix", "MOD SEQ": "mseq", "OP ENV": "env", ENV2: "env", ENV3: "env" };
+const ESTUDIO_ONLY = new Set(["TRACKS", "SONG", "DRUMS", "SLICER", "PRESETS", "USER", "FAVS", "PROJECT", "TOOLS", "NOTES", "REV/CHO"]);
 
 function pageCells(p) { return p.ids.map((id, k) => ({ id, k })).filter((x) => x.id < 127 && desc(p.s, x.id)); }
 const SHARED = new Set(["scale", "layer"]);    /* (SEL and SEL 2, LAYER and LAYER 2: one graph on the device, two pages of knobs) */
@@ -3938,7 +4028,7 @@ function pageRow(p, prevKind) {
     ${cells.length ? `<div class="prow" style="--n:${cells.length}">${cells.map(({ id, k }) => tileP(p.s, id, k, p.title, false)).join("")}</div>` : ""}</section>`;
 }
 function folderView(folder) {
-  const pages = LAYOUT.filter((x) => x.folder === folder && !ESTUDIO_ONLY.has(x.title)).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
+  const pages = LAYOUT.filter((x) => x.folder === folder && pageOn(x) && !ESTUDIO_ONLY.has(x.title)).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
   const seen = new Set(), uniq = pages.filter((p) => !seen.has(p.title) && seen.add(p.title));   /* (FILTER, MASTER twice: the drum track's) */
   return `<div class="pgs">${uniq.map((p, i) => pageRow(p, i ? PGRAPH[uniq[i - 1].title] : null)).join("")}</div>`;
 }
@@ -4059,10 +4149,28 @@ document.addEventListener("click", (e) => {
 const LV_DEF = [{ t: "g", g: "filt", w: 2, h: 2 }, { t: "g", g: "fx", w: 2, h: 2 }, { t: "q", key: "0:17" }, { t: "q", key: "0:28" }, { t: "q", key: "1:0" }, { t: "q", key: "0:-1" },
   { t: "q", key: "0:23" }, { t: "q", key: "0:49" }, { t: "q", key: "0:27" }, { t: "q", key: "0:38" }];
 const HM_DEF = [{ t: "a", a: "favprev" }, { t: "a", a: "favnext" }, { t: "q", key: "0:17" }, { t: "q", key: "0:-1" }];
-const CFG = { live: store.get("cfg:live") || LV_DEF, home: store.get("cfg:home") || HM_DEF, edit: null, sel: -1, drag: null };
+const CFG = { live: null, home: store.get("cfg:home") || HM_DEF, edit: null, sel: -1, drag: null,
+  lpages: store.get("cfg:lpages") || [{ name: "LIVE 1", items: store.get("cfg:live") || LV_DEF }], lp: Math.max(0, store.get("cfg:lp") | 0) };   /* (LIVE: pages of its own) */
+if (CFG.lp >= CFG.lpages.length) CFG.lp = 0;
+CFG.live = CFG.lpages[CFG.lp].items;
+function livePage(i) { CFG.lp = Math.max(0, Math.min(CFG.lpages.length - 1, i)); CFG.live = CFG.lpages[CFG.lp].items; store.set("cfg:lp", CFG.lp); }
 const ACT = { play: ["PLAY", "Arranca o para el patrón"], rec: ["REC", "Como el botón REC"], favnext: ["Fav. siguiente", ""], favprev: ["Fav. anterior", ""], discard: ["Descartar", "Lo editado vuelve a como se cargó"] };
 const GITEM = { filt: ["Filtro", "FILTER", "filt", 0, [50, 127, 127, 127]], fx: ["Efectos", "FX", "meters", 0, [33, 34, 35, 36]], env: ["ENV", "ENV", "env", 0, [1, 2, 3, 4]], lfo: ["LFO", "LFO", "lfo", 0, [9, 10, 11, 12]] };
-function cfgSave(which) { store.set("cfg:" + which, CFG[which]); }
+function cfgSave(which) { if (which === "live") { CFG.lpages[CFG.lp].items = CFG.live; store.set("cfg:lpages", CFG.lpages); store.set("cfg:lp", CFG.lp); } else store.set("cfg:" + which, CFG[which]); }
+/* LIVE's pages: a tab each (in Edit: rename by a tap on the open one, × removes, + adds) */
+function lpTabs() {
+  const ed = CFG.edit === "live";
+  return `<nav class="lpt" aria-label="Páginas de LIVE">${CFG.lpages.map((pg, i) => `<button data-lp="${i}" aria-current="${i === CFG.lp}">${esc(pg.name)}${ed && CFG.lpages.length > 1 && i === CFG.lp ? `<span class="lpx" data-lpdel="${i}" aria-label="Quitar la página">×</span>` : ""}</button>`).join("")}
+    ${ed || CFG.lpages.length < 2 ? `<button class="lpadd" data-lpadd="1">+ Página</button>` : ""}</nav>`;
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-lp],[data-lpadd]"); if (!b) return;
+  if (e.target.closest("[data-lpdel]")) { if (!confirm(trUi(`¿Quitar la página «${CFG.lpages[CFG.lp].name}»?`))) return; CFG.lpages.splice(CFG.lp, 1); livePage(CFG.lp - 1); cfgSave("live"); renderWork(); return; }
+  if (b.dataset.lpadd) { CFG.lpages.push({ name: "LIVE " + (CFG.lpages.length + 1), items: [] }); livePage(CFG.lpages.length - 1); cfgSave("live"); if (!CFG.edit) { CFG.edit = "live"; document.body.classList.add("cfgediting"); } renderWork(); return; }
+  const i = +b.dataset.lp;
+  if (i === CFG.lp && CFG.edit === "live") { const n = prompt(trUi("Nombre de la página"), CFG.lpages[i].name); if (n && n.trim()) { CFG.lpages[i].name = n.trim().slice(0, 16).toUpperCase(); cfgSave("live"); renderWork(); } return; }
+  livePage(i); renderWork();
+});
 function itemHtml(it, i, which) {
   const ed = CFG.edit === which, w = it.w || 1, h = it.h || 1, at = `style="grid-column:span ${w};grid-row:span ${h}" data-ci="${i}"`;
   let body = "";
@@ -4080,7 +4188,7 @@ function cfgGrid(which, cls) {
   return `<div class="cg ${cls}${CFG.edit === which ? " editing" : ""}" data-cg="${which}">${items.map((it, i) => itemHtml(it, i, which)).join("")}${CFG.edit === which ? `<button class="ci cadd" data-cadd="${which}">+ Añadir</button>` : ""}</div>`;
 }
 function catalog(which) {
-  const fold = CFG.catF || "FX", pages = LAYOUT.filter((x) => x.folder === fold && x.scope !== 2 && !ESTUDIO_ONLY.has(x.title));
+  const fold = CFG.catF || "FX", pages = LAYOUT.filter((x) => x.folder === fold && x.scope !== 2 && pageOn(x) && !ESTUDIO_ONLY.has(x.title));
   const chip = (lab, data) => `<button class="chip" ${data}>${esc(lab)}</button>`;
   return `<aside class="cat"><h2>Añadir</h2>
     <h3>ACCIONES</h3><div class="chips">${Object.entries(ACT).map(([k, a]) => chip(a[0], `data-cnew='${JSON.stringify({ t: "a", a: k })}'`)).join("")}</div>
@@ -4095,7 +4203,7 @@ function cfgView(which, title) {
   const head = `<div class="qhead"><h2>${title}</h2>${ed ? `<span class="hint2">Arrastra una tarjeta para ordenar · × quita · elige el tamaño abajo</span>` : ""}<div class="qtools">${ed
     ? `<button data-creset="${which}"><svg class="i"><use href="#i-undo"/></svg>Restablecer</button><button class="pri" data-cedit=""><svg class="i"><use href="#i-check"/></svg>Listo</button>`
     : `${which === "live" ? `<button class="${lock ? "on" : ""}" data-lock="1" aria-pressed="${lock}"><svg class="i"><use href="#i-${lock ? "lock" : "unlock"}"/></svg>${lock ? "Bloqueado" : "Bloquear"}</button>` : ""}${lock ? "" : `<button data-cedit="${which}"><svg class="i"><use href="#i-edit"/></svg>Editar</button>`}`}</div></div>`;
-  return `<div class="cfgwrap${ed ? " editing" : ""}"><div class="cfgw">${head}${cfgGrid(which, which === "live" ? "lg4" : "lg4 short")}</div>${ed ? catalog(which) : ""}</div>`;
+  return `<div class="cfgwrap${ed ? " editing" : ""}"><div class="cfgw">${head}${which === "live" ? lpTabs() : ""}${cfgGrid(which, which === "live" ? "lg4" : "lg4 short")}</div>${ed ? catalog(which) : ""}</div>`;
 }
 /* LIVE locked: the view stays (the nav and Seguir do not take it away), for playing */
 document.addEventListener("click", (e) => {
@@ -4107,7 +4215,7 @@ document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-cedit],[data-cx],[data-csz],[data-cnew],[data-catf],[data-creset],[data-act],[data-fxedit]"); if (!b) return;
   const which = CFG.edit;
   if (b.dataset.cedit !== undefined) { CFG.edit = b.dataset.cedit || null; document.body.classList.toggle("cfgediting", !!CFG.edit); renderWork(); return; }
-  if (b.dataset.creset) { CFG[b.dataset.creset] = JSON.parse(JSON.stringify(b.dataset.creset === "live" ? LV_DEF : HM_DEF)); cfgSave(b.dataset.creset); renderWork(); return; }
+  if (b.dataset.creset) { CFG[b.dataset.creset] = JSON.parse(JSON.stringify(b.dataset.creset === "live" ? (CFG.lp ? [] : LV_DEF) : HM_DEF)); cfgSave(b.dataset.creset); renderWork(); return; }
   if (b.dataset.cx) { CFG[which].splice(+b.dataset.cx, 1); cfgSave(which); renderWork(); return; }
   if (b.dataset.csz) { const it = CFG[which][+b.dataset.csz]; it.w = +b.dataset.w; it.h = +b.dataset.h; cfgSave(which); renderWork(); return; }
   if (b.dataset.cnew) { CFG[which].push(JSON.parse(b.dataset.cnew)); cfgSave(which); renderWork(); toast(-1, "Añadido"); return; }
@@ -4220,12 +4328,13 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && PK.key) 
    the samples, drum kits, library and projects (bento.js devView), the complete backup (BK_LIST / BK_GET / BK_PUT and
    the sample slots, as editor.html backupCapture / backupRestore: the same file, either way), the system */
 const STU = { tab: "seq", busy: false, prog: 0, msg: "" };
-const STABS = [["seq", "Secuenciador avanzado", "seq"], ["SMP", "Samples", "save"], ["LIB", "Biblioteca", "save"],
+const STABS = [["seq", "Secuenciador avanzado", "seq"], ["hy", "HYBRID", "edit"], ["SMP", "Samples", "save"], ["LIB", "Biblioteca", "save"],
   ["PRJ", "Proyectos", "save"], ["bak", "Copia de seguridad", "save"], ["sys", "Sistema", "glo"]];
 function studioView() {
   const t = STU.tab;
   let body;
   if (t === "seq") { SQ.full = true; body = seqBlock(); }
+  else if (t === "hy") body = hyView();
   else if (t === "bak") body = backupView();
   else if (t === "sys") body = systemView();
   else body = devView(t);
@@ -4248,11 +4357,12 @@ const fwAtLeast = (v, want) => { const m = /(\d+)\.(\d+)(?:\.(\d+))?/.exec(Strin
   for (let i = 0; i < 3; i++) if (a[i] !== want[i]) return a[i] > want[i]; return true; };
 const devFmt = (info) => (/clipper/i.test(info.version || "") ? (fwAtLeast(info.version, [0, 4, 1]) ? 6 : 5) : info.pcount >= 71 ? 6 : info.pcount >= 61 ? 5 : 4);
 function bkStep(p, msg) { STU.prog = p; if (msg) STU.msg = msg; const el = $("bkp"); if (el) { el.style.width = Math.round(p * 100) + "%"; $("bkm").textContent = STU.msg; } }
-async function backupSave() {
+async function backupSave(only, tag) {                 /* (only: the object ids to keep — 0 and 1, the project playing and the settings) */
   const o = { quiet: true, retries: 2, timeout: 1500 };
   const a = await rq(34, [], { quiet: true, retries: 0, timeout: 5000 }), r = new Reader(a), rc = r.b(), n = r.b(), items = [];
   if (rc) throw new Error(rc === 4 ? "este FM-1 no tiene memoria flash" : `el FM-1 no dio la lista (${rc})`);
   for (let i = 0; i < n; i++) { const id = r.b(); let len = 0, crc = 0; for (let k = 0; k < 5; k++) len += r.b() * 2 ** (7 * k); for (let k = 0; k < 5; k++) crc += r.b() * 2 ** (7 * k); items.push({ id, len, crc: crc >>> 0 }); }
+  if (only) items.splice(0, items.length, ...items.filter((it) => only.includes(it.id)));
   const total = items.reduce((s, it) => s + it.len, 0) || 1, objects = []; let done = 0;
   for (const it of items) {
     const data = new Uint8Array(it.len);
@@ -4268,7 +4378,7 @@ async function backupSave() {
   }
   const file = { format: BKX.FORMAT, version: BKX.VERSION, firmware: M.info.version, date: new Date().toISOString(), objects };
   const url = URL.createObjectURL(new Blob([JSON.stringify(file)], { type: "application/json" })), aa = document.createElement("a");
-  aa.href = url; aa.download = `clipper-backup-${new Date().toISOString().slice(0, 10)}.json`; document.body.append(aa); aa.click(); aa.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+  aa.href = url; aa.download = `clipper-backup-${tag ? tag + "-" : ""}${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}.json`; document.body.append(aa); aa.click(); aa.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
   return Math.round(total / 1024);
 }
 async function backupRestore(file) {
@@ -4326,7 +4436,9 @@ document.addEventListener("change", async (e) => {
   const f = e.target.files[0]; let file;
   try { file = JSON.parse(await f.text()); } catch (er) { STU.msg = "Ese archivo no se puede leer."; renderWork(); return; }
   if (!confirm(`¿Restaurar «${f.name}»? Se reemplaza todo lo que hay en el FM-1.`)) return;
-  STU.busy = true; STU.prog = 0; STU.msg = "Comprobando la copia…"; renderWork();
+  STU.busy = true; STU.prog = 0; STU.msg = "Antes, una copia de lo que hay ahora (por si acaso)…"; renderWork();
+  try { await backupSave(null, "antes-de-restaurar"); } catch (er) { STU.msg = "No pude hacer la copia de lo de ahora, así que no restauro: " + er.message; STU.busy = false; renderWork(); return; }
+  STU.msg = "Comprobando la copia…"; bkStep(0);
   try { await backupRestore(file); STU.msg = "Restaurado. El FM-1 tiene ahora lo de la copia."; toast(-1, "<b>Restaurado</b>"); reloadSoon(); US.slots = null; }
   catch (er) { STU.msg = "No se pudo: " + er.message; }
   STU.busy = false; renderWork();
@@ -4343,6 +4455,296 @@ function systemView() {
     <div class="syl"><span>Idioma · Language</span><button class="btn${LANG.cur !== "en" ? " pri" : ""}" data-lang="es">Español</button><button class="btn${LANG.cur === "en" ? " pri" : ""}" data-lang="en">English</button></div>
     <p class="msh">MIDI, sincronía y afinación se ajustan en GLO.</p></section>`;
 }
+
+/* before a project replaces the one playing: that one (and the settings) to a file first, so a wrong tap loses nothing */
+async function autoBackupProject() {
+  toast(-1, "Guardando el proyecto de ahora, por si acaso…");
+  try { const kib = await backupSave([0, 1], "proyecto-antes-de-cargar"); toast(-1, `<b>Copia</b> del proyecto de ahora en tus descargas (${kib} KiB)`); return true; }
+  catch (e) { toast(-1, "No pude copiar el proyecto de ahora: no cargo"); return false; }
+}
+
+/* ---- HYBRID: the sound's whole patch (editor_hybrid.c: HY_GET [0, part] / [1, factory], HY_PUT [0, part, 128 bytes
+   packed]; the layout of editor.html HY). The device shows eight values of it; here every oscillator, filter, envelope,
+   LFO and matrix slot, as scope 4: the same tiles, drag, double tap and lists as the device's pages. Each change goes
+   to the FM-1 (at most every 80 ms) and stays the sound's patch until PTCH turns or another sound loads. */
+const HY = (() => {
+  const OSC = ["OFF", "SAW", "PULSE", "TRI", "SINE", "MORPH", "SUPER", "FM", "SYNC", "FOLD", "NOISE"];
+  const FLT = ["OFF", "LP12", "LP24", "BP", "HP", "NOTCH", "PEAK", "MOOG"];
+  const ROUTE = ["SER", "PAR", "SPLIT"];
+  const LFOW = ["SINE", "TRI", "SAW", "SQR", "S&H", "SMTH"];
+  const SRC = ["--", "ENV2", "ENV3", "AENV", "LFO1", "LFO2", "LFO3", "VEL", "KEY", "MW", "AT", "BEND", "EXPR", "RAND", "M1", "M2", "M3", "M4", "ONE"];
+  const DST = ["--", "PITCH", "P1", "P2", "P3", "SHP1", "SHP2", "SHP3", "LVL1", "LVL2", "LVL3", "RING", "CUT", "CUT1", "CUT2", "RES1", "RES2", "DRIVE", "AMP", "LFO2", "LFO3", "FBAL"];
+  const SHAPE = ["", "", "WIDTH", "", "FDBK", "MORPH", "DETUNE", "FM", "SYNC", "FOLD", "DARK"];   /* (what SHAPE does on each type: eng_hybrid.c) */
+  const SYNC = ["1/32", "1/16T", "1/16", "1/8T", "1/8", "1/4T", "1/4", "1/2T", "1/2", "1/2.", "1 bar", "1.5 bars", "2 bars", "4 bars", "8 bars"];
+  const SIZE = 128, NSLOT = 16;
+  const s8 = (x) => (x > 127 ? x - 256 : x), cl = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(+v || 0)));
+  const pick = (v, names) => (v < names.length ? cl(v, 0, names.length - 1) : 0);
+  function unpack(b) {
+    const o = { osc: [], flt: [], lfo: [], mod: [] };
+    for (let k = 0; k < 3; k++) { const i = k * 6; o.osc.push({ type: b[i], coarse: s8(b[i + 1]), fine: s8(b[i + 2]), level: b[i + 3], shape: b[i + 4], reset: !!(b[i + 5] & 1), fixed: !!(b[i + 5] & 2) }); }
+    [o.ring, o.drift, o.drive, o.route, o.fbal] = [b[18], b[19], b[20], b[21], b[22]];
+    for (let k = 0; k < 2; k++) { const i = 23 + k * 6; o.flt.push({ type: b[i], cut: b[i + 1], res: b[i + 2], env: s8(b[i + 3]), key: s8(b[i + 4]), vel: b[i + 5] }); }
+    o.env2 = Array.from(b.slice(35, 39)); o.env3 = Array.from(b.slice(39, 43));
+    for (let k = 0; k < 2; k++) { const i = 43 + k * 4; o.lfo.push({ wave: b[i], rate: b[i + 1], key: !!(b[i + 2] & 1), sync: !!(b[i + 2] & 2), fade: b[i + 3] }); }
+    for (let k = 0; k < NSLOT; k++) { const i = 51 + k * 4; o.mod.push({ src: b[i], via: b[i + 1], dst: b[i + 2], amt: s8(b[i + 3]) }); }
+    o.bend = b[115]; o.level = b[116];
+    o.name = String.fromCharCode(...Array.from(b.slice(118, 128)).filter((c) => c >= 32 && c <= 126)).trimEnd();
+    return sanitize(o);
+  }
+  function sanitize(o) {
+    const n = { osc: [], flt: [], lfo: [], mod: [] };
+    for (let k = 0; k < 3; k++) { const x = (o.osc && o.osc[k]) || {};
+      n.osc.push({ type: pick(x.type, OSC), coarse: cl(x.coarse, -48, 48), fine: cl(x.fine, -64, 63), level: cl(x.level, 0, 127), shape: cl(x.shape, 0, 127), reset: !!x.reset, fixed: !!x.fixed }); }
+    n.ring = cl(o.ring, 0, 127); n.drift = cl(o.drift, 0, 127); n.drive = cl(o.drive, 0, 127); n.route = pick(o.route, ROUTE); n.fbal = cl(o.fbal, 0, 127);
+    for (let k = 0; k < 2; k++) { const x = (o.flt && o.flt[k]) || {};
+      n.flt.push({ type: pick(x.type, FLT), cut: cl(x.cut, 0, 127), res: cl(x.res, 0, 127), env: cl(x.env, -64, 63), key: cl(x.key, -64, 63), vel: cl(x.vel, 0, 127) }); }
+    n.env2 = [0, 1, 2, 3].map((i) => cl((o.env2 || [])[i], 0, 127)); n.env3 = [0, 1, 2, 3].map((i) => cl((o.env3 || [])[i], 0, 127));
+    for (let k = 0; k < 2; k++) { const x = (o.lfo && o.lfo[k]) || {}; n.lfo.push({ wave: pick(x.wave, LFOW), rate: cl(x.rate, 0, 127), key: !!x.key, sync: !!x.sync, fade: cl(x.fade, 0, 127) }); }
+    for (let k = 0; k < NSLOT; k++) { const x = (o.mod && o.mod[k]) || {}; n.mod.push({ src: pick(x.src, SRC), via: pick(x.via, SRC), dst: pick(x.dst, DST), amt: cl(x.amt, -64, 63) }); }
+    n.bend = cl(o.bend, 0, 24); n.level = cl(o.level, 0, 127);
+    n.name = String(o.name || "").replace(/[^\x20-\x7E]/g, " ").slice(0, 10).toUpperCase();
+    return n;
+  }
+  function pack(o) {
+    const x = sanitize(o), b = new Uint8Array(SIZE);
+    x.osc.forEach((v, k) => b.set([v.type, v.coarse & 255, v.fine & 255, v.level, v.shape, (v.reset ? 1 : 0) | (v.fixed ? 2 : 0)], k * 6));
+    b.set([x.ring, x.drift, x.drive, x.route, x.fbal], 18);
+    x.flt.forEach((v, k) => b.set([v.type, v.cut, v.res, v.env & 255, v.key & 255, v.vel], 23 + k * 6));
+    b.set(x.env2, 35); b.set(x.env3, 39);
+    x.lfo.forEach((v, k) => b.set([v.wave, v.rate, (v.key ? 1 : 0) | (v.sync ? 2 : 0), v.fade], 43 + k * 4));
+    x.mod.forEach((v, k) => b.set([v.src, v.via, v.dst, v.amt & 255], 51 + k * 4));
+    b[115] = x.bend; b[116] = x.level;
+    for (let i = 0; i < 10; i++) b[118 + i] = i < x.name.length ? x.name.charCodeAt(i) : 0;   /* (C: NUL-padded) */
+    return b;
+  }
+  const init = () => sanitize({ osc: [{ type: 1, level: 127 }, {}, {}], flt: [{ type: 1, cut: 100 }, {}], env2: [0, 64, 64, 64], env3: [0, 64, 64, 64],
+    lfo: [{ rate: 60 }, { rate: 60 }], bend: 2, level: 100, name: "INIT" });
+  const lfoHz = (v) => 0.05 * Math.pow(800, v / 127);
+  const rateText = (l) => (l.sync ? [SYNC[Math.floor(l.rate * SYNC.length / 128)], ""] : [lfoHz(l.rate).toFixed(2), "Hz"]);
+  return { OSC, FLT, ROUTE, LFOW, SRC, DST, SHAPE, SIZE, NSLOT, unpack, pack, sanitize, init, rateText };
+})();
+const HYV = { v: null, orig: null, key: "", busy: false, err: "", t: 0, all: false };
+const hyOn = () => !!M.info && M.info.engines[M.engine] === "HYBRID";
+const hyKey = () => `${M.engine}:${M.preset}:${M.p[M.info.pe0 + 3]}`;   /* (PTCH turned or another sound: another patch) */
+const HYD = [];                                 /* scope 4's ids: each a field of the patch, with its get and set */
+function hyF(label, get, set, min, max, o = {}) {
+  HYD.push({ id: HYD.length, label, get, set, min, max, fmt: o.names ? F.ENUM : o.fmt ?? F.INT, names: o.names || [], unit: o.unit || "", txt: o.txt, re: !!o.re });
+  return HYD.length - 1;
+}
+const hySign = (v) => [v > 0 ? "+" + v : String(v), ""];
+const HYG = (() => {                            /* the pages: [title, ids] */
+  const g = [], OO = ["OFF", "ON"], b = (x) => (x ? 1 : 0);
+  for (let k = 0; k < 3; k++) {
+    const o = (v) => v.osc[k];
+    g.push([`OSC ${k + 1}`, [hyF("TYPE", (v) => o(v).type, (v, x) => { o(v).type = x; }, 0, HY.OSC.length - 1, { names: HY.OSC, re: true }),
+      hyF("COARSE", (v) => o(v).coarse, (v, x) => { o(v).coarse = x; }, -48, 48, { fmt: F.SEMI }),
+      hyF("FINE", (v) => o(v).fine, (v, x) => { o(v).fine = x; }, -64, 63, { txt: (x) => [hySign(x)[0], "ct"] }),
+      hyF("LEVEL", (v) => o(v).level, (v, x) => { o(v).level = x; }, 0, 127),
+      hyF("SHAPE", (v) => o(v).shape, (v, x) => { o(v).shape = x; }, 0, 127, { txt: (x) => [String(x), HY.SHAPE[HYV.v ? HYV.v.osc[k].type : 0] || ""] }),
+      hyF("RESET", (v) => b(o(v).reset), (v, x) => { o(v).reset = !!x; }, 0, 1, { names: OO }),
+      hyF("FIXED", (v) => b(o(v).fixed), (v, x) => { o(v).fixed = !!x; }, 0, 1, { names: OO })]]);
+  }
+  g.push(["MIX", [hyF("RING 1×2", (v) => v.ring, (v, x) => { v.ring = x; }, 0, 127), hyF("DRIFT", (v) => v.drift, (v, x) => { v.drift = x; }, 0, 127),
+    hyF("DRIVE", (v) => v.drive, (v, x) => { v.drive = x; }, 0, 127), hyF("ROUTE", (v) => v.route, (v, x) => { v.route = x; }, 0, 2, { names: HY.ROUTE, re: true }),
+    hyF("BAL F1↔F2", (v) => v.fbal, (v, x) => { v.fbal = x; }, 0, 127)]]);
+  for (let k = 0; k < 2; k++) {
+    const f = (v) => v.flt[k];
+    g.push([`FILTER ${k + 1}`, [hyF("TYPE", (v) => f(v).type, (v, x) => { f(v).type = x; }, 0, HY.FLT.length - 1, { names: HY.FLT }),
+      hyF("CUT", (v) => f(v).cut, (v, x) => { f(v).cut = x; }, 0, 127, { fmt: F.CUTOFF }), hyF("RES", (v) => f(v).res, (v, x) => { f(v).res = x; }, 0, 127),
+      hyF("ENV2", (v) => f(v).env, (v, x) => { f(v).env = x; }, -64, 63, { txt: hySign }),
+      hyF("KEY", (v) => f(v).key, (v, x) => { f(v).key = x; }, -64, 63, { txt: (x) => [String(Math.round(x * 100 / 64)), "%"] }),
+      hyF("VEL", (v) => f(v).vel, (v, x) => { f(v).vel = x; }, 0, 127)]]);
+  }
+  for (const [n, e] of [["ENV2", "env2"], ["ENV3", "env3"]])
+    g.push([n, ["A", "D", "S", "R"].map((l, i) => hyF(l, (v) => v[e][i], (v, x) => { v[e][i] = x; }, 0, 127, { fmt: i === 2 ? F.PCT : F.TIME }))]);
+  for (let k = 0; k < 2; k++) {
+    const l = (v) => v.lfo[k];
+    g.push([`LFO${k + 2}`, [hyF("WAVE", (v) => l(v).wave, (v, x) => { l(v).wave = x; }, 0, HY.LFOW.length - 1, { names: HY.LFOW }),
+      hyF("RATE", (v) => l(v).rate, (v, x) => { l(v).rate = x; }, 0, 127, { txt: (x) => HY.rateText({ rate: x, sync: HYV.v && HYV.v.lfo[k].sync }) }),
+      hyF("KEY", (v) => b(l(v).key), (v, x) => { l(v).key = !!x; }, 0, 1, { names: OO }),
+      hyF("SYNC", (v) => b(l(v).sync), (v, x) => { l(v).sync = !!x; }, 0, 1, { names: OO, re: true }),
+      hyF("FADE", (v) => l(v).fade, (v, x) => { l(v).fade = x; }, 0, 127, { fmt: F.TIME })]]);
+  }
+  for (let k = 0; k < HY.NSLOT; k++) {
+    const m = (v) => v.mod[k];
+    g.push([`MOD ${k + 1}`, [hyF("SOURCE", (v) => m(v).src, (v, x) => { m(v).src = x; }, 0, HY.SRC.length - 1, { names: HY.SRC, re: true }),
+      hyF("× VIA", (v) => m(v).via, (v, x) => { m(v).via = x; }, 0, HY.SRC.length - 1, { names: HY.SRC }),
+      hyF("→ DEST", (v) => m(v).dst, (v, x) => { m(v).dst = x; }, 0, HY.DST.length - 1, { names: HY.DST, re: true }),
+      hyF("AMOUNT", (v) => m(v).amt, (v, x) => { m(v).amt = x; }, -64, 63, { txt: hySign })]]);
+  }
+  g.push(["GLOBAL", [hyF("BEND", (v) => v.bend, (v, x) => { v.bend = x; }, 0, 24, { txt: (x) => ["±" + x, "st"] }), hyF("LEVEL", (v) => v.level, (v, x) => { v.level = x; }, 0, 127)]]);
+  return g;
+})();
+const hyDesc = (id) => (HYV.v ? HYD[id] : null);
+const hyVal = (id) => (HYV.v && HYD[id] ? HYD[id].get(HYV.v) : 0);
+function hyTook(v) {                            /* a patch read (or loaded): it, and what a double tap goes back to */
+  HYV.v = v; HYV.orig = JSON.parse(JSON.stringify(v)); HYD.forEach((d) => { d.def = d.get(HYV.orig); });
+}
+async function hyRead() {
+  if (HYV.busy || !M.link) return;
+  HYV.busy = true; HYV.err = "";
+  try { const a = await rq(C.HY_GET, [0, 0], { timeout: 800 }); if (a[2]) throw new Error("el FM-1 dijo que no (" + a[2] + ")");
+    hyTook(HY.unpack(unpack7(a.slice(3)).slice(0, HY.SIZE))); HYV.key = hyKey(); }
+  catch (e) { HYV.err = e.message; HYV.key = hyKey(); }
+  HYV.busy = false; if (S.folder === "ESTUDIO" && STU.tab === "hy") renderWork();
+}
+function hySend() {
+  clearTimeout(HYV.t);
+  HYV.t = setTimeout(() => rq(C.HY_PUT, [0, 0, ...pack7(HY.pack(HYV.v))], { key: "hy", timeout: 800 })
+    .then((a) => { if (a[2]) toast(-1, "El FM-1 no aceptó el patch HYBRID"); }).catch(() => {}), 80);
+}
+function hySet(id, v) {
+  const d = HYD[id]; if (!HYV.v || !d) return;
+  d.set(HYV.v, v); hySend();
+  if (d.re) renderWork(); else paintValue(4, id);
+}
+function hyView() {
+  if (!hyOn()) return `<section class="blk"><header class="bh"><h2><svg class="i"><use href="#i-edit"/></svg>HYBRID</h2></header>
+    <p class="msh">Este sonido usa ${esc(M.info ? M.info.engines[M.engine] : "")}. Carga un sonido HYBRID para editar sus osciladores, filtros y matriz aquí.</p></section>`;
+  if (HYV.key !== hyKey() && !HYV.busy) { HYV.v = null; setTimeout(hyRead, 0); }
+  if (!HYV.v) return `<section class="blk"><header class="bh"><h2><svg class="i"><use href="#i-edit"/></svg>HYBRID</h2></header><p class="msh">${HYV.err ? "No pude leer el patch: " + esc(HYV.err) : "Leyendo el patch…"}</p></section>`;
+  const fn = (M.pdesc[M.info.pe0 + 3] && M.pdesc[M.info.pe0 + 3].names) || [];
+  const used = (k) => HYV.v.mod[k].src || HYV.v.mod[k].dst, last = HYV.v.mod.reduce((n, m, k) => (used(k) ? k : n), -1);
+  const pages = HYG.filter(([t]) => { const m = /^MOD (\d+)$/.exec(t); return !m || HYV.all || +m[1] - 1 <= last + 1; });
+  const row = ([title, ids]) => pageRow({ title, folder: "ESTUDIO", s: 4, ids }, null);
+  const sec = (h, rows) => `${h ? `<h3 class="hyh">${h}</h3>` : ""}${rows.map(row).join("")}`;
+  const by = (re) => pages.filter(([t]) => re.test(t));
+  return `<section class="blk hyb"><header class="bh"><h2><svg class="i"><use href="#i-edit"/></svg>HYBRID</h2>
+      <input class="hyn" id="hyname" maxlength="10" value="${esc(HYV.v.name)}" aria-label="Nombre del patch" spellcheck="false" autocomplete="off">
+      <span class="hyt">
+        <select class="btn" id="hyfact" aria-label="Cargar un patch de fábrica"><option value="">Fábrica…</option>${fn.map((n, i) => `<option value="${i}">${i + 1} ${esc(n)}</option>`).join("")}</select>
+        <button class="btn" data-hy="init">INIT</button><button class="btn" data-hy="read"><svg class="i"><use href="#i-undo"/></svg>Volver a leer</button>
+        <button class="btn" data-hy="export"><svg class="i"><use href="#i-dl"/></svg>Exportar</button>
+        <label class="btn">Importar<input type="file" accept=".json,application/json" id="hyfile" hidden></label></span></header>
+    <p class="msh">Cada cambio suena ya en el FM-1. Es el patch del sonido hasta que gires PTCH o cargues otro; guárdalo con Guardar.</p>
+    <div class="pgs">${sec("Osciladores", by(/^(OSC|MIX)/))}${sec("Filtros", by(/^FILTER/))}${sec("Envolventes y LFO", by(/^(ENV|LFO)/))}
+      ${sec("Matriz", by(/^MOD /))}<button class="btn hyall" data-hy="all">${HYV.all ? "Solo las que se usan" : `Ver las ${HY.NSLOT}`}</button>${sec("", by(/^GLOBAL/))}</div></section>`;
+}
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-hy]"); if (!b || !M.link) return;
+  const w = b.dataset.hy;
+  if (w === "all") { HYV.all = !HYV.all; renderWork(); return; }
+  if (w === "read") { HYV.key = ""; renderWork(); return; }
+  if (w === "init") { HYV.v = HY.init(); hySend(); renderWork(); toast(-1, "<b>INIT</b> en el FM-1"); return; }
+  if (w === "export") {
+    const blob = new Blob([JSON.stringify({ format: "clipper-hybrid", version: 1, patch: HY.sanitize(HYV.v) }, null, 1)], { type: "application/json" });
+    const aa = document.createElement("a"), url = URL.createObjectURL(blob);
+    aa.href = url; aa.download = `${(HYV.v.name || "hybrid").toLowerCase().replace(/[^a-z0-9]+/g, "-")}.clipper.json`; document.body.append(aa); aa.click(); aa.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+});
+document.addEventListener("change", async (e) => {
+  const t = e.target;
+  if (t.id === "hyname" && HYV.v) { HYV.v.name = HY.sanitize({ ...HYV.v, name: t.value }).name; t.value = HYV.v.name; hySend(); return; }
+  if (t.id === "hyfact" && t.value !== "") {
+    const i = +t.value;
+    try { const a = await rq(C.HY_GET, [1, i], { timeout: 800 }); if (a[2]) throw new Error(String(a[2]));
+      HYV.v = HY.unpack(unpack7(a.slice(3)).slice(0, HY.SIZE)); hySend(); renderWork(); toast(-1, `<b>${esc(HYV.v.name)}</b> en el FM-1`); }
+    catch (er) { toast(-1, "No pude leer ese patch de fábrica"); }
+    return;
+  }
+  if (t.id === "hyfile" && t.files[0]) {
+    try { const j = JSON.parse(await t.files[0].text()); if (!j || j.format !== "clipper-hybrid" || !j.patch) throw new Error("format");
+      HYV.v = HY.sanitize(j.patch); hySend(); renderWork(); toast(-1, `<b>${esc(HYV.v.name)}</b> importado`); }
+    catch (er) { toast(-1, "Ese archivo no es un patch HYBRID"); }
+    t.value = "";
+  }
+});
+
+/* ---- the library: sounds kept on the tablet, with tags; the file is editor.html's (felucca-library v1), so either
+   reads the other's. A sound goes back to the FM-1 into a USER slot (UP_PUT: slot, engine, name, every parameter,
+   the 16-step pattern) */
+const LIBX = { FORMAT: "felucca-library", VERSION: 1, PAT: 16 };
+const LIBV = { tag: "", q: "", slotFor: -1, busy: false };
+const libAll = () => store.get("lib") || [];
+const libKeep = (a) => store.set("lib", a);
+function libKeys() {                             /* each parameter's key (editor.html paramKeys): a label, #2 when repeated, E0..E7 */
+  const seen = {}, out = [];
+  for (let i = 0; i < M.info.pcount; i++) {
+    if (i >= M.info.pe0) { out.push("E" + (i - M.info.pe0)); continue; }
+    const l = (M.pdesc[i] && M.pdesc[i].label) || "P" + i; seen[l] = (seen[l] || 0) + 1; out.push(seen[l] > 1 ? `${l}#${seen[l]}` : l);
+  }
+  return out;
+}
+const libTags = (s) => [...new Set(String(s || "").split(/[,;]+/).map((t) => t.trim().toLowerCase()).filter(Boolean))].slice(0, 8);
+function libNow() {                              /* the sound playing, as a library entry */
+  const x = M.list[entryNow()], t = new Date().toISOString();
+  return { name: cleanName(x ? x.name : M.info.engines[M.engine]) || "PATCH", engine: M.engine, engineName: M.info.engines[M.engine],
+    params: M.p.slice(0, M.info.pcount), pattern: null, tags: x && x.kind && x.kind !== "USER" ? [x.kind.toLowerCase()] : [], created: t, modified: t };
+}
+function libFile(list) {
+  return { format: LIBX.FORMAT, version: LIBX.VERSION, kind: "library", firmware: M.info.version || "", pCount: M.info.pcount, pE0: M.info.pe0,
+    paramLabels: libKeys(), engines: M.info.engines, exported: new Date().toISOString(),
+    patches: list.map((p) => ({ name: p.name, engine: p.engine, engineName: p.engineName, params: p.params, pattern: p.pattern, tags: p.tags, created: p.created, modified: p.modified })) };
+}
+function libRead(j) {                            /* a file -> entries, the parameters by key, the engines by name */
+  if (!j || j.format !== LIBX.FORMAT || !Array.isArray(j.patches)) throw new Error("no es una biblioteca de Felucca");
+  const to = libKeys(), from = Array.isArray(j.paramLabels) ? j.paramLabels : null, at = from && new Map(from.map((k, i) => [k, i])), t = new Date().toISOString();
+  return j.patches.filter((p) => p && Array.isArray(p.params)).map((p) => {
+    const e = p.engineName && M.info.engines.includes(p.engineName) ? M.info.engines.indexOf(p.engineName) : p.engine | 0;
+    return { name: cleanName(p.name) || "PATCH", engine: e, engineName: M.info.engines[e] || p.engineName || "",
+      params: from ? to.map((k) => (at.has(k) ? p.params[at.get(k)] ?? null : null)) : p.params.slice(0, M.info.pcount),
+      pattern: Array.isArray(p.pattern) ? p.pattern.slice(0, LIBX.PAT) : null, tags: libTags((p.tags || []).join(",")), created: p.created || t, modified: p.modified || t };
+  });
+}
+async function libToSlot(p, slot) {              /* UP_PUT; unknown values: the global's default, the engine's own if it plays */
+  const ps = Array.from({ length: M.info.pcount }, (_, i) => { const v = p.params[i]; if (v != null) return v; const d = M.pdesc[i];
+    return d && (i < M.info.pe0 || p.engine === M.engine) ? d.def ?? 0 : 0; });
+  const pat = Array.from({ length: LIBX.PAT }, (_, i) => { const x = (p.pattern || [])[i] || [0, 0]; return [x[0] & 127, x[1] & 7]; }).flat();
+  const a = await rq(C.UP_PUT, [slot & 127, p.engine & 127, ...[...cleanName(p.name).slice(0, 12)].map((c) => c.charCodeAt(0) & 127), 0, ...ps.flatMap(v14), ...pat], { timeout: 2500, retries: 0 });
+  if (a[1]) throw new Error(a[1] === 3 ? "el FM-1 está tocando: para la canción y prueba otra vez" : "el FM-1 dijo que no (" + a[1] + ")");
+}
+function libView() {
+  const all = libAll(), tags = [...new Set(all.flatMap((p) => p.tags))].sort(), q = LIBV.q.trim().toLowerCase();
+  const list = all.map((p, i) => ({ p, i })).filter(({ p }) => (!LIBV.tag || p.tags.includes(LIBV.tag)) && (!q || p.name.toLowerCase().includes(q) || p.engineName.toLowerCase().includes(q)));
+  const slots = LIBV.slotFor >= 0 ? US.slots : null;
+  if (LIBV.slotFor >= 0 && !US.slots && !US.busy) { US.busy = true; readSlots().then((v) => { US.slots = v; }, () => { US.slots = []; }).finally(() => { US.busy = false; renderWork(); }); }
+  const pickSlots = (i) => `<div class="lsl"><span class="c">¿En qué ranura USER?</span>${!slots ? `<span class="c">Leyendo las ranuras…</span>` : slots.map((u, k) =>
+    `<button class="btn${u.used ? " used" : ""}" data-lib="put" data-n="${i}" data-k="${k}"><span class="num">${upLabel(k)}</span><small>${u.used ? esc(u.name) : "Libre"}</small></button>`).join("")}
+    <button class="btn" data-lib="nosl">Cancelar</button></div>`;
+  const row = ({ p, i }) => `<div class="lrow"><b>${esc(p.name)}</b><span class="e">${esc(p.engineName)}</span>
+      <span class="ltg">${p.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</span><small class="num">${esc((p.modified || "").slice(0, 10))}</small>
+      <span class="dva"><button class="btn" data-lib="slot" data-n="${i}" aria-expanded="${LIBV.slotFor === i}">A USER…</button><button class="btn" data-lib="tags" data-n="${i}">Etiquetas</button>
+        <button class="btn" data-lib="ren" data-n="${i}">Renombrar</button><button class="dsc" data-lib="del" data-n="${i}">Borrar</button></span>
+      ${LIBV.slotFor === i ? pickSlots(i) : ""}</div>`;
+  return `<section class="blk tlib"><header class="bh"><h2><svg class="i"><use href="#i-save"/></svg>BIBLIOTECA</h2><span class="c">${all.length} ${all.length === 1 ? "sonido" : "sonidos"} en esta tablet</span>
+      <span class="hyt"><button class="btn pri" data-lib="add"${M.link ? "" : " disabled"}><svg class="i"><use href="#i-disk"/></svg>Guardar el sonido actual</button>
+        <button class="btn" data-lib="export"${all.length ? "" : " disabled"}><svg class="i"><use href="#i-dl"/></svg>Exportar</button>
+        <label class="btn">Importar<input type="file" accept=".json,application/json" id="libf" hidden></label></span></header>
+    <div class="lflt"><input class="lq" id="libq" type="search" placeholder="Buscar por nombre o motor" value="${esc(LIBV.q)}" autocomplete="off" spellcheck="false">
+      <button class="tg2${LIBV.tag ? "" : " on"}" data-libtag="">Todas</button>${tags.map((t) => `<button class="tg2${LIBV.tag === t ? " on" : ""}" data-libtag="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+    ${list.length ? `<div class="lrows">${list.map(row).join("")}</div>` : `<p class="msh">${all.length ? "Ningún sonido con eso." : "Aún no hay nada. Guarda el sonido que suena o importa una biblioteca del editor."}</p>`}
+    <p class="msh">Se guarda en esta tablet, no en el FM-1. «A USER…» lo escribe en una ranura de usuario del sinte; desde ahí lo cargas en SAVE.</p></section>`;
+}
+document.addEventListener("click", async (e) => {
+  const tg = e.target.closest("[data-libtag]"); if (tg) { LIBV.tag = tg.dataset.libtag; renderWork(); return; }
+  const b = e.target.closest("[data-lib]"); if (!b || LIBV.busy) return;
+  const w = b.dataset.lib, n = +b.dataset.n, all = libAll(), p = all[n];
+  if (w === "add") { const x = libNow(); all.unshift(x); libKeep(all); renderWork(); toast(-1, `<b>${esc(x.name)}</b> en la biblioteca`); }
+  else if (w === "export") {
+    const blob = new Blob([JSON.stringify(libFile(all), null, 1)], { type: "application/json" }), aa = document.createElement("a"), url = URL.createObjectURL(blob);
+    aa.href = url; aa.download = `felucca-library-${new Date().toISOString().slice(0, 10)}.json`; document.body.append(aa); aa.click(); aa.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+  } else if (w === "nosl") { LIBV.slotFor = -1; renderWork(); }
+  else if (!p) return;
+  else if (w === "slot") { LIBV.slotFor = LIBV.slotFor === n ? -1 : n; US.slots = null; renderWork(); }
+  else if (w === "tags") { const t = prompt(trUi("Etiquetas, separadas por comas"), p.tags.join(", ")); if (t == null) return; p.tags = libTags(t); p.modified = new Date().toISOString(); libKeep(all); renderWork(); }
+  else if (w === "ren") { const t = prompt(trUi("Nombre (hasta 12 letras)"), p.name); if (t == null) return; p.name = cleanName(t).slice(0, 12) || p.name; p.modified = new Date().toISOString(); libKeep(all); renderWork(); }
+  else if (w === "del") { if (b.dataset.arm !== "1") { arm(b, "Borrar", "¿Seguro?"); return; } all.splice(n, 1); libKeep(all); LIBV.slotFor = -1; renderWork(); toast(-1, `<b>${esc(p.name)}</b> fuera de la biblioteca`); }
+  else if (w === "put") {
+    const k = +b.dataset.k, u = US.slots && US.slots[k];
+    if (u && u.used && b.dataset.arm !== "1") { arm(b, `${upLabel(k)} ${u.name}`, `${upLabel(k)} ¿encima?`); return; }
+    LIBV.busy = true; toast(-1, `Escribiendo <b>${esc(p.name)}</b> en ${upLabel(k)}…`);
+    try { await libToSlot(p, k); toast(-1, `<b>${esc(p.name)}</b> en <span class="num">${upLabel(k)}</span>`); LIBV.slotFor = -1; US.slots = null; try { await readList(); } catch (er) { /* the next RELOAD */ } }
+    catch (er) { toast(-1, "No se pudo: " + esc(er.message)); }
+    LIBV.busy = false; renderWork();
+  }
+});
+document.addEventListener("input", (e) => { if (e.target.id !== "libq") return; LIBV.q = e.target.value; const at = e.target.selectionStart; renderWork(); const q = $("libq"); if (q) { q.focus(); q.setSelectionRange(at, at); } });
+document.addEventListener("change", async (e) => {
+  if (e.target.id !== "libf" || !e.target.files[0]) return;
+  try { const got = libRead(JSON.parse(await e.target.files[0].text())), all = libAll(); libKeep([...got, ...all]); toast(-1, `<b>${got.length}</b> ${got.length === 1 ? "sonido importado" : "sonidos importados"}`); }
+  catch (er) { toast(-1, "Ese archivo no se puede leer: " + esc(er.message)); }
+  e.target.value = ""; renderWork();
+});
 
 /* ------------------------------------------------------------------- i18n --- */
 /* English, or Spanish (the source): asked the first time, changed in Estudio > Sistema. The page is written in Spanish;
@@ -4404,16 +4806,42 @@ const DICT = {
   "como se cargó": "as loaded", "por defecto": "default", "Guardado": "Saved", "Mostrar u ocultar los favoritos": "Show or hide the favourites", "Pantalla completa": "Full screen",
   "La página del sinte": "The synth's page", "Carpetas": "Folders", "Carpetas de sonidos": "Sound folders", "Cerrar": "Close", "Favorito": "Favourite", "Favorito anterior": "Previous favourite", "Favorito siguiente": "Next favourite",
   "Quitar": "Remove", "Esta página se usa en el sinte.": "This page is used on the synth.",
+  "+ Página": "+ Page", "Páginas de LIVE": "LIVE pages", "Pánico: cortar todas las notas": "Panic: cut all notes", "en el sinte": "on the synth", "aquí": "here",
+  "Aún no hay patrones guardados aquí. «Guardar este» copia el patrón del FM-1 a la tablet, para volver a él cuando quieras.": "No patterns saved here yet. \u201cSave this one\u201d copies the FM-1's pattern to the tablet, to come back to it whenever you like.",
+  "Mover el rango a la izquierda": "Move the range left", "Mover el rango a la derecha": "Move the range right",
+  "Un archivo por ranura, mono a 22 050 Hz; la raíz sale del nombre del archivo (por ejemplo «PIANO A4»). Cabe hasta 80 KiB comprimidos.": "One file a slot, mono at 22 050 Hz; the root comes from the file's name (for example \u201cPIANO A4\u201d). Up to 80 KiB compressed.",
+  "Guardar aquí": "Save here", "Cargar sustituye el proyecto que suena. Guardar encima borra el que había. Las dos piden un segundo toque.": "Load replaces the project playing. Save over erases the one there was. Both ask for a second tap.",
+  "Arrastra una tarjeta para ordenar · × quita · elige el tamaño abajo": "Drag a card to reorder · × removes · pick the size below", "Antes, una copia de lo que hay ahora (por si acaso)…": "First, a backup of what is there now (just in case)…",
+  "Comprobando la copia…": "Checking the backup…", "Restaurado. El FM-1 tiene ahora lo de la copia.": "Restored. The FM-1 now has the backup's.", "Guardando el proyecto de ahora, por si acaso…": "Saving the project playing, just in case…",
+  "No pude copiar el proyecto de ahora: no cargo": "Couldn't back up the project playing: not loading", "Nombre de la página": "Page name", "Ese archivo no se puede leer.": "That file can't be read.",
+  "Quitar la página": "Remove the page", "Páginas de LIVE": "LIVE pages", "Guardar el sonido actual": "Save the current sound", "Exportar": "Export", "Importar": "Import", "Etiquetas": "Tags", "A USER…": "To USER…", "Todas": "All",
+  "Buscar por nombre o motor": "Search by name or engine", "¿En qué ranura USER?": "Which USER slot?", "Ningún sonido con eso.": "No sound matches.",
+  "Aún no hay nada. Guarda el sonido que suena o importa una biblioteca del editor.": "Nothing yet. Save the sound playing or import a library from the editor.",
+  "Se guarda en esta tablet, no en el FM-1. «A USER…» lo escribe en una ranura de usuario del sinte; desde ahí lo cargas en SAVE.": "Kept on this tablet, not on the FM-1. “To USER…” writes it to one of the synth's user slots; load it from there in SAVE.",
+  "Etiquetas, separadas por comas": "Tags, separated by commas", "Nombre (hasta 12 letras)": "Name (up to 12 letters)", "en la biblioteca": "in the library", "fuera de la biblioteca": "out of the library",
+  "Leyendo las ranuras…": "Reading the slots…", "BIBLIOTECA": "LIBRARY", "Fábrica…": "Factory…", "Volver a leer": "Read again", "Leyendo el patch…": "Reading the patch…",
+  "Osciladores": "Oscillators", "Filtros": "Filters", "Envolventes y LFO": "Envelopes and LFOs", "Matriz": "Matrix", "Solo las que se usan": "Only the ones in use",
+  "Cada cambio suena ya en el FM-1. Es el patch del sonido hasta que gires PTCH o cargues otro; guárdalo con Guardar.": "Every change plays on the FM-1 right away. It is the sound's patch until you turn PTCH or load another; keep it with Save.",
+  "Nombre del patch": "Patch name", "Cargar un patch de fábrica": "Load a factory patch", "en el FM-1": "on the FM-1", "importado": "imported",
+  "El FM-1 no aceptó el patch HYBRID": "The FM-1 didn't take the HYBRID patch", "Ese archivo no es un patch HYBRID": "That file is not a HYBRID patch", "No pude leer ese patch de fábrica": "Couldn't read that factory patch",
+  "Pidiendo la lista al FM-1…": "Asking the FM-1 for the list…", "Biblioteca de la tablet": "Tablet library", "Bancos del FM-1": "FM-1 banks",
+
 };
 const RX = [
   [/^(.+): anterior$/, "$1: previous"], [/^(.+): siguiente$/, "$1: next"], [/^(.+): apagado$/, "$1: off"], [/^(.+): encendido$/, "$1: on"], [/^(.+): menos$/, "$1: less"], [/^(.+): más$/, "$1: more"], [/^(.+): nivel$/, "$1: level"],
   [/^Paso (\d+): vacío$/, "Step $1: empty"], [/^Paso (\d+): ligado$/, "Step $1: tied"], [/^Paso (\d+): (.+)$/, "Step $1: $2"], [/^Deshacer (.+): volver a (.+)$/, "Undo $1: back to $2"],
-  [/^Editar (.+)$/, "Edit $1"], [/^Abrir (.+)$/, "Open $1"], [/^(\d+) pasos$/, "$1 steps"], [/^(\d+) sonidos$/, "$1 sounds"], [/^(\d+) de (\d+)$/, "$1 of $2"],
+  [/^Editar (.+)$/, (m, x) => `Edit ${DICT[x] || x}`], [/^Abrir (.+)$/, (m, x) => `Open ${DICT[x] || x}`], [/^(\d+) pasos$/, "$1 steps"], [/^(\d+) sonidos$/, "$1 sounds"], [/^(\d+) de (\d+)$/, "$1 of $2"],
   [/^(\d+) zonas? · (.+)$/, (m, n, k) => `${n} zone${n === "1" ? "" : "s"} · ${k}`], [/^Anterior en (.+)$/, "Previous in $1"], [/^Banco (\d+)$/, "Bank $1"], [/^Proyecto (\d+)$/, "Project $1"],
   [/^Acorde de (\d+) notas$/, "Chord of $1 notes"], [/^Favorito (\d+): quitar$/, "Favourite $1: remove"], [/^Favorito (\d+) de (\d+)$/, "Favourite $1 of $2"], [/^Guardar en (U\d+)$/, "Save to $1"], [/^Reemplazar (U\d+)$/, "Replace $1"],
   [/^Se reemplaza (.+)\.$/, "Replaces $1."], [/^Guarda encima de (.+), el que suena\.$/, "Saves over $1, the one playing."], [/^Hasta 12 letras\. Sin nombre se llama (.+)\.$/, "Up to 12 letters. Without a name it is called $1."],
   [/^Poner (.+)$/, "Put $1"], [/^Generar en (.+)$/, "Generate in $1"], [/^Leyendo (.+) del FM-1…$/, "Reading $1 from the FM-1…"], [/^(.+) como se cargó (.+)$/, "$1 as loaded $2"],
   [/^Leyendo (\d+) de (\d+) KiB…$/, "Reading $1 of $2 KiB…"], [/^Escribiendo (.+)$/, "Writing $1"], [/^Copia guardada: (\d+) KiB\. Está en tus descargas\.$/, "Backup saved: $1 KiB. It is in your downloads."], [/^No se pudo: (.+)$/, "Couldn't: $1"],
+  [/^([A-G]#?-?\d+), paso (\d+)(, suena)?$/, (m, n, k, on) => `${n}, step ${k}${on ? ", sounding" : ""}`],
+  [/^No pude hacer la copia de lo de ahora, así que no restauro: (.+)$/, "Couldn't back up what is there now, so not restoring: $1"], [/^Copia del proyecto de ahora en tus descargas \((.+)\)$/, "Backup of the project playing in your downloads ($1)"],
+  [/^(\d+) sonidos? en esta tablet$/, (m, n) => `${n} sound${n === "1" ? "" : "s"} on this tablet`], [/^Ver las (\d+)$/, "Show all $1"], [/^(U\d+) ¿encima\?$/, "$1 over it?"],
+  [/^(\d+) sonidos? importados?$/, (m, n) => `${n} sound${n === "1" ? "" : "s"} imported`], [/^Ese archivo no se puede leer: (.+)$/, "That file can't be read: $1"],
+  [/^Este sonido usa (.+)\. Carga un sonido HYBRID para editar sus osciladores, filtros y matriz aquí\.$/, "This sound uses $1. Load a HYBRID sound to edit its oscillators, filters and matrix here."],
+  [/^No pude leer el patch: (.+)$/, "Couldn't read the patch: $1"], [/^¿Quitar la página «(.+)»\?$/, "Remove the page “$1”?"],
   [/^(.+), editado: abrir sonidos$/, "$1, edited: open sounds"], [/^(.+): abrir sonidos$/, "$1: open sounds"], [/^Pista (\d+)$/, "Track $1"],
 ];
 function tr(t) {
@@ -4435,6 +4863,7 @@ const trObs = new MutationObserver((ms) => { if (LANG.cur !== "en") return; for 
 function setLang(l) {
   const was = LANG.cur; LANG.cur = l; try { localStorage.setItem("clipperlive:lang", l); } catch (e) { /* (asked again next time) */ }
   document.documentElement.lang = l;
+  document.documentElement.style.setProperty("--fine-txt", l === "en" ? '"FINE ×¼"' : '"FINO ×¼"');
   if (l === "en") { trNode(document.body); trObs.observe(document.body, { childList: true, subtree: true, characterData: true }); }
   else if (was === "en") { trObs.disconnect(); location.reload(); }   /* (back to Spanish: the page as written) */
 }
@@ -4447,6 +4876,7 @@ function langAsk() {
   g.querySelector(".box").prepend(box);
 }
 document.addEventListener("click", (e) => { const b = e.target.closest("[data-lang]"); if (!b) return; const l = b.dataset.lang; document.querySelector(".langq")?.remove(); if (l !== LANG.cur) setLang(l); });
+const trUi = (t) => (LANG.cur === "en" ? tr(t) : t);   /* (what the DOM does not show: a prompt's question) */
 
 /* ------------------------------------------------------------------ start --- */
 $("connect").onclick = () => connectMidi();

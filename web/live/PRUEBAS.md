@@ -48,18 +48,29 @@ Abre `clipper-live.html` en Chrome, en horizontal, y toca el botón de pantalla 
 - [ ] Genera un patrón sobre uno vacío y usa Deshacer.
 - [ ] MIDI: exporta un `.mid` e impórtalo; el patrón queda igual.
 
+## 4b. Lo nuevo (edición fina, FMX, HYBRID, biblioteca)
+
+- [ ] Arrastra un fader y deja el dedo quieto un momento: sale «FINO ×¼» y el valor se mueve más despacio; al soltar se va.
+- [ ] LIVE: «+ Página» crea otra página, se renombra en Editar y se quita con ×. Al recargar siguen ahí.
+- [ ] Carga un sonido FMX: en EDIT salen OP, OP 2, OP ENV, ROUTE, FMX y STORE, y el sinte cambia al moverlos. Con otro motor no salen.
+- [ ] Carga un sonido HYBRID y abre ESTUDIO > HYBRID: se ve el patch; mueve LEVEL de un oscilador y el sonido cambia. Prueba Fábrica…, INIT y Volver a leer.
+- [ ] HYBRID: Exportar baja un `.clipper.json`; Importar lo vuelve a poner.
+- [ ] Biblioteca: «Guardar el sonido actual», ponle etiquetas, filtra por una, renómbralo. Exportar y luego Importar en el editor viejo (o al revés).
+
 ## 5. Lo que escribe en la memoria del sinte
 
 - [ ] **Guardar** el sonido en una ranura de usuario **libre**: sale en SAVE > USER del sinte con su nombre y el punto naranja se va.
 - [ ] Sube un WAV corto a una ranura de **samples libre**.
 - [ ] Guarda un proyecto en una ranura **vacía**.
+- [ ] Biblioteca > A USER… en una ranura **libre**: sale en SAVE > USER con su nombre.
 
 ## 6. Lo que borra (al final, y solo sobre cosas de prueba)
 
 - [ ] TOOLS > CLRSQ (pide dos toques): el patrón se vacía.
 - [ ] TOOLS > INIT: el sonido vuelve al de inicio del motor.
 - [ ] Borra el sample de prueba y el sonido de usuario de prueba.
-- [ ] Carga un proyecto.
+- [ ] Carga un proyecto: antes baja sola una copia del proyecto de ahora.
+- [ ] Restaurar una copia de seguridad: antes baja sola una copia de lo que hay.
 - [ ] TOOLS > NEW, solo si no te importa perder el proyecto actual.
 
 ---

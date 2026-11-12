@@ -934,3 +934,51 @@
   .ci.ghost { position: fixed; z-index: 40; pointer-events: none; box-shadow: 0 18px 40px rgba(0, 0, 0, .7), 0 0 0 2px var(--k1); transform: rotate(-1.5deg) scale(1.03); opacity: .95; }
   .ci.ghost .cx, .ci.ghost .csz, .ci.ghost .cgrip { display: none; }
   .ci.hole > * { visibility: hidden; } .ci.hole { outline: 2px dashed var(--k1); outline-offset: -2px; background: rgba(40, 124, 255, .08); }
+
+  /* LIVE's pages */
+  .lpt { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+  .lpt button { height: 38px; padding: 0 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: .04em; color: var(--tx-2); background: var(--panel); border: 1px solid var(--line); }
+  .lpt button[aria-current="true"] { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .lpx { width: 22px; height: 22px; display: grid; place-items: center; background: var(--fav); color: #000; }
+  .lpadd { border-style: dashed !important; color: var(--tx-3) !important; }
+  /* fine: held still while dragging */
+  .fine { outline: 2px solid var(--k3) !important; outline-offset: -2px; }
+  body.finemode::after { content: var(--fine-txt, "FINO ×¼"); position: fixed; top: 72px; left: 50%; transform: translateX(-50%); z-index: 31; font: 800 13px var(--sans); letter-spacing: .08em; background: var(--k3); color: #000; padding: 6px 12px; pointer-events: none; }
+
+  /* ESTUDIO > HYBRID: the patch's name, its tools, its pages */
+  .hyb .bh { flex-wrap: wrap; }
+  .hyn { height: 44px; width: 12ch; padding: 0 12px; background: var(--page); border: 1px solid var(--line-2); color: var(--tx); font-family: var(--num); font-size: 26px; letter-spacing: .04em; text-transform: uppercase; -webkit-font-smoothing: none; outline: none; }
+  .hyn:focus { border-color: var(--tx-3); }
+  .hyt { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+  .hyt .btn { padding: 0 14px; cursor: pointer; }
+  .hyt select.btn { appearance: none; padding-right: 14px; color: var(--tx); font-family: inherit; }
+  .hyh { font-size: 13px; font-weight: 800; letter-spacing: .06em; color: var(--tx-3); margin-top: 14px; }
+  .hyb .prow .tp { min-height: 112px; }
+  .hyall { align-self: flex-start; padding: 0 16px; cursor: pointer; }
+  .hyb .tp, .hyb .ro { --c: var(--tx-3) !important; }   /* (no knob plays these: no knob colours) */
+  .hyb .pgr.tall { height: 170px; }
+
+  /* ESTUDIO > Biblioteca: the tablet's sounds, their tags, a USER slot to send one to */
+  .tlib .bh .c { color: var(--tx-3); font-size: 14px; }
+  .lflt { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .lq { height: 44px; width: 260px; padding: 0 12px; background: var(--page); border: 1px solid var(--line-2); color: var(--tx); font: inherit; font-size: 15px; outline: none; }
+  .lq:focus { border-color: var(--tx-3); }
+  .tg2 { height: 36px; padding: 0 14px; background: var(--raised); border: 1px solid var(--line); color: var(--tx-2); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .tg2.on { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .lrows { display: flex; flex-direction: column; gap: 6px; }
+  .lrow { display: grid; grid-template-columns: minmax(0, 1.2fr) 90px minmax(0, 1fr) 96px auto; align-items: center; gap: 12px; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); }
+  .lrow > b { font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lrow .e { color: var(--eng); font-size: 13px; font-weight: 700; }
+  .lrow small { color: var(--tx-3); font-size: 13px; }
+  .ltg { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+  .ltg span { padding: 2px 8px; border: 1px solid var(--line-2); color: var(--tx-2); font-size: 12px; }
+  .lrow .dva { display: flex; gap: 6px; }
+  .lrow .dva .btn, .lrow .dva .dsc { padding: 0 12px; cursor: pointer; }
+  .lsl { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .lsl > .c { grid-column: 1 / -1; color: var(--tx-3); font-size: 13px; }
+  .lsl .btn { height: 52px; flex-direction: column; gap: 2px; cursor: pointer; }
+  .lsl .btn small { font-size: 11px; color: var(--tx-3); font-weight: 500; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lsl .btn.used { border-color: var(--line-2); }
+  .lsl .btn:last-child { grid-column: span 2; }
+  .tlib .bh { flex-wrap: wrap; }
+  .hyb .t-arr .pos { display: none; }   /* (seven across: the name needs the room) */

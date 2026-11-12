@@ -5,8 +5,8 @@
    their X_* values (Live 109..111), turned here or by the knobs on the device */
 const PGRAPH = { ENV: "env", "ENV 2": "env", LFO: "lfo", "LFO 2": "lfo", "LFO 3": "lfo", FX: "meters", FILTER: "filt", DLY: "echo",
   REVERB: "verb", "EQ+COMP": "eq", MACROS: "meters", SEL: "scale", "SEL 2": "scale", LAYER: "layer", "LAYER 2": "layer",
-  MORPH: "morph", UNDO: "hist", MATRIX: "matrix", "MOD SEQ": "mseq" };
-const ESTUDIO_ONLY = new Set(["TRACKS", "SONG", "DRUMS", "SLICER", "OP", "OP 2", "OP ENV", "ROUTE", "FMX", "STORE", "PRESETS", "USER", "FAVS", "PROJECT", "TOOLS", "NOTES", "REV/CHO"]);
+  MORPH: "morph", UNDO: "hist", MATRIX: "matrix", "MOD SEQ": "mseq", "OP ENV": "env", ENV2: "env", ENV3: "env" };
+const ESTUDIO_ONLY = new Set(["TRACKS", "SONG", "DRUMS", "SLICER", "PRESETS", "USER", "FAVS", "PROJECT", "TOOLS", "NOTES", "REV/CHO"]);
 
 function pageCells(p) { return p.ids.map((id, k) => ({ id, k })).filter((x) => x.id < 127 && desc(p.s, x.id)); }
 const SHARED = new Set(["scale", "layer"]);    /* (SEL and SEL 2, LAYER and LAYER 2: one graph on the device, two pages of knobs) */
@@ -19,7 +19,7 @@ function pageRow(p, prevKind) {
     ${cells.length ? `<div class="prow" style="--n:${cells.length}">${cells.map(({ id, k }) => tileP(p.s, id, k, p.title, false)).join("")}</div>` : ""}</section>`;
 }
 function folderView(folder) {
-  const pages = LAYOUT.filter((x) => x.folder === folder && !ESTUDIO_ONLY.has(x.title)).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
+  const pages = LAYOUT.filter((x) => x.folder === folder && pageOn(x) && !ESTUDIO_ONLY.has(x.title)).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
   const seen = new Set(), uniq = pages.filter((p) => !seen.has(p.title) && seen.add(p.title));   /* (FILTER, MASTER twice: the drum track's) */
   return `<div class="pgs">${uniq.map((p, i) => pageRow(p, i ? PGRAPH[uniq[i - 1].title] : null)).join("")}</div>`;
 }
@@ -140,10 +140,28 @@ document.addEventListener("click", (e) => {
 const LV_DEF = [{ t: "g", g: "filt", w: 2, h: 2 }, { t: "g", g: "fx", w: 2, h: 2 }, { t: "q", key: "0:17" }, { t: "q", key: "0:28" }, { t: "q", key: "1:0" }, { t: "q", key: "0:-1" },
   { t: "q", key: "0:23" }, { t: "q", key: "0:49" }, { t: "q", key: "0:27" }, { t: "q", key: "0:38" }];
 const HM_DEF = [{ t: "a", a: "favprev" }, { t: "a", a: "favnext" }, { t: "q", key: "0:17" }, { t: "q", key: "0:-1" }];
-const CFG = { live: store.get("cfg:live") || LV_DEF, home: store.get("cfg:home") || HM_DEF, edit: null, sel: -1, drag: null };
+const CFG = { live: null, home: store.get("cfg:home") || HM_DEF, edit: null, sel: -1, drag: null,
+  lpages: store.get("cfg:lpages") || [{ name: "LIVE 1", items: store.get("cfg:live") || LV_DEF }], lp: Math.max(0, store.get("cfg:lp") | 0) };   /* (LIVE: pages of its own) */
+if (CFG.lp >= CFG.lpages.length) CFG.lp = 0;
+CFG.live = CFG.lpages[CFG.lp].items;
+function livePage(i) { CFG.lp = Math.max(0, Math.min(CFG.lpages.length - 1, i)); CFG.live = CFG.lpages[CFG.lp].items; store.set("cfg:lp", CFG.lp); }
 const ACT = { play: ["PLAY", "Arranca o para el patrón"], rec: ["REC", "Como el botón REC"], favnext: ["Fav. siguiente", ""], favprev: ["Fav. anterior", ""], discard: ["Descartar", "Lo editado vuelve a como se cargó"] };
 const GITEM = { filt: ["Filtro", "FILTER", "filt", 0, [50, 127, 127, 127]], fx: ["Efectos", "FX", "meters", 0, [33, 34, 35, 36]], env: ["ENV", "ENV", "env", 0, [1, 2, 3, 4]], lfo: ["LFO", "LFO", "lfo", 0, [9, 10, 11, 12]] };
-function cfgSave(which) { store.set("cfg:" + which, CFG[which]); }
+function cfgSave(which) { if (which === "live") { CFG.lpages[CFG.lp].items = CFG.live; store.set("cfg:lpages", CFG.lpages); store.set("cfg:lp", CFG.lp); } else store.set("cfg:" + which, CFG[which]); }
+/* LIVE's pages: a tab each (in Edit: rename by a tap on the open one, × removes, + adds) */
+function lpTabs() {
+  const ed = CFG.edit === "live";
+  return `<nav class="lpt" aria-label="Páginas de LIVE">${CFG.lpages.map((pg, i) => `<button data-lp="${i}" aria-current="${i === CFG.lp}">${esc(pg.name)}${ed && CFG.lpages.length > 1 && i === CFG.lp ? `<span class="lpx" data-lpdel="${i}" aria-label="Quitar la página">×</span>` : ""}</button>`).join("")}
+    ${ed || CFG.lpages.length < 2 ? `<button class="lpadd" data-lpadd="1">+ Página</button>` : ""}</nav>`;
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-lp],[data-lpadd]"); if (!b) return;
+  if (e.target.closest("[data-lpdel]")) { if (!confirm(trUi(`¿Quitar la página «${CFG.lpages[CFG.lp].name}»?`))) return; CFG.lpages.splice(CFG.lp, 1); livePage(CFG.lp - 1); cfgSave("live"); renderWork(); return; }
+  if (b.dataset.lpadd) { CFG.lpages.push({ name: "LIVE " + (CFG.lpages.length + 1), items: [] }); livePage(CFG.lpages.length - 1); cfgSave("live"); if (!CFG.edit) { CFG.edit = "live"; document.body.classList.add("cfgediting"); } renderWork(); return; }
+  const i = +b.dataset.lp;
+  if (i === CFG.lp && CFG.edit === "live") { const n = prompt(trUi("Nombre de la página"), CFG.lpages[i].name); if (n && n.trim()) { CFG.lpages[i].name = n.trim().slice(0, 16).toUpperCase(); cfgSave("live"); renderWork(); } return; }
+  livePage(i); renderWork();
+});
 function itemHtml(it, i, which) {
   const ed = CFG.edit === which, w = it.w || 1, h = it.h || 1, at = `style="grid-column:span ${w};grid-row:span ${h}" data-ci="${i}"`;
   let body = "";
@@ -161,7 +179,7 @@ function cfgGrid(which, cls) {
   return `<div class="cg ${cls}${CFG.edit === which ? " editing" : ""}" data-cg="${which}">${items.map((it, i) => itemHtml(it, i, which)).join("")}${CFG.edit === which ? `<button class="ci cadd" data-cadd="${which}">+ Añadir</button>` : ""}</div>`;
 }
 function catalog(which) {
-  const fold = CFG.catF || "FX", pages = LAYOUT.filter((x) => x.folder === fold && x.scope !== 2 && !ESTUDIO_ONLY.has(x.title));
+  const fold = CFG.catF || "FX", pages = LAYOUT.filter((x) => x.folder === fold && x.scope !== 2 && pageOn(x) && !ESTUDIO_ONLY.has(x.title));
   const chip = (lab, data) => `<button class="chip" ${data}>${esc(lab)}</button>`;
   return `<aside class="cat"><h2>Añadir</h2>
     <h3>ACCIONES</h3><div class="chips">${Object.entries(ACT).map(([k, a]) => chip(a[0], `data-cnew='${JSON.stringify({ t: "a", a: k })}'`)).join("")}</div>
@@ -176,7 +194,7 @@ function cfgView(which, title) {
   const head = `<div class="qhead"><h2>${title}</h2>${ed ? `<span class="hint2">Arrastra una tarjeta para ordenar · × quita · elige el tamaño abajo</span>` : ""}<div class="qtools">${ed
     ? `<button data-creset="${which}"><svg class="i"><use href="#i-undo"/></svg>Restablecer</button><button class="pri" data-cedit=""><svg class="i"><use href="#i-check"/></svg>Listo</button>`
     : `${which === "live" ? `<button class="${lock ? "on" : ""}" data-lock="1" aria-pressed="${lock}"><svg class="i"><use href="#i-${lock ? "lock" : "unlock"}"/></svg>${lock ? "Bloqueado" : "Bloquear"}</button>` : ""}${lock ? "" : `<button data-cedit="${which}"><svg class="i"><use href="#i-edit"/></svg>Editar</button>`}`}</div></div>`;
-  return `<div class="cfgwrap${ed ? " editing" : ""}"><div class="cfgw">${head}${cfgGrid(which, which === "live" ? "lg4" : "lg4 short")}</div>${ed ? catalog(which) : ""}</div>`;
+  return `<div class="cfgwrap${ed ? " editing" : ""}"><div class="cfgw">${head}${which === "live" ? lpTabs() : ""}${cfgGrid(which, which === "live" ? "lg4" : "lg4 short")}</div>${ed ? catalog(which) : ""}</div>`;
 }
 /* LIVE locked: the view stays (the nav and Seguir do not take it away), for playing */
 document.addEventListener("click", (e) => {
@@ -188,7 +206,7 @@ document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-cedit],[data-cx],[data-csz],[data-cnew],[data-catf],[data-creset],[data-act],[data-fxedit]"); if (!b) return;
   const which = CFG.edit;
   if (b.dataset.cedit !== undefined) { CFG.edit = b.dataset.cedit || null; document.body.classList.toggle("cfgediting", !!CFG.edit); renderWork(); return; }
-  if (b.dataset.creset) { CFG[b.dataset.creset] = JSON.parse(JSON.stringify(b.dataset.creset === "live" ? LV_DEF : HM_DEF)); cfgSave(b.dataset.creset); renderWork(); return; }
+  if (b.dataset.creset) { CFG[b.dataset.creset] = JSON.parse(JSON.stringify(b.dataset.creset === "live" ? (CFG.lp ? [] : LV_DEF) : HM_DEF)); cfgSave(b.dataset.creset); renderWork(); return; }
   if (b.dataset.cx) { CFG[which].splice(+b.dataset.cx, 1); cfgSave(which); renderWork(); return; }
   if (b.dataset.csz) { const it = CFG[which][+b.dataset.csz]; it.w = +b.dataset.w; it.h = +b.dataset.h; cfgSave(which); renderWork(); return; }
   if (b.dataset.cnew) { CFG[which].push(JSON.parse(b.dataset.cnew)); cfgSave(which); renderWork(); toast(-1, "Añadido"); return; }

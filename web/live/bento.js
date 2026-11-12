@@ -143,7 +143,7 @@ function module(p, kind, opt = {}) {
 }
 function pagesOf(folder) {
   if (folder === "HOME") return [{ title: "HOME", folder: "HOME", s: 0, ids: M.homeIds }, ...["ENV", "FILTER", "LFO", "FX", "MACROS"].map((t) => { const x = LAYOUT.find((y) => y.title === t); return { title: t, folder: x.folder, s: x.scope, ids: x.ids }; })];
-  return LAYOUT.filter((x) => x.folder === folder).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
+  return LAYOUT.filter((x) => x.folder === folder && pageOn(x)).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
 }
 /* a folder in blocks: an effect, an LFO, an envelope… each with its pages (named by its first, as on the device) */
 const BLOCKS = {
@@ -576,12 +576,7 @@ function devView(kind) {
     return `<div class="kts">${all.map((x) => `<button class="kf" data-pc="kit" data-n="${x.k}" aria-current="${cur && x.k === cur.k}"><span>${esc(x.n)}</span></button>`).join("")}</div>
       <div class="pads" role="group" aria-label="Pads de ${esc(cur ? cur.n : "")}">${Array.from({ length: 16 }, (_, l) => `<button class="pad" data-pc="pad" data-n="${l}" style="--c:${KC[l % 4]}"><span class="num">${l + 1}</span></button>`).join("")}</div>`;
   }
-  if (kind === "LIB") {
-    const v = PC.load("banks", CE.BK_LIST, [], PCP.banks);
-    if (!v || v === "…") return pcEmpty(v, "la biblioteca");
-    return `<div class="dvc">${v.items.map((x) => `<div class="dvs"><span class="num">B${String(x.id + 1).padStart(2, "0")}</span><b>Banco ${x.id + 1}</b>
-      <small class="num">${(x.len / 1024).toFixed(1)} KiB</small><button class="btn" data-pend="BK_GET · BK_PUT">Abrir</button></div>`).join("")}</div>`;
-  }
+  if (kind === "LIB") return libView();                     /* (the tablet's: studio.js) */
   /* PROYECTOS: 4 ranuras (PROJECT: 2 consulta, 0 carga, 1 guarda) */
   const ps = [0, 1, 2, 3].map((k) => PC.load("prj" + k, CE.PROJECT, [2, k], (a) => ({ slot: a[1], used: !!a[2], busy: a[3] === 1 })));
   if (ps.some((p) => p === "…")) return pcEmpty("…", "los proyectos");
@@ -593,7 +588,7 @@ function devView(kind) {
 }
 
 /* las acciones: dos toques para borrar, un toque para sonar */
-document.addEventListener("click", (e) => {
+document.addEventListener("click", async (e) => {
   const pend = e.target.closest("[data-pend]"); if (pend) { PC.pend(pend.dataset.pend); return; }
   const b = e.target.closest("[data-pc]"); if (!b) return;
   const n = +b.dataset.n;
@@ -612,6 +607,7 @@ document.addEventListener("click", (e) => {
     const load = b.dataset.pc === "prj-load", lab = load ? "Cargar" : b.textContent;
     if (b.dataset.arm !== "1") { arm(b, lab, "¿Seguro?"); return; }
     disarm(b, lab);
+    if (load && !M.mock && !(await autoBackupProject())) return;
     PC.act(CE.PROJECT, [load ? 0 : 1, n & 3], load ? `Proyecto <b class="num">${n + 1}</b> cargado` : `Guardado en el proyecto <b class="num">${n + 1}</b>`)
       .then((ok) => { if (!ok) return; if (load) reloadSoon(); PC.again("prj" + n); });
   }
@@ -686,8 +682,19 @@ $("edit").addEventListener("pointerdown", (e) => {
   bdrag = { el, dir: mtr ? "abs" : arc ? "v" : "h", s, id, d, x0: e.clientX, y0: e.clientY, v0: val(s, id), on: !fd, pid: e.pointerId };
   if (!fd) { el.setPointerCapture(e.pointerId); e.preventDefault(); }
 });
-$("edit").addEventListener("pointermove", (e) => {
+/* fine: the finger held still a moment while dragging, the moves count a quarter from there (a badge says so) */
+function fineArm(raw, eff) {
+  clearTimeout(bdrag.ft);
+  bdrag.ft = setTimeout(() => { if (!bdrag || bdrag.fine || !(bdrag.kind || bdrag.on)) return;
+    bdrag.fine = { ax: raw.x, ay: raw.y, ex: eff.clientX, ey: eff.clientY }; bdrag.el.classList.add("fine"); document.body.classList.add("finemode"); }, 380);
+}
+function effPt(e) {
+  const f = bdrag.fine; if (!f) return { clientX: e.clientX, clientY: e.clientY };
+  return { clientX: f.ex + (e.clientX - f.ax) * 0.25, clientY: f.ey + (e.clientY - f.ay) * 0.25 };
+}
+$("edit").addEventListener("pointermove", (ev) => {
   if (!bdrag) return;
+  const e = effPt(ev); fineArm({ x: ev.clientX, y: ev.clientY }, e);
   if (bdrag.kind) { graphDrag(e); return; }
   const dx = e.clientX - bdrag.x0, dy = bdrag.y0 - e.clientY;
   if (!bdrag.on) {                                       /* a fader: it is a slide once it goes sideways */
@@ -701,7 +708,7 @@ $("edit").addEventListener("pointermove", (e) => {
   else if (bdrag.dir === "v") setVal(bdrag.s, bdrag.id, bdrag.v0 + dy * span / 220);
   else setVal(bdrag.s, bdrag.id, bdrag.v0 + dx * span / Math.max(220, bdrag.el.getBoundingClientRect().width * 1.4));
 });
-const bend = () => { if (bdrag && bdrag.el) bdrag.el.classList.remove("held"); bdrag = null; };
+const bend = () => { if (bdrag && bdrag.el) { bdrag.el.classList.remove("held", "fine"); clearTimeout(bdrag.ft); } document.body.classList.remove("finemode"); bdrag = null; };
 $("edit").addEventListener("pointerup", bend); $("edit").addEventListener("pointercancel", bend);
 function barAt(e) {
   const r = bdrag.el.getBoundingClientRect(), d = bdrag.d;
