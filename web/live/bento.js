@@ -665,6 +665,7 @@ function paintCards(s, id) {
       el.querySelector(el.classList.contains("ro") ? ".rv" : ".tv").innerHTML = valHtml(d, v); el.setAttribute("aria-valuenow", v);
     } else el.outerHTML = el.classList.contains("ro") ? readout(s, id, +el.dataset.ro) : tileP(s, id, +el.dataset.kk, el.dataset.title, el.dataset.tag === "1");
   });
+  document.querySelectorAll(`#edit .tp[data-cell="${key}"]:not([data-fd]) .tv`).forEach((v) => v.classList.add("chg"));   /* (a choice: its value slides in) */
 }
 
 /* ---- touch. Faders and readouts slide sideways from where they are (a vertical swipe still scrolls the page); the
@@ -686,7 +687,7 @@ $("edit").addEventListener("pointerdown", (e) => {
 function fineArm(raw, eff) {
   clearTimeout(bdrag.ft);
   bdrag.ft = setTimeout(() => { if (!bdrag || bdrag.fine || !(bdrag.kind || bdrag.on)) return;
-    bdrag.fine = { ax: raw.x, ay: raw.y, ex: eff.clientX, ey: eff.clientY }; bdrag.el.classList.add("fine"); document.body.classList.add("finemode"); }, 380);
+    bdrag.fine = { ax: raw.x, ay: raw.y, ex: eff.clientX, ey: eff.clientY }; bdrag.el.classList.add("fine"); document.body.classList.add("finemode"); buzz(15); }, 380);
 }
 function effPt(e) {
   const f = bdrag.fine; if (!f) return { clientX: e.clientX, clientY: e.clientY };
@@ -704,10 +705,23 @@ $("edit").addEventListener("pointermove", (ev) => {
     return;
   }
   const span = bdrag.d.max - bdrag.d.min;
-  if (bdrag.dir === "abs") { if (!bdrag.armed) { if (Math.abs(dy) < 6) return; bdrag.armed = true; bdrag.el.classList.add("held"); } barAt(e); }
-  else if (bdrag.dir === "v") setVal(bdrag.s, bdrag.id, bdrag.v0 + dy * span / 220);
-  else setVal(bdrag.s, bdrag.id, bdrag.v0 + dx * span / Math.max(220, bdrag.el.getBoundingClientRect().width * 1.4));
+  if (bdrag.dir === "abs") { if (!bdrag.armed) { if (Math.abs(dy) < 6) return; bdrag.armed = true; bdrag.el.classList.add("held"); } barAt(e); return; }
+  if (bdrag.w == null) bdrag.w = bdrag.el.getBoundingClientRect().width;    /* (measured once a drag, not once a move) */
+  const want = bdrag.dir === "v" ? bdrag.v0 + dy * span / 220 : bdrag.v0 + dx * span / Math.max(220, bdrag.w * 1.4);
+  edgeAt(want < bdrag.d.min ? -1 : want > bdrag.d.max ? 1 : 0);
+  setVal(bdrag.s, bdrag.id, want);
 });
+/* ---- small answers to a hand: a tick under the finger (Android, a touch screen), a bump at the end of a range */
+const COARSE = matchMedia("(pointer: coarse)");
+const buzz = (ms) => { if (COARSE.matches && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { /* (not allowed yet) */ } };
+function edgeAt(side) {                                   /* a drag past its end: once, until it comes back */
+  if (!bdrag || side === (bdrag.edge || 0)) return;
+  bdrag.edge = side; if (!side) return;
+  buzz(12); const el = bdrag.el; el.style.setProperty("--edx", side * 2 + "px"); el.classList.remove("edge"); void el.offsetWidth; el.classList.add("edge");
+}
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-set],[data-pick],[data-tool],[data-tplay],[data-trec],[data-tap],[data-panic],[data-f],[data-lp],[data-stab],[data-skind]")) buzz(6);
+}, true);
 const bend = () => { if (bdrag && bdrag.el) { bdrag.el.classList.remove("held", "fine"); clearTimeout(bdrag.ft); } document.body.classList.remove("finemode"); bdrag = null; };
 $("edit").addEventListener("pointerup", bend); $("edit").addEventListener("pointercancel", bend);
 function barAt(e) {

@@ -472,7 +472,7 @@ function setX(id, v) {
 }
 /* the device's state, every 1.5 s: CPU, LATE, PEAK, the scale's notes, REC */
 async function pollState() {
-  if (!M.link || !M.info) return;
+  if (!M.link || !M.info || document.hidden) return;
   try { const st = P.state(await rq(C.STATE, [], { key: "state", quiet: true, retries: 0, timeout: 500 })); const scaleCh = !M.state || M.state.scale !== st.scale;
     M.state = st; M.rec = st.rec; renderTransport(); if (scaleCh && (S.folder === "SEL")) renderWork(); if (S.folder === "REC") paintRec(); } catch (e) { /* (an older firmware: no STATE) */ }
 }
@@ -743,13 +743,15 @@ document.addEventListener("click", (e) => { const b = e.target.closest("[data-to
 
 /* ------------------------------------------- the left rail: the device's page --- */
 /* its four knobs as the FM-1 shows them now (a tap on its name opens its folder here) */
+/* an element's HTML, set only when it changed (a drag paints every frame; what did not change keeps its state) */
+const setHtml = (el, h) => { if (el && el._h !== h) { el._h = h; el.innerHTML = h; } };
 function renderDev() {
   const pg = M.page; if (!pg || !M.info) return;
   const s = pg.home ? 0 : pg.scope, ids = pg.home ? M.homeIds : pg.ids, folder = pg.home ? "HOME" : FAM[pg.fam] || "";
   const k4 = s < 2 ? ids.map((id, k) => { const d = id < 127 && desc(s, id); if (!d) return `<div class="dk off"><span class="l">KNOB ${k + 1}</span><span class="v">–</span></div>`;
     const v = val(s, id); return `<div class="dk" style="--c:${KC[k]};${fillVars(d, v)}"><span class="l"><i></i>${esc(d.label)}</span><span class="v num">${valHtml(d, v)}</span><span class="b"></span></div>`; }).join("") : "";
-  $("dvp").innerHTML = `<button class="dvh" data-f="${folder}" aria-label="Abrir ${esc(folder)}"><span class="c">En el sinte</span><b>${esc(pg.home ? "HOME" : pg.title)}</b><span class="f">${esc(folder)}</span></button>
-    ${k4 ? `<div class="dvk">${k4}</div>` : `<p class="dvn">Esta página se usa en el sinte.</p>`}`;
+  setHtml($("dvp"), `<button class="dvh" data-f="${folder}" aria-label="Abrir ${esc(folder)}"><span class="c">En el sinte</span><b>${esc(pg.home ? "HOME" : pg.title)}</b><span class="f">${esc(folder)}</span></button>
+    ${k4 ? `<div class="dvk">${k4}</div>` : `<p class="dvn">Esta página se usa en el sinte.</p>`}`);
 }
 
 /* -------------------------------------- the left rail: what changed, undoable --- */
@@ -963,9 +965,18 @@ async function usbAudio() {
 }
 /* as the FM-1 draws it (ui_draw.c graph_scope): the output at 22.05 kHz (audio.c keeps every other sample), 240 of them
    from a rising zero crossing, scaled to the loudest (never above 1500 / 32768), a thin line in the curve's colour */
+/* (drawn only when there is something new: a trace arrived, or the USB audio, at most 30 times a second; never while the
+   box is off screen, a phone's rail closed or the page hidden. Its size comes from a ResizeObserver, not a layout a frame) */
+const SCV = { w: 0, h: 0, seen: true, at: -1, t: 0, idle: false };
 function drawScope(cv) {
-  if (!cv) return; const r = cv.getBoundingClientRect(); if (!r.width) return;
-  const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+  if (!cv || !SCV.seen) return;
+  if (!SCV.w) { const now = performance.now(); if (now - (SCV.m || 0) < 500) return; SCV.m = now; const r = cv.getBoundingClientRect(); SCV.w = r.width; SCV.h = r.height; if (!SCV.w) return; }   /* (before the observer's first word) */
+  const now = performance.now(), fresh = scTrace && now - scAt < 400;
+  if (fresh && scAt === SCV.at) return;                          /* (the same trace: already drawn) */
+  if (!fresh && an && now - SCV.t < 33) return;                  /* (the USB audio: 30 a second is plenty) */
+  if (!fresh && !an) { if (SCV.idle) return; SCV.idle = true; } else SCV.idle = false;   /* (nothing: the empty box once) */
+  SCV.at = fresh ? scAt : -1; SCV.t = now;
+  const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(SCV.w * dpr), h = Math.round(SCV.h * dpr);
   if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
   const g = cv.getContext("2d"); g.imageSmoothingEnabled = false;
   g.clearRect(0, 0, w, h); g.fillStyle = "#1e1e23"; g.fillRect(0, h >> 1, w, dpr);
@@ -988,7 +999,12 @@ function drawScope(cv) {
   for (let x = 0; x < 240; x++) g.lineTo(x / 239 * w, h / 2 - at(t + x) / peak * h * .44);
   g.stroke();
 }
-(function loop() { drawScope($("scope")); requestAnimationFrame(loop); })();
+(() => {
+  const cv = $("scope"); if (!cv) return;
+  new ResizeObserver(([e]) => { SCV.w = e.contentRect.width; SCV.h = e.contentRect.height; SCV.idle = false; SCV.at = -1; }).observe(cv);
+  new IntersectionObserver(([e]) => { SCV.seen = e.isIntersecting; SCV.idle = false; SCV.at = -1; }).observe(cv);
+  (function loop() { drawScope(cv); requestAnimationFrame(loop); })();
+})();
 
 /* ------------------------------------------------------------------ start --- */
 $("connect").onclick = () => connectMidi();

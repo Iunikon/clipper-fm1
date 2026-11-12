@@ -1097,6 +1097,27 @@
     body.lopen .rail.l { transform: none; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .6); }
   }
 
+  /* ---- micro-interactions: a press sinks, a choice slides in, a range's end bumps, the folder's line grows */
+  .btn, .nb, .tbt, .kf, .tool, .sc, .lpt button, .tg2, .stt button, .qtools button, .arw button, .opts button, .t-go, .t-sw, .pad, .fv, .ib, .svb {
+    transition: transform .08s var(--ease), background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease); }
+  .btn:active, .nb:active, .tbt:active, .kf:active, .tool:active, .sc:active, .lpt button:active, .tg2:active, .stt button:active,
+  .qtools button:active, .arw button:active, .opts button:active, .t-go:active, .t-sw:active, .pad:active, .fv:active, .ib:active, .svb:active { transform: translateY(1px); }
+  .tv.chg { animation: chg .16s var(--ease); }
+  @keyframes chg { from { opacity: .2; transform: translateY(4px); } }
+  .tp.edge, .ro.edge { animation: edge .22s var(--ease); }
+  @keyframes edge { 30% { transform: translateX(var(--edx, 2px)); } 60% { transform: translateX(calc(var(--edx, 2px) * -0.5)); } }
+  .nb[aria-current="page"]:not(.est)::before { content: ""; position: absolute; left: 14%; right: 14%; top: 0; height: 2px; background: var(--tx); animation: navline .2s var(--ease); }
+  @keyframes navline { from { transform: scaleX(0); } }
+  .tp.t-sw .knob { transition: background .15s var(--ease); }
+  @media (prefers-reduced-motion: reduce) {
+    .tv.chg, .tp.edge, .ro.edge, .nb[aria-current="page"]::before { animation: none !important; }
+    .btn:active, .nb:active, .tbt:active, .kf:active, .tool:active, .sc:active, .ib:active, .svb:active { transform: none; }
+  }
+
+  /* ---- long lists: what is off screen is not laid out or painted until it comes near */
+  .scs > .sc, .lrows > .lrow, .hyb .pgx, .snds > .sd { content-visibility: auto; contain-intrinsic-size: auto 84px; }
+  .hyb .pgx { contain-intrinsic-size: auto 150px; }
+
 </style>
 </head>
 <body class="off">
@@ -1680,7 +1701,7 @@ function setX(id, v) {
 }
 /* the device's state, every 1.5 s: CPU, LATE, PEAK, the scale's notes, REC */
 async function pollState() {
-  if (!M.link || !M.info) return;
+  if (!M.link || !M.info || document.hidden) return;
   try { const st = P.state(await rq(C.STATE, [], { key: "state", quiet: true, retries: 0, timeout: 500 })); const scaleCh = !M.state || M.state.scale !== st.scale;
     M.state = st; M.rec = st.rec; renderTransport(); if (scaleCh && (S.folder === "SEL")) renderWork(); if (S.folder === "REC") paintRec(); } catch (e) { /* (an older firmware: no STATE) */ }
 }
@@ -1951,13 +1972,15 @@ document.addEventListener("click", (e) => { const b = e.target.closest("[data-to
 
 /* ------------------------------------------- the left rail: the device's page --- */
 /* its four knobs as the FM-1 shows them now (a tap on its name opens its folder here) */
+/* an element's HTML, set only when it changed (a drag paints every frame; what did not change keeps its state) */
+const setHtml = (el, h) => { if (el && el._h !== h) { el._h = h; el.innerHTML = h; } };
 function renderDev() {
   const pg = M.page; if (!pg || !M.info) return;
   const s = pg.home ? 0 : pg.scope, ids = pg.home ? M.homeIds : pg.ids, folder = pg.home ? "HOME" : FAM[pg.fam] || "";
   const k4 = s < 2 ? ids.map((id, k) => { const d = id < 127 && desc(s, id); if (!d) return `<div class="dk off"><span class="l">KNOB ${k + 1}</span><span class="v">–</span></div>`;
     const v = val(s, id); return `<div class="dk" style="--c:${KC[k]};${fillVars(d, v)}"><span class="l"><i></i>${esc(d.label)}</span><span class="v num">${valHtml(d, v)}</span><span class="b"></span></div>`; }).join("") : "";
-  $("dvp").innerHTML = `<button class="dvh" data-f="${folder}" aria-label="Abrir ${esc(folder)}"><span class="c">En el sinte</span><b>${esc(pg.home ? "HOME" : pg.title)}</b><span class="f">${esc(folder)}</span></button>
-    ${k4 ? `<div class="dvk">${k4}</div>` : `<p class="dvn">Esta página se usa en el sinte.</p>`}`;
+  setHtml($("dvp"), `<button class="dvh" data-f="${folder}" aria-label="Abrir ${esc(folder)}"><span class="c">En el sinte</span><b>${esc(pg.home ? "HOME" : pg.title)}</b><span class="f">${esc(folder)}</span></button>
+    ${k4 ? `<div class="dvk">${k4}</div>` : `<p class="dvn">Esta página se usa en el sinte.</p>`}`);
 }
 
 /* -------------------------------------- the left rail: what changed, undoable --- */
@@ -2171,9 +2194,18 @@ async function usbAudio() {
 }
 /* as the FM-1 draws it (ui_draw.c graph_scope): the output at 22.05 kHz (audio.c keeps every other sample), 240 of them
    from a rising zero crossing, scaled to the loudest (never above 1500 / 32768), a thin line in the curve's colour */
+/* (drawn only when there is something new: a trace arrived, or the USB audio, at most 30 times a second; never while the
+   box is off screen, a phone's rail closed or the page hidden. Its size comes from a ResizeObserver, not a layout a frame) */
+const SCV = { w: 0, h: 0, seen: true, at: -1, t: 0, idle: false };
 function drawScope(cv) {
-  if (!cv) return; const r = cv.getBoundingClientRect(); if (!r.width) return;
-  const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+  if (!cv || !SCV.seen) return;
+  if (!SCV.w) { const now = performance.now(); if (now - (SCV.m || 0) < 500) return; SCV.m = now; const r = cv.getBoundingClientRect(); SCV.w = r.width; SCV.h = r.height; if (!SCV.w) return; }   /* (before the observer's first word) */
+  const now = performance.now(), fresh = scTrace && now - scAt < 400;
+  if (fresh && scAt === SCV.at) return;                          /* (the same trace: already drawn) */
+  if (!fresh && an && now - SCV.t < 33) return;                  /* (the USB audio: 30 a second is plenty) */
+  if (!fresh && !an) { if (SCV.idle) return; SCV.idle = true; } else SCV.idle = false;   /* (nothing: the empty box once) */
+  SCV.at = fresh ? scAt : -1; SCV.t = now;
+  const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(SCV.w * dpr), h = Math.round(SCV.h * dpr);
   if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
   const g = cv.getContext("2d"); g.imageSmoothingEnabled = false;
   g.clearRect(0, 0, w, h); g.fillStyle = "#1e1e23"; g.fillRect(0, h >> 1, w, dpr);
@@ -2196,7 +2228,12 @@ function drawScope(cv) {
   for (let x = 0; x < 240; x++) g.lineTo(x / 239 * w, h / 2 - at(t + x) / peak * h * .44);
   g.stroke();
 }
-(function loop() { drawScope($("scope")); requestAnimationFrame(loop); })();
+(() => {
+  const cv = $("scope"); if (!cv) return;
+  new ResizeObserver(([e]) => { SCV.w = e.contentRect.width; SCV.h = e.contentRect.height; SCV.idle = false; SCV.at = -1; }).observe(cv);
+  new IntersectionObserver(([e]) => { SCV.seen = e.isIntersecting; SCV.idle = false; SCV.at = -1; }).observe(cv);
+  (function loop() { drawScope(cv); requestAnimationFrame(loop); })();
+})();
 
 /* ------------------------------------------------------------------ bento --- */
 /* The folders, EDITAR and RÁPIDO as a bento grid (12 columns), not the device's pages of four: a page with a graph is a
@@ -2865,6 +2902,7 @@ function paintCards(s, id) {
       el.querySelector(el.classList.contains("ro") ? ".rv" : ".tv").innerHTML = valHtml(d, v); el.setAttribute("aria-valuenow", v);
     } else el.outerHTML = el.classList.contains("ro") ? readout(s, id, +el.dataset.ro) : tileP(s, id, +el.dataset.kk, el.dataset.title, el.dataset.tag === "1");
   });
+  document.querySelectorAll(`#edit .tp[data-cell="${key}"]:not([data-fd]) .tv`).forEach((v) => v.classList.add("chg"));   /* (a choice: its value slides in) */
 }
 
 /* ---- touch. Faders and readouts slide sideways from where they are (a vertical swipe still scrolls the page); the
@@ -2886,7 +2924,7 @@ $("edit").addEventListener("pointerdown", (e) => {
 function fineArm(raw, eff) {
   clearTimeout(bdrag.ft);
   bdrag.ft = setTimeout(() => { if (!bdrag || bdrag.fine || !(bdrag.kind || bdrag.on)) return;
-    bdrag.fine = { ax: raw.x, ay: raw.y, ex: eff.clientX, ey: eff.clientY }; bdrag.el.classList.add("fine"); document.body.classList.add("finemode"); }, 380);
+    bdrag.fine = { ax: raw.x, ay: raw.y, ex: eff.clientX, ey: eff.clientY }; bdrag.el.classList.add("fine"); document.body.classList.add("finemode"); buzz(15); }, 380);
 }
 function effPt(e) {
   const f = bdrag.fine; if (!f) return { clientX: e.clientX, clientY: e.clientY };
@@ -2904,10 +2942,23 @@ $("edit").addEventListener("pointermove", (ev) => {
     return;
   }
   const span = bdrag.d.max - bdrag.d.min;
-  if (bdrag.dir === "abs") { if (!bdrag.armed) { if (Math.abs(dy) < 6) return; bdrag.armed = true; bdrag.el.classList.add("held"); } barAt(e); }
-  else if (bdrag.dir === "v") setVal(bdrag.s, bdrag.id, bdrag.v0 + dy * span / 220);
-  else setVal(bdrag.s, bdrag.id, bdrag.v0 + dx * span / Math.max(220, bdrag.el.getBoundingClientRect().width * 1.4));
+  if (bdrag.dir === "abs") { if (!bdrag.armed) { if (Math.abs(dy) < 6) return; bdrag.armed = true; bdrag.el.classList.add("held"); } barAt(e); return; }
+  if (bdrag.w == null) bdrag.w = bdrag.el.getBoundingClientRect().width;    /* (measured once a drag, not once a move) */
+  const want = bdrag.dir === "v" ? bdrag.v0 + dy * span / 220 : bdrag.v0 + dx * span / Math.max(220, bdrag.w * 1.4);
+  edgeAt(want < bdrag.d.min ? -1 : want > bdrag.d.max ? 1 : 0);
+  setVal(bdrag.s, bdrag.id, want);
 });
+/* ---- small answers to a hand: a tick under the finger (Android, a touch screen), a bump at the end of a range */
+const COARSE = matchMedia("(pointer: coarse)");
+const buzz = (ms) => { if (COARSE.matches && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) { /* (not allowed yet) */ } };
+function edgeAt(side) {                                   /* a drag past its end: once, until it comes back */
+  if (!bdrag || side === (bdrag.edge || 0)) return;
+  bdrag.edge = side; if (!side) return;
+  buzz(12); const el = bdrag.el; el.style.setProperty("--edx", side * 2 + "px"); el.classList.remove("edge"); void el.offsetWidth; el.classList.add("edge");
+}
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-set],[data-pick],[data-tool],[data-tplay],[data-trec],[data-tap],[data-panic],[data-f],[data-lp],[data-stab],[data-skind]")) buzz(6);
+}, true);
 const bend = () => { if (bdrag && bdrag.el) { bdrag.el.classList.remove("held", "fine"); clearTimeout(bdrag.ft); } document.body.classList.remove("finemode"); bdrag = null; };
 $("edit").addEventListener("pointerup", bend); $("edit").addEventListener("pointercancel", bend);
 function barAt(e) {
@@ -4228,11 +4279,11 @@ function gMseq() {
 function renderTransport() {
   const t = $("trn"); if (!t) return;
   const rec = M.rec | 0, recOn = rec & 1, armed = rec & 2, free = rec & 4, ci = rec & 8, pos = SQ.playing && SQ.pos >= 0 ? `${Math.floor(SQ.pos / 16) + 1}.${Math.floor((SQ.pos % 16) / 4) + 1}` : "";
-  t.innerHTML = `<button class="tbt${SQ.playing ? " on" : ""}" data-tplay="1" aria-pressed="${SQ.playing}"><svg class="i"><use href="#i-${SQ.playing ? "stop" : "play"}"/></svg><span class="num">${SQ.playing ? pos : "PLAY"}</span></button>
-    <button class="tbt rec${recOn || free ? " on" : armed || ci ? " arm" : ""}" data-trec="1" aria-pressed="${!!(recOn || armed)}"><i></i><span>${free ? "TOMA" : ci ? "CUENTA" : armed ? "ARMADO" : "REC"}</span></button>`;
+  setHtml(t, `<button class="tbt${SQ.playing ? " on" : ""}" data-tplay="1" aria-pressed="${SQ.playing}"><svg class="i"><use href="#i-${SQ.playing ? "stop" : "play"}"/></svg><span class="num">${SQ.playing ? pos : "PLAY"}</span></button>
+    <button class="tbt rec${recOn || free ? " on" : armed || ci ? " arm" : ""}" data-trec="1" aria-pressed="${!!(recOn || armed)}"><i></i><span>${free ? "TOMA" : ci ? "CUENTA" : armed ? "ARMADO" : "REC"}</span></button>`);
   const sel2 = LAYOUT.find((x) => x.title === "SEL 2"), trn = sel2 && desc(0, sel2.ids[0]) ? val(0, sel2.ids[0]) | 0 : 0, oct = M.state ? M.state.oct | 0 : 0, bpm = desc(1, 0) ? val(1, 0) : null;
-  const tb = $("tmp"); if (tb) tb.innerHTML = `${bpm != null ? `<b class="num">${bpm}</b><small>BPM</small>` : ""}${oct ? `<span class="tag2 num">OCT ${oct > 0 ? "+" : ""}${oct}</span>` : ""}${trn ? `<span class="tag2 num">TRN ${trn > 0 ? "+" : ""}${trn}</span>` : ""}`;
-  const c = $("cpu"); if (c && M.state) { c.innerHTML = `CPU <b class="num">${M.state.cpu}%</b>${M.state.late ? ` LATE <b class="num">${M.state.late}</b>` : ""}`; c.classList.toggle("hot", M.state.cpu > 85 || M.state.late > 0); }
+  setHtml($("tmp"), `${bpm != null ? `<b class="num">${bpm}</b><small>BPM</small>` : ""}${oct ? `<span class="tag2 num">OCT ${oct > 0 ? "+" : ""}${oct}</span>` : ""}${trn ? `<span class="tag2 num">TRN ${trn > 0 ? "+" : ""}${trn}</span>` : ""}`);
+  const c = $("cpu"); if (c && M.state) { setHtml(c, `CPU <b class="num">${M.state.cpu}%</b>${M.state.late ? ` LATE <b class="num">${M.state.late}</b>` : ""}`); c.classList.toggle("hot", M.state.cpu > 85 || M.state.late > 0); }
 }
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-tplay],[data-trec]"); if (!b || !M.link) return;

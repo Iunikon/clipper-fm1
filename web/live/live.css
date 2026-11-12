@@ -1086,3 +1086,24 @@
       transform: translateX(-102%); box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0); transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
     body.lopen .rail.l { transform: none; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .6); }
   }
+
+  /* ---- micro-interactions: a press sinks, a choice slides in, a range's end bumps, the folder's line grows */
+  .btn, .nb, .tbt, .kf, .tool, .sc, .lpt button, .tg2, .stt button, .qtools button, .arw button, .opts button, .t-go, .t-sw, .pad, .fv, .ib, .svb {
+    transition: transform .08s var(--ease), background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease); }
+  .btn:active, .nb:active, .tbt:active, .kf:active, .tool:active, .sc:active, .lpt button:active, .tg2:active, .stt button:active,
+  .qtools button:active, .arw button:active, .opts button:active, .t-go:active, .t-sw:active, .pad:active, .fv:active, .ib:active, .svb:active { transform: translateY(1px); }
+  .tv.chg { animation: chg .16s var(--ease); }
+  @keyframes chg { from { opacity: .2; transform: translateY(4px); } }
+  .tp.edge, .ro.edge { animation: edge .22s var(--ease); }
+  @keyframes edge { 30% { transform: translateX(var(--edx, 2px)); } 60% { transform: translateX(calc(var(--edx, 2px) * -0.5)); } }
+  .nb[aria-current="page"]:not(.est)::before { content: ""; position: absolute; left: 14%; right: 14%; top: 0; height: 2px; background: var(--tx); animation: navline .2s var(--ease); }
+  @keyframes navline { from { transform: scaleX(0); } }
+  .tp.t-sw .knob { transition: background .15s var(--ease); }
+  @media (prefers-reduced-motion: reduce) {
+    .tv.chg, .tp.edge, .ro.edge, .nb[aria-current="page"]::before { animation: none !important; }
+    .btn:active, .nb:active, .tbt:active, .kf:active, .tool:active, .sc:active, .ib:active, .svb:active { transform: none; }
+  }
+
+  /* ---- long lists: what is off screen is not laid out or painted until it comes near */
+  .scs > .sc, .lrows > .lrow, .hyb .pgx, .snds > .sd { content-visibility: auto; contain-intrinsic-size: auto 84px; }
+  .hyb .pgx { contain-intrinsic-size: auto 150px; }
