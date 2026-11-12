@@ -3,7 +3,7 @@
    the samples, drum kits, library and projects (bento.js devView), the complete backup (BK_LIST / BK_GET / BK_PUT and
    the sample slots, as editor.html backupCapture / backupRestore: the same file, either way), the system */
 const STU = { tab: "seq", busy: false, prog: 0, msg: "" };
-const STABS = [["seq", "Secuenciador avanzado", "seq"], ["SMP", "Samples", "save"], ["KIT", "Drum kits", "seq"], ["LIB", "Biblioteca", "save"],
+const STABS = [["seq", "Secuenciador avanzado", "seq"], ["SMP", "Samples", "save"], ["LIB", "Biblioteca", "save"],
   ["PRJ", "Proyectos", "save"], ["bak", "Copia de seguridad", "save"], ["sys", "Sistema", "glo"]];
 function studioView() {
   const t = STU.tab;

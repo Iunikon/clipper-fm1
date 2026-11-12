@@ -126,7 +126,7 @@ function tileP(s, id, k, pt, tag = pt) {
   if (isEnum(d) && d.names.length <= 2) return `<div class="tp t-two${lv}" ${at}>${top}<div class="opts" role="radiogroup" aria-label="${esc(d.label)}">${opts()}</div></div>`;
   if (isEnum(d) && d.names.length <= 4) return `<div class="tp t-seg${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span><div class="opts" role="radiogroup" aria-label="${esc(d.label)}">${opts()}</div></div>`;
   if (isEnum(d)) return `<div class="tp t-arr${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span><span class="pos num">${v - d.min + 1}/${d.max - d.min + 1}</span>
-    <div class="arw"><button data-set="${key}" data-v="${v <= d.min ? d.max : v - 1}" aria-label="${esc(d.label)}: anterior"><svg class="i"><use href="#i-prev"/></svg></button><button data-set="${key}" data-v="${nextOf(d, v)}" aria-label="${esc(d.label)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div></div>`;
+    <div class="arw"><button data-set="${key}" data-v="${v <= d.min ? d.max : v - 1}" aria-label="${esc(d.label)}: anterior"><svg class="i"><use href="#i-prev"/></svg></button><button class="pkb" data-pick="${key}" aria-label="${esc(d.label)}: lista"><svg class="i"><use href="#i-list"/></svg></button><button data-set="${key}" data-v="${nextOf(d, v)}" aria-label="${esc(d.label)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div></div>`;
   if (d.max <= d.min && d.label === "CPU" && M.state) return `<div class="tp${lv}" ${at}>${top}<span class="tv num">${M.state.cpu}<small>%</small></span><span class="pos2 num">LATE ${M.state.late}  PEAK ${M.state.peak}%</span></div>`;   /* (SYSTEM's reading: STATE) */
   if (d.max <= d.min) return `<div class="tp${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span></div>`;   /* (a reading) */
   return `<div class="tp t-fd${zeroOf(d) ? " t-bi" : ""}${lv}" ${at} data-fd="${key}" role="slider" tabindex="0" aria-label="${esc(d.label)}" aria-valuenow="${v}" aria-valuemin="${d.min}" aria-valuemax="${d.max}">${top}<span class="tv num">${valHtml(d, v)}</span><span class="fl" aria-hidden="true"></span></div>`;
@@ -552,7 +552,7 @@ document.addEventListener("change", (e) => {
 });
 
 /* ---- SAVE > Dispositivo: biblioteca, samples, kits y proyectos ---- */
-const DEV = [["KIT", "Drum kits"], ["LIB", "Biblioteca"], ["PRJ", "Proyectos"]];   /* (the samples: in Estudio) */
+const DEV = [["LIB", "Biblioteca"], ["PRJ", "Proyectos"]];   /* (the samples: in Estudio) */
 const KIT = { k: 0 };
 function devView(kind) {
   if (kind === "SMP") {

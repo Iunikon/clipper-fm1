@@ -507,7 +507,7 @@ function tileInner(q) {
     foot = `<div class="stp"><button data-qn="${key}" data-d="-1" aria-label="Tempo −1">−</button><button class="tap" data-tap="1">TAP</button><button data-qn="${key}" data-d="1" aria-label="Tempo +1">+</button></div>`;
   } else if (q.kind === "choice" || q.step) {
     foot = `<div class="stp"><button data-qstep="${key}" data-d="-1" aria-label="${esc(q.name)}: anterior"><svg class="i"><use href="#i-prev"/></svg></button>
-      <button data-qstep="${key}" data-d="1" aria-label="${esc(q.name)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div>`;
+      ${d.names && d.names.length > 4 ? `<button class="pkb" data-pick="${key}" aria-label="${esc(q.name)}: lista"><svg class="i"><use href="#i-list"/></svg></button>` : ""}<button data-qstep="${key}" data-d="1" aria-label="${esc(q.name)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div>`;
   }
   const top = `<span class="t"><b>${esc(q.name)}</b>${q.kind === "choice" || q.kind === "tempo" ? "" : `<i class="led" aria-hidden="true"></i>`}</span>
     <span class="v">${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}</span><span class="s">${esc(note)}</span>`;
