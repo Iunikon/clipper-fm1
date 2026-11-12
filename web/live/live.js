@@ -598,6 +598,20 @@ function renderWork() {
 }
 function flashRowQuiet(title) { document.querySelectorAll(`#edit [data-title="${CSS.escape(title)}"]`).forEach((r) => r.classList.add("dev")); }
 function renderWhere() { $("where").textContent = !M.page ? "" : M.page.home ? "HOME" : M.page.title; renderNav(); renderDev(); }
+/* the phone, landscape (a screen under 540 px tall): the two rails are panels over the work, one at a time, from the
+   bar's two buttons; a tap outside, or a folder, closes them */
+const PHONE = matchMedia("(max-height: 540px)");
+const isPhone = () => PHONE.matches;
+function phoneRail(side) {
+  const b = document.body, k = side === "l" ? "lopen" : "ropen", on = !b.classList.contains(k);
+  b.classList.remove("lopen", "ropen"); if (on) b.classList.add(k);
+  $("lrh").setAttribute("aria-pressed", b.classList.contains("lopen")); if (isPhone()) $("favh").setAttribute("aria-pressed", b.classList.contains("ropen"));
+}
+document.addEventListener("pointerdown", (e) => {
+  if (!document.body.matches(".lopen, .ropen") || e.target.closest(".rail, #lrh, #favh, .sh, .br, .pick")) return;
+  document.body.classList.remove("lopen", "ropen"); $("lrh").setAttribute("aria-pressed", "false");
+}, true);
+PHONE.addEventListener("change", () => { document.body.classList.remove("lopen", "ropen"); renderWork(); });
 function renderNav() {
   const dev = M.page ? (M.page.home ? "HOME" : FAM[M.page.fam]) : "";
   $("nav").innerHTML = NAV.map(([n, ic]) => `<button class="nb${n === dev ? " dev" : ""}${n === "ESTUDIO" ? " est" : ""}" ${n === S.folder ? 'aria-current="page"' : ""} data-f="${n}"><svg class="i"><use href="#i-${ic}"/></svg>${n}</button>`).join("");
@@ -857,7 +871,7 @@ async function favToggle() {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && B.open) { openBrowser(false); $("now").focus(); } });
 $("scrim").addEventListener("click", () => openBrowser(false));
 document.addEventListener("click", (e) => {
-  const b = e.target.closest("#favh,#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-qtog],[data-qstep],[data-qn],[data-tap],[data-panic],#prev,#next,#favt,#usb,#follow,[data-f]");
+  const b = e.target.closest("#favh,#lrh,#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-qtog],[data-qstep],[data-qn],[data-tap],[data-panic],#prev,#next,#favt,#usb,#follow,[data-f]");
   if (!b) return;
   if (b.id === "now") openBrowser(!B.open);
   else if (b.id === "brx") openBrowser(false);
@@ -876,6 +890,8 @@ document.addEventListener("click", (e) => {
   }
   else if (b.id === "favt") { favToggle(); again(b, "pop"); }
   else if (b.id === "usb") usbAudio();
+  else if (b.id === "favh" && isPhone()) phoneRail("r");
+  else if (b.id === "lrh") phoneRail("l");
   else if (b.id === "favh") { const on = document.body.classList.toggle("nofav"); b.setAttribute("aria-pressed", !on); store.set("nofav", on); }
   else if (b.id === "follow") { S.follow = !S.follow; b.setAttribute("aria-pressed", S.follow); if (S.follow && M.page) followPage(); }
   else if (b.dataset.f === "ESTUDIO" && !(S.lock && S.folder === "LIVE")) openStudio();

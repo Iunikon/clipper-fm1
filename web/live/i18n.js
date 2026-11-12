@@ -5,7 +5,7 @@
 const LANG = { cur: (() => { try { return localStorage.getItem("clipperlive:lang"); } catch (e) { return null; } })() };
 const DICT = {
   "Conecta el FM-1": "Connect the FM-1", "Conectar el FM-1": "Connect the FM-1",
-  "Conéctalo por USB a esta tablet y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.": "Plug it into this tablet over USB and tap Connect. The first time, Chrome asks to use MIDI devices.",
+  "Conéctalo por USB y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.": "Plug it in over USB and tap Connect. The first time, Chrome asks to use MIDI devices.",
   "Descargar para usar sin internet": "Download to use offline", "Datos de ejemplo": "Example data", "FM-1 (ejemplo)": "FM-1 (example)", "Sin conectar": "Not connected",
   "Leyendo el FM-1…": "Reading the FM-1…", "Leyendo la lista de sonidos…": "Reading the sound list…", "Pidiendo permiso para MIDI…": "Asking for MIDI permission…",
   "No encuentro el FM-1. Revisa el cable USB y que esté encendido.": "I can't find the FM-1. Check the USB cable and that it is on.",

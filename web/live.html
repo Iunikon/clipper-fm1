@@ -1000,6 +1000,83 @@
   .svm .tool b { font-size: 28px; }
   .svm .tool span { font-size: 15px; }
 
+  /* ================================================================ the phone, landscape (~852 x 393) ===
+     Under 540 px tall: a 44 px bar and a 44 px folder bar, the work all the width between; the rails are panels
+     over it (the bar's two panel buttons), the sheets fill the height. The tablet never reaches this. */
+  .phb { display: none; }
+  @media (max-height: 540px) {
+    .app { grid-template-rows: 44px minmax(0, 1fr) 46px; }
+    .bar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px; padding: 0 4px; }
+    .phb { display: grid; }
+    .bar .ib { width: 38px; height: 38px; }
+    .conn { display: none; }
+    .snd { gap: 2px; justify-self: start; }
+    .now { min-width: 0; padding: 2px 6px; max-width: 250px; }
+    .now .n { font-size: 16px; } .now .n > span { overflow: hidden; text-overflow: ellipsis; }
+    .now .m { font-size: 11px; gap: 6px; }
+    .svb { height: 34px; padding: 0 8px; margin-left: 2px; } .svb span { display: none; }
+    .right { gap: 4px; }
+    .right .cpu, .right .where { display: none !important; }
+    .tmp { font-size: 15px; }
+    .trn { gap: 4px; } .trn button { height: 34px; padding: 0 8px; }
+    .follow { height: 38px; padding: 0 6px; font-size: 0; gap: 0; } .follow i { width: 24px; }
+    .body, .body:has(#edit[data-folder="SAVE"]), body.nofav .body { grid-template-columns: minmax(0, 1fr) !important; position: relative; }
+    .rail.l, .rail.r { display: flex !important; position: fixed; top: 44px; bottom: 46px; width: min(300px, 46vw); z-index: 12; overflow-y: auto;
+      box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0); transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
+    .rail.l { left: 0; transform: translateX(-102%); } .rail.r { right: 0; transform: translateX(102%); }
+    body.lopen .rail.l, body.ropen .rail.r { transform: none; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .6); }
+    .work, .gate { grid-column: 1 !important; }
+    .work { padding: 8px 8px 16px; gap: 8px; }
+    .gate { padding: 12px; } .gate .box { gap: 10px; } .gate h1 { font-size: 22px; } .gate p { font-size: 13px; }
+    .nav { grid-template-columns: repeat(12, minmax(0, 1fr)) minmax(0, 1.2fr); padding: 3px 4px; gap: 2px; }
+    .nb { gap: 1px; font-size: 9px; letter-spacing: 0; min-height: 0; padding: 0; } .nb svg { width: 17px; height: 17px; }
+    .nb.est { margin-left: 4px; } .nb.est::before { left: -4px; top: 6px; bottom: 6px; }
+    .nb.dev::after { top: 3px; right: calc(50% - 13px); width: 5px; height: 5px; }
+    .toast { top: 50px; min-width: 0; font-size: 13px; padding: 8px 12px; }
+    .scrim { inset: 44px 0 0 0; }
+    .br, .sh, .pick { top: 48px; width: calc(100vw - 16px); max-height: calc(100dvh - 56px); }
+    .br { height: calc(100dvh - 56px); }
+    .brb { grid-template-columns: 140px minmax(0, 1fr); }
+    .snds { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  }
+  @media (max-height: 540px) {               /* the phone: LIVE (and HOME's accesses) */
+    .cfgw { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; align-items: center; }
+    .cfgw > .qhead { grid-column: 2; grid-row: 1; margin: 0 !important; } .cfgw > .lpt { grid-column: 1; grid-row: 1; margin: 0; }
+    .cfgw > :not(.qhead):not(.lpt) { grid-column: 1 / -1; margin-top: 8px; }
+    .cfgw .qhead h2, .cfgw .qhead .hint2 { display: none; }
+    .qtools button { height: 34px; padding: 0 10px; }
+    .lpt button { height: 34px; padding: 0 10px; }
+    .cg { grid-auto-rows: 112px; gap: 6px; } .cg.short { grid-auto-rows: 100px; }
+    .cfgwrap.editing { grid-template-columns: minmax(0, 1fr) 230px; gap: 8px; }
+    .cat { max-height: calc(100dvh - 104px); padding: 10px; }
+  }
+  @media (max-height: 540px) {               /* the phone: the pages, SEQ, SAVE, REC, ESTUDIO */
+    .pgx { gap: 6px; } .pgh { padding-bottom: 4px; } .pgh h3 { font-size: 13px; }
+    .pgs { gap: 10px; }
+    .prow { gap: 6px; } .prow .tp, .ci .tp { min-height: 92px; }
+    .pgr { height: 150px; } .pgr.tall { height: 170px; } .hyb .pgr.tall { height: 130px; }
+    .tp .tv { font-size: 30px; line-height: 34px; }
+    .bh { padding-bottom: 6px; margin-bottom: 8px; gap: 8px; } .bh h2 { font-size: 18px; } .bh h2 svg { width: 16px; height: 16px; }
+    .stt { overflow-x: auto; grid-auto-columns: max-content; padding-bottom: 6px; scrollbar-width: none; }
+    .stt button { height: 36px; padding: 0 10px; }
+    .sqb .bh .c { font-size: 13px; }
+    .sqd { gap: 10px; margin-top: 8px; padding-top: 8px; }
+    .sv { grid-template-columns: 132px minmax(0, 1fr); gap: 8px; }
+    .svc { padding: 10px 12px; gap: 10px; } .svn b { font-size: 26px; line-height: 30px; }
+    .svh h2 { font-size: 18px; }
+    .svm .tool { min-height: 110px; padding: 12px; } .svm .tool b { font-size: 22px; }
+    .recv { gap: 8px; } .rbig { padding: 10px 14px; } .rbig b { font-size: 28px; line-height: 32px; } .rbig p { font-size: 13px; margin-top: 2px; }
+    .rbtn button { height: 64px !important; }
+    .hyn { font-size: 20px; height: 38px; } .hyt .btn { height: 38px; padding: 0 10px; }
+    .lrow { grid-template-columns: minmax(0, 1fr) 70px auto; } .lrow .ltg, .lrow small { display: none; }
+    .lsl { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  }
+  @media (max-height: 540px) {
+    .hyb .hyt, .tlib .hyt { margin-left: 0; width: 100%; }
+    .hyb .prow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .work { overflow-x: hidden; }
+  }
+
 </style>
 </head>
 <body class="off">
@@ -1016,6 +1093,7 @@
   <symbol id="i-stop" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"/></symbol>
   <symbol id="i-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></symbol>
   <symbol id="i-favs" viewBox="0 0 24 24"><path d="M15 4v16M4 4h16v16H4z"/></symbol>
+  <symbol id="i-lpanel" viewBox="0 0 24 24"><path d="M9 4v16M4 4h16v16H4z"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><path d="M6 11h12v9H6zM8 11V8a4 4 0 018 0v3"/></symbol>
   <symbol id="i-unlock" viewBox="0 0 24 24"><path d="M6 11h12v9H6zM8 11V8a4 4 0 017.5-2"/></symbol>
   <symbol id="i-list" viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"/></symbol>
@@ -1038,6 +1116,7 @@
 
 <div class="app">
   <header class="bar">
+    <button class="ib phb" id="lrh" aria-pressed="false" aria-label="Salida, en el sinte y cambios"><svg class="i"><use href="#i-lpanel"/></svg></button>
     <div class="conn" id="conn"><span class="dot"></span><div><b id="cname">FM-1</b><span id="cstate">Sin conectar</span></div></div>
     <div class="snd">
       <button class="ib" id="prev" aria-label="Favorito anterior"><svg class="i"><use href="#i-prev"/></svg></button>
@@ -1066,7 +1145,7 @@
     <section class="gate" id="gate" aria-labelledby="gt">
       <div class="box">
         <h1 id="gt">Conecta el FM-1</h1>
-        <p>Conéctalo por USB a esta tablet y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.</p>
+        <p>Conéctalo por USB y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.</p>
         <button class="btn pri" id="connect">Conectar el FM-1</button>
         <div class="bar2" aria-hidden="true"><b id="prog"></b></div>
         <div class="msg" id="msg" role="status" aria-live="polite"></div>
@@ -1707,6 +1786,20 @@ function renderWork() {
 }
 function flashRowQuiet(title) { document.querySelectorAll(`#edit [data-title="${CSS.escape(title)}"]`).forEach((r) => r.classList.add("dev")); }
 function renderWhere() { $("where").textContent = !M.page ? "" : M.page.home ? "HOME" : M.page.title; renderNav(); renderDev(); }
+/* the phone, landscape (a screen under 540 px tall): the two rails are panels over the work, one at a time, from the
+   bar's two buttons; a tap outside, or a folder, closes them */
+const PHONE = matchMedia("(max-height: 540px)");
+const isPhone = () => PHONE.matches;
+function phoneRail(side) {
+  const b = document.body, k = side === "l" ? "lopen" : "ropen", on = !b.classList.contains(k);
+  b.classList.remove("lopen", "ropen"); if (on) b.classList.add(k);
+  $("lrh").setAttribute("aria-pressed", b.classList.contains("lopen")); if (isPhone()) $("favh").setAttribute("aria-pressed", b.classList.contains("ropen"));
+}
+document.addEventListener("pointerdown", (e) => {
+  if (!document.body.matches(".lopen, .ropen") || e.target.closest(".rail, #lrh, #favh, .sh, .br, .pick")) return;
+  document.body.classList.remove("lopen", "ropen"); $("lrh").setAttribute("aria-pressed", "false");
+}, true);
+PHONE.addEventListener("change", () => { document.body.classList.remove("lopen", "ropen"); renderWork(); });
 function renderNav() {
   const dev = M.page ? (M.page.home ? "HOME" : FAM[M.page.fam]) : "";
   $("nav").innerHTML = NAV.map(([n, ic]) => `<button class="nb${n === dev ? " dev" : ""}${n === "ESTUDIO" ? " est" : ""}" ${n === S.folder ? 'aria-current="page"' : ""} data-f="${n}"><svg class="i"><use href="#i-${ic}"/></svg>${n}</button>`).join("");
@@ -1966,7 +2059,7 @@ async function favToggle() {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && B.open) { openBrowser(false); $("now").focus(); } });
 $("scrim").addEventListener("click", () => openBrowser(false));
 document.addEventListener("click", (e) => {
-  const b = e.target.closest("#favh,#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-qtog],[data-qstep],[data-qn],[data-tap],[data-panic],#prev,#next,#favt,#usb,#follow,[data-f]");
+  const b = e.target.closest("#favh,#lrh,#now,#brx,[data-kind],[data-load],[data-favgo],[data-kstep],[data-qtog],[data-qstep],[data-qn],[data-tap],[data-panic],#prev,#next,#favt,#usb,#follow,[data-f]");
   if (!b) return;
   if (b.id === "now") openBrowser(!B.open);
   else if (b.id === "brx") openBrowser(false);
@@ -1985,6 +2078,8 @@ document.addEventListener("click", (e) => {
   }
   else if (b.id === "favt") { favToggle(); again(b, "pop"); }
   else if (b.id === "usb") usbAudio();
+  else if (b.id === "favh" && isPhone()) phoneRail("r");
+  else if (b.id === "lrh") phoneRail("l");
   else if (b.id === "favh") { const on = document.body.classList.toggle("nofav"); b.setAttribute("aria-pressed", !on); store.set("nofav", on); }
   else if (b.id === "follow") { S.follow = !S.follow; b.setAttribute("aria-pressed", S.follow); if (S.follow && M.page) followPage(); }
   else if (b.dataset.f === "ESTUDIO" && !(S.lock && S.folder === "LIVE")) openStudio();
@@ -4761,7 +4856,7 @@ document.addEventListener("change", async (e) => {
 const LANG = { cur: (() => { try { return localStorage.getItem("clipperlive:lang"); } catch (e) { return null; } })() };
 const DICT = {
   "Conecta el FM-1": "Connect the FM-1", "Conectar el FM-1": "Connect the FM-1",
-  "Conéctalo por USB a esta tablet y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.": "Plug it into this tablet over USB and tap Connect. The first time, Chrome asks to use MIDI devices.",
+  "Conéctalo por USB y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.": "Plug it in over USB and tap Connect. The first time, Chrome asks to use MIDI devices.",
   "Descargar para usar sin internet": "Download to use offline", "Datos de ejemplo": "Example data", "FM-1 (ejemplo)": "FM-1 (example)", "Sin conectar": "Not connected",
   "Leyendo el FM-1…": "Reading the FM-1…", "Leyendo la lista de sonidos…": "Reading the sound list…", "Pidiendo permiso para MIDI…": "Asking for MIDI permission…",
   "No encuentro el FM-1. Revisa el cable USB y que esté encendido.": "I can't find the FM-1. Check the USB cable and that it is on.",
