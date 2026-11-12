@@ -416,7 +416,7 @@ function followPage() {
   if (S.folder === "LIVE" && (S.lock || CFG.edit)) { renderNav(); return; }   /* LIVE locked (or being arranged) stays; unlocked it follows */
   if (pg.home) { if (S.folder !== "HOME") { S.folder = "HOME"; renderAll(); } flashRow("HOME"); return; }
   const folder = FAM[pg.fam];
-  if (folder === "SAVE") { const k = pg.title === "FAVS" ? "FAVS" : pg.title === "USER" ? "USER" : null; if (k) SV.kind = k; if (S.folder !== "SAVE") { S.folder = "SAVE"; renderAll(); } else renderWork(); return; }
+  if (folder === "SAVE") { const k = pg.title === "FAVS" ? "FAVS" : pg.title === "USER" ? "USER" : pg.title === "TOOLS" ? "TOOLS" : null; if (k) SV.kind = k; if (S.folder !== "SAVE") { S.folder = "SAVE"; renderAll(); } else renderWork(); return; }
   if (!folder || folder === "HOME") return;
   if (folder === "SEQ" && (pg.title === "NOTES" || pg.title === "PATTERN") && S.seqPage !== pg.title) { S.seqPage = pg.title; if (S.folder === "SEQ") renderWork(); }   /* (the device's page) */
   if (S.folder !== folder) { S.folder = folder; renderAll(); } else renderNav();
@@ -678,8 +678,8 @@ function soundsView() {
   return `<div class="sv">
     <div class="svl"><nav class="svk" aria-label="Carpetas de sonidos">${kinds.map((k) => `<button class="kf${k === "FAVS" ? " fk" : ""}" data-skind="${k}" aria-current="${SV.kind === k}"><span>${k === "FAVS" ? "Favoritos" : k === "ALL" ? "Todos" : k}</span><span class="num">${cnt(k)}</span></button>`).join("")}</nav>
       <h3 class="svg2">Dispositivo</h3>
-      <nav class="svk" aria-label="Dispositivo">${DEV.map(([k, t]) => `<button class="kf" data-skind="${k}" aria-current="${SV.kind === k}"><span>${t}</span></button>`).join("")}</nav>
-      ${toolsHtml()}</div>
+      <nav class="svk" aria-label="Dispositivo">${DEV.map(([k, t]) => `<button class="kf" data-skind="${k}" aria-current="${SV.kind === k}"><span>${t}</span></button>`).join("")}
+        <button class="kf" data-skind="TOOLS" aria-current="${SV.kind === "TOOLS"}"><span>Herramientas</span></button></nav></div>
     <div class="svm">
       <section class="svc${M.edited ? " edited" : ""}"><div class="svn"><span class="c">Suena ahora</span><b>${esc(name)}</b>
         <span class="m">${x ? `<span class="k">${esc(x.kind)}</span>` : ""}<span class="e">${esc(M.info.engines[M.engine] || "USER")}</span><span class="num">${n >= 0 ? `${n + 1}/${M.list.length}` : ""}</span>${M.edited ? '<span class="edtx">Editado</span>' : ""}</span></div>
@@ -692,7 +692,8 @@ function soundsView() {
             ? `<button class="btn" data-save="1"><svg class="i"><use href="#i-edit"/></svg>Renombrar</button>`
             : ""}
           ${x && x.e === M.info.nengines ? `<button class="btn dsc2" data-pc="up-erase" data-n="${x.k}">Borrar</button>` : ""}</div></section>
-      ${DEV.some(([k]) => k === SV.kind)
+      ${SV.kind === "TOOLS" ? `<header class="svh"><h2>Herramientas</h2><span class="c">Cada una pide un segundo toque</span></header>${toolsHtml()}`
+        : DEV.some(([k]) => k === SV.kind)
         ? `<header class="svh"><h2>${DEV.find(([k]) => k === SV.kind)[1]}</h2></header>${devView(SV.kind)}`
         : `<header class="svh"><h2>${SV.kind === "FAVS" ? "Favoritos" : SV.kind === "ALL" ? "Todos los sonidos" : SV.kind === "USER" ? "Sonidos de usuario" : esc(SV.kind)}</h2><span class="c num">${SV.kind === "FAVS" ? `${M.favs.length} de 16` : SV.kind === "USER" ? `${items.length} de 32` : `${items.length} sonidos`}</span></header>
       <div class="scs" role="list">${userBody != null ? userBody : items.map(card).join("") + free}</div>`}

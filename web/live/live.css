@@ -982,3 +982,10 @@
   .lsl .btn:last-child { grid-column: span 2; }
   .tlib .bh { flex-wrap: wrap; }
   .hyb .t-arr .pos { display: none; }   /* (seven across: the name needs the room) */
+
+  /* SAVE > Herramientas: the three, large, in the main area (not squeezed at the foot of the list) */
+  .svm .tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; border-top: 0; padding-top: 0; }
+  .svm .tools h3 { display: none; }
+  .svm .tool { min-height: 150px; padding: 18px; justify-content: space-between; cursor: pointer; }
+  .svm .tool b { font-size: 28px; }
+  .svm .tool span { font-size: 15px; }
