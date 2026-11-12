@@ -1,6 +1,6 @@
 # Clipper Live: decisiones e instrucciones para seguir
 
-Estado al 12 de noviembre de 2026 (commit `fcad9cd`, rama `live`). Este documento sustituye a `BRIEF.md` donde se contradigan: BRIEF es de antes de las versiones de celular y PC, de Estudio nativo y de LIVE configurable.
+Estado al 12 de noviembre de 2026 (commit `fae2cc7`, rama `live`). Este documento sustituye a `BRIEF.md` donde se contradigan: BRIEF es de antes de las versiones de celular y PC, de Estudio nativo y de LIVE configurable.
 
 Sirve para dos cosas:
 
@@ -63,13 +63,13 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 
 | Carpeta | Qué tiene |
 |---|---|
-| **LIVE** | Una cuadrícula **configurable** de tarjetas (acciones, rápidos, gráficas, cualquier parámetro), en **varias páginas** (LIVE 1, LIVE 2…). Editar: arrastrar para ordenar, × quitar, tamaño. **Candado:** bloqueado no se sale de LIVE; suelto, «Seguir» lleva a la carpeta del sinte. |
+| **LIVE** | Una cuadrícula **configurable** de tarjetas (acciones, rápidos, gráficas, cualquier parámetro), en **varias páginas** (LIVE 1, LIVE 2…). Editar: arrastrar para ordenar, × quitar, tamaño. **Candado:** bloqueado no se sale de LIVE; suelto, «Seguir» lleva a la carpeta del sinte. En Editar, **Exportar / Importar** las páginas a un archivo. |
 | **HOME** | Los 16 favoritos como pads, los 4 knobs principales y unos accesos configurables. |
 | **EDIT, ENV, LFO, FX, SEL, ARP, GLO** | **Como las páginas del sinte, en su orden, una fila por página**, tantas columnas como knobs. La gráfica de la página encima de sus tarjetas. En EDIT salen las páginas de FMX (OP, OP 2, OP ENV, ROUTE, FMX, STORE) solo si el sonido usa FMX. |
 | **SEQ** | Dos páginas como el sinte: **NOTES** (pasos o vista MIDI con todo el patrón) y **PATTERN**. «Avanzado en Estudio». |
 | **REC** | La pantalla REC del sinte: estado grande, REC/PLAY, MODE, LEN, START, QUANT. |
 | **SAVE** | Carpetas de sonidos a la izquierda; debajo, «Dispositivo»: Biblioteca, Proyectos y **Herramientas** (CLRSQ, INIT, NEW en grande, con segundo toque). |
-| **ESTUDIO** | Nativo, en pestañas: Secuenciador avanzado, **HYBRID** (el patch entero), Samples, Biblioteca (de la tablet, con etiquetas), Proyectos, Copia de seguridad, Sistema (con idioma). |
+| **ESTUDIO** | Nativo, en pestañas: Secuenciador avanzado, **HYBRID** (el patch entero), Samples, Biblioteca (de la tablet, con etiquetas), Proyectos, Copia de seguridad, Sistema (idioma y **Ajustes de Live**: exportar o importar toda la configuración, con la explicación de dónde se guarda). |
 
 ---
 
@@ -152,6 +152,8 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 | HYBRID y FMX editables desde la tablet | Lo que faltaba del editor viejo. |
 | Biblioteca en la tablet, formato `felucca-library` v1 | Se lee con el editor viejo en los dos sentidos. |
 | Copia automática antes de restaurar o de cargar un proyecto | Un toque equivocado no pierde nada. |
+| La configuración de Live (LIVE, HOME, Biblioteca, idioma…) se guarda en el navegador, y se puede exportar e importar | No vive en el FM-1. Cada aparato y cada dirección tiene la suya (Vercel y el archivo descargado no se ven entre sí) y se pierde al borrar los datos del sitio: el archivo es la copia y la forma de pasarla a otro aparato. |
+| Importar páginas de LIVE las **añade**; importar ajustes **reemplaza** con segundo toque | Las páginas son para compartir y combinar; los ajustes son una copia completa para restaurar. |
 | Sin teclado de piano en pantalla | Descartado en propuestas. |
 | Sin Drum kits | Clipper no tiene batería. |
 | El sinte no se adorna desde la tablet | La ventana flotante del valor en el FM-1 es su opción MENU > ZOOM, no Live. |
@@ -234,7 +236,8 @@ Commits: en la rama `live`, con el prefijo `Clipper Live (personal):`. Copia a `
 - «A USER…» desde la Biblioteca;
 - el arrastre fino con el dedo;
 - la vibración;
-- el celular y la ventana de 1024 con un sinte de verdad.
+- el celular y la ventana de 1024 con un sinte de verdad;
+- exportar e importar páginas y ajustes en Chrome de Android (la descarga y el selector de archivos).
 
 **Abiertos para la revisión:**
 - **Naranja fuera de su regla:** una herramienta armada (CLRSQ/INIT/NEW antes del segundo toque) y «Reemplazar» en Guardar van en naranja, aunque la regla lo reserva para favorito, editado y Guardar. ¿Se queda como «peligro» o pasa a otro color?
