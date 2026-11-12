@@ -2,6 +2,8 @@
 
 Documento de contexto para revisar el diseño de Clipper Live con Claude Design o Impeccable (`critique`, `audit`, `polish`, `layout`). Explica qué es el producto, quién lo usa, cómo está construido y qué decisiones se tomaron, con su porqué. Así la revisión parte de lo que ya se decidió y no lo deshace sin querer.
 
+> **Versión anterior.** Para el estado actual (celular, PC, Estudio nativo, LIVE configurable, HYBRID, Biblioteca) y las instrucciones de revisión, ver **`DECISIONES.md`**, que manda donde se contradigan.
+
 > **Proyecto personal.** Clipper Live vive en la rama local `live` de `clipper-fm1`, un firmware de la comunidad para el sintetizador FM-1. No se propone al repositorio original ni se envía upstream.
 
 ## Dónde está
