@@ -22,7 +22,7 @@ Abre `clipper-live.html` en Chrome, en horizontal, y toca el botón de pantalla 
 ## 2. Seguir al sinte (solo lee)
 
 - [ ] Cambia de página en el FM-1: arriba, «En el sinte» dice la página, y a la izquierda salen sus 4 knobs con sus valores.
-- [ ] Con «Seguir» encendido, la tablet va a esa carpeta e ilumina la página (desde LIVE se queda en LIVE).
+- [ ] Con «Seguir» encendido, la tablet va a esa carpeta e ilumina la página (desde LIVE también, salvo con el candado cerrado: entonces se queda en LIVE).
 - [ ] Gira un knob del sinte: el valor cambia en la tablet, sale un aviso y el cambio aparece en «Cambios» a la izquierda.
 - [ ] Carga otro sonido en el sinte: arriba cambian el nombre, el tipo y la posición en la lista.
 - [ ] MATRIX, LAYER, MOD SEQ, TUNING, PISTAS, Samples, Drum kits, Biblioteca y Proyectos muestran algo (no «El FM-1 no contestó»).

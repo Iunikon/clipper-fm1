@@ -413,7 +413,7 @@ function onPush(f) {
 /* the device's page: its folder here, its row flashed */
 function followPage() {
   const pg = M.page;
-  if (S.folder === "LIVE") { renderNav(); return; }   /* LIVE se queda: el riel y la barra ya dicen qué abrió el sinte */
+  if (S.folder === "LIVE" && (S.lock || CFG.edit)) { renderNav(); return; }   /* LIVE locked (or being arranged) stays; unlocked it follows */
   if (pg.home) { if (S.folder !== "HOME") { S.folder = "HOME"; renderAll(); } flashRow("HOME"); return; }
   const folder = FAM[pg.fam];
   if (folder === "SAVE") { const k = pg.title === "FAVS" ? "FAVS" : pg.title === "USER" ? "USER" : null; if (k) SV.kind = k; if (S.folder !== "SAVE") { S.folder = "SAVE"; renderAll(); } else renderWork(); return; }
