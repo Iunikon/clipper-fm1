@@ -394,6 +394,7 @@ function followPage() {
   const folder = FAM[pg.fam];
   if (folder === "SAVE") { const k = pg.title === "FAVS" ? "FAVS" : pg.title === "USER" ? "USER" : null; if (k) SV.kind = k; if (S.folder !== "SAVE") { S.folder = "SAVE"; renderAll(); } else renderWork(); return; }
   if (!folder || folder === "HOME") return;
+  if (folder === "SEQ" && (pg.title === "NOTES" || pg.title === "PATTERN") && S.seqPage !== pg.title) { S.seqPage = pg.title; if (S.folder === "SEQ") renderWork(); }   /* (the device's page) */
   if (S.folder !== folder) { S.folder = folder; renderAll(); } else renderNav();
   flashRow(pg.title);
 }
@@ -557,7 +558,7 @@ function renderWork() {
   const f = S.folder;
   if (f !== "ESTUDIO") SQ.full = false;                     /* (the advanced sequencer: Estudio's) */
   $("edit").innerHTML = f === "ESTUDIO" ? studioView() : f === "SAVE" ? soundsView() : f === "LIVE" ? cfgView("live", "Live") : f === "HOME" ? homeView() : f === "REC" ? recView()
-    : f === "SEQ" ? `<div class="pgs">${seqBlock()}${LAYOUT.filter((x) => x.title === "PATTERN").map((x) => pageRow({ title: x.title, folder: "SEQ", s: x.scope, ids: x.ids })).join("")}</div>`
+    : f === "SEQ" ? seqView()
     : folderView(f);
 }
 function flashRowQuiet(title) { document.querySelectorAll(`#edit [data-title="${CSS.escape(title)}"]`).forEach((r) => r.classList.add("dev")); }
@@ -841,8 +842,9 @@ document.addEventListener("click", (e) => {
   else if (b.id === "usb") usbAudio();
   else if (b.id === "favh") { const on = document.body.classList.toggle("nofav"); b.setAttribute("aria-pressed", !on); store.set("nofav", on); }
   else if (b.id === "follow") { S.follow = !S.follow; b.setAttribute("aria-pressed", S.follow); if (S.follow && M.page) followPage(); }
-  else if (b.dataset.f === "ESTUDIO") openStudio();
-  else if (b.dataset.f) { S.folder = b.dataset.f; renderNav(); renderWork(); $("edit").scrollTop = 0; fade(); }
+  else if (b.dataset.f === "ESTUDIO" && !(S.lock && S.folder === "LIVE")) openStudio();
+  else if (b.dataset.f && S.lock && S.folder === "LIVE") toast(-1, "LIVE está bloqueado: toca el candado para moverte");
+  else if (b.dataset.f) { CFG.edit = null; document.body.classList.remove("cfgediting"); S.folder = b.dataset.f; renderNav(); renderWork(); $("edit").scrollTop = 0; fade(); }
 });
 
 
@@ -945,6 +947,8 @@ $("fs").onclick = () => (document.fullscreenElement ? document.exitFullscreen()
   : document.documentElement.requestFullscreen().then(() => screen.orientation?.lock?.("landscape"))).catch(() => {});   /* (always landscape) */
 document.addEventListener("fullscreenchange", () => $("fs").setAttribute("aria-pressed", !!document.fullscreenElement));   /* (served, as on Vercel: the same file to keep offline) */
 $("conn").classList.add("off");
+S.lock = !!store.get("lock"); document.body.classList.toggle("locked", S.lock);
 if (store.get("nofav")) { document.body.classList.add("nofav"); $("favh").setAttribute("aria-pressed", "false"); }
 renderNav();                                        /* (empty until the FM-1 is connected: Conectar in the middle) */
+langAsk();                                          /* (Spanish or English: asked once) */
 if (QS.get("mock") === "1") connectMock();

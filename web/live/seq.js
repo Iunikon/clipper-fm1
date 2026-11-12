@@ -83,8 +83,23 @@ function seqBlock() {
   for (let i = 0; i < rows * 16 && i < SQ.steps.length; i++) cells.push(sqCell(i, len));
   const lv = M.page && !M.page.home && M.page.title === "NOTES";
   return `<section class="blk sqb${lv ? " dev" : ""}" data-title="NOTES"><header class="bh"><h2><svg class="i"><use href="#i-seq"/></svg>NOTES</h2>
-      <span class="c num">${len} pasos</span>${SQ.full ? "" : `<button class="sqst" data-stab="seq" data-stgo="1">Avanzado en Estudio</button>`}<button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
-    ${SQ.full ? sqFullBody(len, cells.join("")) : `<div class="sqg" role="group" aria-label="Pasos">${cells.join("")}</div>`}${sqEditor()}${SQ.full ? sqLib() : ""}</section>`;
+      <span class="c num">${len} pasos</span>${SQ.full ? "" : `<div class="seg sqvw" role="group" aria-label="Vista"><button data-sqbv="grid" aria-pressed="${SQ.bview !== "midi"}">Pasos</button><button data-sqbv="midi" aria-pressed="${SQ.bview === "midi"}">MIDI</button></div><button class="sqst" data-stab="seq" data-stgo="1">Avanzado en Estudio</button>`}<button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
+    ${SQ.full ? sqFullBody(len, cells.join("")) : SQ.bview === "midi" ? sqMidi(len) : `<div class="sqg" role="group" aria-label="Pasos">${cells.join("")}</div>`}${sqEditor()}${SQ.full ? sqLib() : ""}</section>`;
+}
+/* NOTES' MIDI view: the whole pattern as a piano roll, every note of it in sight (its range and a fifth around); a tap
+   puts or takes a note there, as the roll of the advanced sequencer */
+function sqMidi(len) {
+  const ns = SQ.steps.slice(0, len).flatMap((st) => (sqOn(st) ? st.notes.slice(0, st.n) : []));
+  let lo = ns.length ? Math.min(...ns) : SQ.last - 6, hi = ns.length ? Math.max(...ns) : SQ.last + 6;
+  lo = Math.max(0, lo - 5); hi = Math.min(127, Math.max(hi + 5, lo + 23));
+  const rows = [];
+  for (let p = hi; p >= lo; p--) {
+    const bk = NOTE_N[p % 12].length > 1;
+    rows.push(`<div class="mr${bk ? " bk" : ""}${p % 12 === 0 ? " c" : ""}"><span class="mn num">${p % 12 === 0 || p === hi || p === lo ? noteName(p) : ""}</span>${Array.from({ length: len }, (_, i) => {
+      const st = SQ.steps[i], on = sqOn(st) && st.notes.slice(0, st.n).includes(p), tie = st && st.time === ST_TIE && sqOn(SQ.steps[i - 1] || null) && SQ.steps[i - 1].notes.slice(0, SQ.steps[i - 1].n).includes(p);
+      return `<button class="mc${on ? " on" : tie ? " tie" : ""}${i % 4 === 0 ? " beat" : ""}${i === SQ.sel ? " sel" : ""}${SQ.playing && SQ.pos === i ? " ph" : ""}" data-pr="${i}" data-p="${p}" aria-label="${noteName(p)}, paso ${i + 1}"></button>`; }).join("")}</div>`);
+  }
+  return `<div class="sqmidi" style="--cols:${len}"><div class="mhd"><span></span>${Array.from({ length: len }, (_, i) => `<span class="num">${i % 4 === 0 ? i + 1 : ""}</span>`).join("")}</div>${rows.join("")}</div>`;
 }
 function sqPaint(i) {
   const el = document.querySelector(`.sq[data-sq="${i}"]`); if (el) el.outerHTML = sqCell(i, sqLen());
@@ -108,7 +123,7 @@ const unpack7 = (a) => { const out = []; for (let i = 0; i < a.length; i += 8) {
 const SQX = { loaded: false, loading: false, tr: 0, micro: null, fill: null, locks: null };
 const sqTr = () => (PCD.tracks && PCD.tracks !== "…" ? PCD.tracks.sel : 0) || 0;
 const sqPref = (() => { try { return JSON.parse(localStorage.getItem("clipper.sq") || "{}"); } catch (e) { return {}; } })();
-Object.assign(SQ, { full: false, view: sqPref.view || "grid", lane: sqPref.lane || "vel", r0: 0, r1: 0, ext: false, clip: null, page: 0, oct: null });
+Object.assign(SQ, { bview: (() => { try { return new URLSearchParams(location.search).get("sqbv") || localStorage.getItem("clipper.sqbv") || "grid"; } catch (e) { return "grid"; } })(), full: false, view: sqPref.view || "grid", lane: sqPref.lane || "vel", r0: 0, r1: 0, ext: false, clip: null, page: 0, oct: null });
 const sqPrefSave = () => { try { localStorage.setItem("clipper.sq", JSON.stringify({ full: SQ.full, view: SQ.view, lane: SQ.lane })); } catch (e) { /* (solo comodidad) */ } };
 const C_MICRO_GET = 39, C_MICRO_SET = 40, C_FILL_GET = 41, C_FILL_SET = 42, C_LOCK_GET = 37, C_LOCK_SET = 38;
 
@@ -293,9 +308,11 @@ function sqRollTap(i, p) {
 /* ---- los toques del modo completo (fase de captura: van antes que los del básico) ---- */
 document.addEventListener("click", (e) => {
   const t = e.target;
+  const bv = t.closest("[data-sqbv]"); if (bv) { SQ.bview = bv.dataset.sqbv; try { localStorage.setItem("clipper.sqbv", SQ.bview); } catch (er) { /* (comfort) */ } renderWork(); return; }
+  if (!SQ.full) { const pr = t.closest("[data-pr]"); if (pr) { sqRollTap(+pr.dataset.pr, +pr.dataset.p); if (SQ.bview === "midi") renderWork(); return; } }
   const mode = t.closest("[data-sqmode]");
   if (mode) { SQ.full = mode.dataset.sqmode === "c"; sqPrefSave(); renderWork(); return; }
-  if (!SQ.full || S.folder !== "SEQ") return;
+  if (!SQ.full || (S.folder !== "SEQ" && S.folder !== "ESTUDIO")) return;
   const stepB = t.closest("[data-sq]");
   if (stepB && SQ.ext) { SQ.r1 = +stepB.dataset.sq; SQ.ext = false; e.stopPropagation(); renderWork(); return; }
   const v = t.closest("[data-sqview]"); if (v) { SQ.view = v.dataset.sqview; sqPrefSave(); renderWork(); return; }
@@ -1059,7 +1076,7 @@ async function midiImport(file) {
   } catch (e) { toast(-1, "No es un MIDI que pueda leer"); }
 }
 document.addEventListener("click", (e) => {
-  if (!SQ.full || S.folder !== "SEQ") return;
+  if (!SQ.full || (S.folder !== "SEQ" && S.folder !== "ESTUDIO")) return;
   const ty = e.target.closest("[data-gentype]"); if (ty) { SQ.gen.type = ty.dataset.gentype; renderWork(); return; }
   const b = e.target.closest("[data-gen]"); if (!b) return;
   const k = b.dataset.gen;

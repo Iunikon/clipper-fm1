@@ -9,8 +9,9 @@ const PGRAPH = { ENV: "env", "ENV 2": "env", LFO: "lfo", "LFO 2": "lfo", "LFO 3"
 const ESTUDIO_ONLY = new Set(["TRACKS", "SONG", "DRUMS", "SLICER", "OP", "OP 2", "OP ENV", "ROUTE", "FMX", "STORE", "PRESETS", "USER", "FAVS", "PROJECT", "TOOLS", "NOTES", "REV/CHO"]);
 
 function pageCells(p) { return p.ids.map((id, k) => ({ id, k })).filter((x) => x.id < 127 && desc(p.s, x.id)); }
-function pageRow(p) {
-  const kind = PGRAPH[p.title], cells = pageCells(p), lv = devLive(p.folder, p.title);
+const SHARED = new Set(["scale", "layer"]);    /* (SEL and SEL 2, LAYER and LAYER 2: one graph on the device, two pages of knobs) */
+function pageRow(p, prevKind) {
+  const kind = SHARED.has(PGRAPH[p.title]) && PGRAPH[p.title] === prevKind ? null : PGRAPH[p.title], cells = pageCells(p), lv = devLive(p.folder, p.title);
   if (!cells.length && !kind) return "";
   const g = kind ? `<div class="pgr g-${kind}${kind === "env" ? " tall" : ""}">${graphPanel(p, kind)}</div>` : "";
   return `<section class="pgx${lv ? " dev" : ""}" data-title="${esc(p.title)}">
@@ -20,7 +21,7 @@ function pageRow(p) {
 function folderView(folder) {
   const pages = LAYOUT.filter((x) => x.folder === folder && !ESTUDIO_ONLY.has(x.title)).map((x) => ({ title: x.title, folder, s: x.scope, ids: x.ids }));
   const seen = new Set(), uniq = pages.filter((p) => !seen.has(p.title) && seen.add(p.title));   /* (FILTER, MASTER twice: the drum track's) */
-  return `<div class="pgs">${uniq.map(pageRow).join("")}</div>`;
+  return `<div class="pgs">${uniq.map((p, i) => pageRow(p, i ? PGRAPH[uniq[i - 1].title] : null)).join("")}</div>`;
 }
 
 /* ---- the graphs of those pages, as the device draws them */
@@ -151,7 +152,8 @@ function itemHtml(it, i, which) {
   else if (it.t === "g") { const g = GITEM[it.g]; body = g ? module({ title: g[1], folder: g[1] === "FILTER" || g[1] === "FX" ? "FX" : g[1], s: g[3], ids: g[4] }, g[2], { name: g[0], toggles: it.g === "fx", fxedit: it.g === "fx" }) : ""; }
   else if (it.t === "a") { const a = ACT[it.a] || ["?", ""], nx = it.a === "favnext" ? M.favs[(M.favCur + 1) % Math.max(1, M.favs.length)] : it.a === "favprev" ? M.favs[(M.favCur - 1 + M.favs.length) % Math.max(1, M.favs.length)] : null;
     body = `<button class="act" data-act="${it.a}"><b>${a[0]}</b><span class="v num">${it.a === "favnext" ? "›" : it.a === "favprev" ? "‹" : it.a === "play" ? (SQ.playing ? "■" : "▶") : it.a === "rec" ? "●" : "↺"}</span><span class="s">${esc(nx ? nx.name : a[1])}</span></button>`; }
-  return `<div class="ci${ed ? " ed" : ""}${CFG.sel === i && ed ? " sel" : ""}" ${at}>${body}${ed ? `<button class="cx" data-cx="${i}" aria-label="Quitar">×</button><button class="csz" data-csz="${i}">${w}×${h}</button>` : ""}</div>`;
+  const sz = [[1, 1], [2, 1], [1, 2], [2, 2]].map(([a, b]) => `<button data-csz="${i}" data-w="${a}" data-h="${b}" aria-pressed="${a === w && b === h}">${a}×${b}</button>`).join("");
+  return `<div class="ci${ed ? " ed" : ""}${CFG.sel === i && ed ? " sel" : ""}" ${at}>${body}${ed ? `<button class="cx" data-cx="${i}" aria-label="Quitar">×</button><span class="cgrip" aria-hidden="true">⋮⋮</span><div class="csz">${sz}</div>` : ""}</div>`;
 }
 function cfgGrid(which, cls) {
   const items = CFG[which];
@@ -168,18 +170,25 @@ function catalog(which) {
     <div class="catp">${pages.map((p) => `<div><small>${esc(p.title)}</small><div class="chips">${pageCells(p).map(({ id, k }) => chip(desc(p.s, id).label, `data-cnew='${JSON.stringify({ t: "p", s: p.s, id, k })}'`)).join("")}</div></div>`).join("")}</div></aside>`;
 }
 function cfgView(which, title) {
-  const ed = CFG.edit === which;
-  return `<div class="cfgw${ed ? " editing" : ""}"><div class="qhead"><h2>${title}</h2>${ed ? `<button class="more" data-creset="${which}">Restablecer</button><button class="more pri" data-cedit="">Listo</button>` : `<button class="more" data-cedit="${which}">Editar</button>`}</div>
-    ${cfgGrid(which, which === "live" ? "lg4" : "lg4 short")}${ed ? `<p class="msh">Arrastra para cambiar el orden; × quita; el botón de tamaño cambia entre 1×1, 2×1, 1×2 y 2×2.</p>` : ""}</div>${ed ? catalog(which) : ""}`;
+  const ed = CFG.edit === which, lock = which === "live" && S.lock;
+  document.body.classList.toggle("cfgediting", !!CFG.edit);
+  const head = `<div class="qhead"><h2>${title}</h2>${ed ? `<span class="hint2">Arrastra por ⋮⋮ para ordenar · × quita · elige el tamaño abajo</span><button class="more" data-creset="${which}">Restablecer</button><button class="more pri" data-cedit="">Listo</button>`
+    : `${which === "live" ? `<button class="more lockb${lock ? " on" : ""}" data-lock="1" aria-pressed="${lock}"><svg class="i"><use href="#i-${lock ? "lock" : "unlock"}"/></svg>${lock ? "Bloqueado" : "Bloquear"}</button>` : ""}${lock ? "" : `<button class="more" data-cedit="${which}">Editar</button>`}`}</div>`;
+  return `<div class="cfgwrap${ed ? " editing" : ""}"><div class="cfgw">${head}${cfgGrid(which, which === "live" ? "lg4" : "lg4 short")}</div>${ed ? catalog(which) : ""}</div>`;
 }
+/* LIVE locked: the view stays (the nav and Seguir do not take it away), for playing */
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-lock]"); if (!b) return;
+  S.lock = !S.lock; store.set("lock", S.lock); document.body.classList.toggle("locked", S.lock); renderWork();
+  toast(-1, S.lock ? "<b>LIVE bloqueado</b>: toca el candado para soltarlo" : "<b>LIVE suelto</b>");
+});
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-cedit],[data-cx],[data-csz],[data-cnew],[data-catf],[data-creset],[data-act],[data-fxedit]"); if (!b) return;
   const which = CFG.edit;
-  if (b.dataset.cedit !== undefined) { CFG.edit = b.dataset.cedit || null; renderWork(); return; }
+  if (b.dataset.cedit !== undefined) { CFG.edit = b.dataset.cedit || null; document.body.classList.toggle("cfgediting", !!CFG.edit); renderWork(); return; }
   if (b.dataset.creset) { CFG[b.dataset.creset] = JSON.parse(JSON.stringify(b.dataset.creset === "live" ? LV_DEF : HM_DEF)); cfgSave(b.dataset.creset); renderWork(); return; }
   if (b.dataset.cx) { CFG[which].splice(+b.dataset.cx, 1); cfgSave(which); renderWork(); return; }
-  if (b.dataset.csz) { const it = CFG[which][+b.dataset.csz], S4 = [[1, 1], [2, 1], [1, 2], [2, 2]], k = S4.findIndex(([w, h]) => w === (it.w || 1) && h === (it.h || 1));
-    [it.w, it.h] = S4[(k + 1) % 4]; cfgSave(which); renderWork(); return; }
+  if (b.dataset.csz) { const it = CFG[which][+b.dataset.csz]; it.w = +b.dataset.w; it.h = +b.dataset.h; cfgSave(which); renderWork(); return; }
   if (b.dataset.cnew) { CFG[which].push(JSON.parse(b.dataset.cnew)); cfgSave(which); renderWork(); toast(-1, "Añadido"); return; }
   if (b.dataset.catf) { CFG.catF = b.dataset.catf; renderWork(); return; }
   if (b.dataset.fxedit) { S.folder = "FX"; renderNav(); renderWork(); setTimeout(() => document.querySelector(`#edit [data-title="${CSS.escape(b.dataset.fxedit)}"]`)?.scrollIntoView({ block: "start" }), 30); return; }
@@ -231,3 +240,11 @@ document.addEventListener("pointerup", (e) => {
   }
   DT.key = key; DT.t = now;
 }, true);
+
+/* SEQ: the device's two pages, NOTES (the steps or the MIDI roll) and PATTERN */
+function seqView() {
+  const sp = S.seqPage || "NOTES", pat = LAYOUT.find((x) => x.title === "PATTERN");
+  return `<div class="pgs"><nav class="stt" aria-label="SEQ">${["NOTES", "PATTERN"].map((t) => `<button data-seqp="${t}" aria-current="${t === sp}"><svg class="i"><use href="#i-seq"/></svg>${t}</button>`).join("")}</nav>
+    ${sp === "PATTERN" && pat ? pageRow({ title: pat.title, folder: "SEQ", s: pat.scope, ids: pat.ids }) : seqBlock()}</div>`;
+}
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-seqp]"); if (b) { S.seqPage = b.dataset.seqp; renderWork(); } });

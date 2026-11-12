@@ -123,5 +123,6 @@ function systemView() {
     <div class="sys">${row("Firmware", i.version || "—")}${row("Protocolo", i.proto || "—")}${row("Motores", i.nengines || "—")}${row("Sonidos de fábrica", M.list.length - users)}
       ${row("Sonidos de usuario", `${users} de 32`)}${row("Favoritos", `${M.favs.length} de 16`)}${row("Pasos del patrón", i.nstep || "—")}
       ${st ? row("CPU", st.cpu + " %") + row("LATE", st.late) + row("PEAK", st.peak + " %") : ""}${row("Puerto MIDI", $("cname").textContent)}</div>
+    <div class="syl"><span>Idioma · Language</span><button class="btn${LANG.cur !== "en" ? " pri" : ""}" data-lang="es">Español</button><button class="btn${LANG.cur === "en" ? " pri" : ""}" data-lang="en">English</button></div>
     <p class="msh">MIDI, sincronía y afinación se ajustan en GLO.</p></section>`;
 }
