@@ -933,6 +933,18 @@
   .pkl button span { font-size: 13px; color: var(--tx-3); min-width: 20px; } .pkl button[aria-selected="true"] { background: var(--k1); color: #000; } .pkl button[aria-selected="true"] span { color: rgba(0, 0, 0, .6); }
   .arw .pkb, .stp .pkb { flex: 0 0 44px; }
 
+  /* the header's tools: one strip at the right of the title */
+  .qtools { margin-left: auto; display: flex; border: 1px solid var(--line-2); }
+  .qtools button { height: 40px; padding: 0 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--tx-2); background: var(--panel); }
+  .qtools button + button { border-left: 1px solid var(--line-2); } .qtools button svg { width: 16px; height: 16px; }
+  .qtools button.on { background: var(--k3); color: #000; } .qtools button.pri { background: var(--tx); color: var(--page); }
+  .qtools button:active { background: var(--press); }
+  .qhead .hint2 { margin-left: 12px; }
+  /* the card being moved: a ghost under the finger, a hole where it goes */
+  .ci.ghost { position: fixed; z-index: 40; pointer-events: none; box-shadow: 0 18px 40px rgba(0, 0, 0, .7), 0 0 0 2px var(--k1); transform: rotate(-1.5deg) scale(1.03); opacity: .95; }
+  .ci.ghost .cx, .ci.ghost .csz, .ci.ghost .cgrip { display: none; }
+  .ci.hole > * { visibility: hidden; } .ci.hole { outline: 2px dashed var(--k1); outline-offset: -2px; background: rgba(40, 124, 255, .08); }
+
 </style>
 </head>
 <body class="off">
@@ -952,6 +964,7 @@
   <symbol id="i-lock" viewBox="0 0 24 24"><path d="M6 11h12v9H6zM8 11V8a4 4 0 018 0v3"/></symbol>
   <symbol id="i-unlock" viewBox="0 0 24 24"><path d="M6 11h12v9H6zM8 11V8a4 4 0 017.5-2"/></symbol>
   <symbol id="i-list" viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></symbol>
   <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v14M12 3l-2.5 3M12 3l2.5 3M12 13l-4-2.5V8M12 15l4-2.5V10"/><circle cx="12" cy="19" r="2"/></symbol>
@@ -4059,7 +4072,8 @@ function itemHtml(it, i, which) {
   else if (it.t === "a") { const a = ACT[it.a] || ["?", ""], nx = it.a === "favnext" ? M.favs[(M.favCur + 1) % Math.max(1, M.favs.length)] : it.a === "favprev" ? M.favs[(M.favCur - 1 + M.favs.length) % Math.max(1, M.favs.length)] : null;
     body = `<button class="act" data-act="${it.a}"><b>${a[0]}</b><span class="v num">${it.a === "favnext" ? "›" : it.a === "favprev" ? "‹" : it.a === "play" ? (SQ.playing ? "■" : "▶") : it.a === "rec" ? "●" : "↺"}</span><span class="s">${esc(nx ? nx.name : a[1])}</span></button>`; }
   const sz = [[1, 1], [2, 1], [1, 2], [2, 2]].map(([a, b]) => `<button data-csz="${i}" data-w="${a}" data-h="${b}" aria-pressed="${a === w && b === h}">${a}×${b}</button>`).join("");
-  return `<div class="ci${ed ? " ed" : ""}${CFG.sel === i && ed ? " sel" : ""}" ${at}>${body}${ed ? `<button class="cx" data-cx="${i}" aria-label="Quitar">×</button><span class="cgrip" aria-hidden="true">⋮⋮</span><div class="csz">${sz}</div>` : ""}</div>`;
+  if (!it.uid) it.uid = Math.random().toString(36).slice(2, 8);
+  return `<div class="ci${ed ? " ed" : ""}${CFG.sel === i && ed ? " sel" : ""}" data-uid="${it.uid}" ${at}>${body}${ed ? `<button class="cx" data-cx="${i}" aria-label="Quitar">×</button><span class="cgrip" aria-hidden="true">⋮⋮</span><div class="csz">${sz}</div>` : ""}</div>`;
 }
 function cfgGrid(which, cls) {
   const items = CFG[which];
@@ -4078,8 +4092,9 @@ function catalog(which) {
 function cfgView(which, title) {
   const ed = CFG.edit === which, lock = which === "live" && S.lock;
   document.body.classList.toggle("cfgediting", !!CFG.edit);
-  const head = `<div class="qhead"><h2>${title}</h2>${ed ? `<span class="hint2">Arrastra por ⋮⋮ para ordenar · × quita · elige el tamaño abajo</span><button class="more" data-creset="${which}">Restablecer</button><button class="more pri" data-cedit="">Listo</button>`
-    : `${which === "live" ? `<button class="more lockb${lock ? " on" : ""}" data-lock="1" aria-pressed="${lock}"><svg class="i"><use href="#i-${lock ? "lock" : "unlock"}"/></svg>${lock ? "Bloqueado" : "Bloquear"}</button>` : ""}${lock ? "" : `<button class="more" data-cedit="${which}">Editar</button>`}`}</div>`;
+  const head = `<div class="qhead"><h2>${title}</h2>${ed ? `<span class="hint2">Arrastra una tarjeta para ordenar · × quita · elige el tamaño abajo</span>` : ""}<div class="qtools">${ed
+    ? `<button data-creset="${which}"><svg class="i"><use href="#i-undo"/></svg>Restablecer</button><button class="pri" data-cedit=""><svg class="i"><use href="#i-check"/></svg>Listo</button>`
+    : `${which === "live" ? `<button class="${lock ? "on" : ""}" data-lock="1" aria-pressed="${lock}"><svg class="i"><use href="#i-${lock ? "lock" : "unlock"}"/></svg>${lock ? "Bloqueado" : "Bloquear"}</button>` : ""}${lock ? "" : `<button data-cedit="${which}"><svg class="i"><use href="#i-edit"/></svg>Editar</button>`}`}</div></div>`;
   return `<div class="cfgwrap${ed ? " editing" : ""}"><div class="cfgw">${head}${cfgGrid(which, which === "live" ? "lg4" : "lg4 short")}</div>${ed ? catalog(which) : ""}</div>`;
 }
 /* LIVE locked: the view stays (the nav and Seguir do not take it away), for playing */
@@ -4106,19 +4121,44 @@ document.addEventListener("click", (e) => {
     else if (a === "discard") document.querySelector("[data-discard]")?.click();
   }
 });
-/* reorder: in edit, drag an item over another */
+/* reorder: in edit, a card lifts and follows the finger (a ghost), the others make room as it passes (FLIP: they slide
+   from where they were), and on release it settles into its place */
+function cfgFlip(which, change) {
+  const cg = document.querySelector(`.cg[data-cg="${which}"]`), before = new Map();
+  cg?.querySelectorAll(".ci[data-ci]").forEach((el) => before.set(el.dataset.uid, el.getBoundingClientRect()));
+  change();
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll(`.cg[data-cg="${which}"] .ci[data-ci]`).forEach((el) => {
+    const r0 = before.get(el.dataset.uid); if (!r0 || reduce) return;
+    const r1 = el.getBoundingClientRect(), dx = r0.left - r1.left, dy = r0.top - r1.top; if (!dx && !dy) return;
+    el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 180, easing: "cubic-bezier(.2, .8, .2, 1)" });
+  });
+}
 document.addEventListener("pointerdown", (e) => {
   const c = e.target.closest(".cg.editing .ci[data-ci]"); if (!c || e.target.closest("[data-cx],[data-csz]")) return;
-  CFG.drag = { from: +c.dataset.ci, which: c.closest(".cg").dataset.cg, el: c, pid: e.pointerId }; c.classList.add("drag"); e.preventDefault();
+  const r = c.getBoundingClientRect(), g = c.cloneNode(true);
+  g.className = "ci ghost"; Object.assign(g.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+  document.body.append(g);
+  CFG.drag = { from: +c.dataset.ci, which: c.closest(".cg").dataset.cg, uid: c.dataset.uid, ghost: g, dx: e.clientX - r.left, dy: e.clientY - r.top, pid: e.pointerId };
+  c.classList.add("hole"); e.preventDefault();
 }, true);
 document.addEventListener("pointermove", (e) => {
   const d = CFG.drag; if (!d) return;
+  d.ghost.style.left = e.clientX - d.dx + "px"; d.ghost.style.top = e.clientY - d.dy + "px";
   const over = document.elementFromPoint(e.clientX, e.clientY)?.closest(".cg.editing .ci[data-ci]"); if (!over) return;
   const to = +over.dataset.ci; if (to === d.from) return;
-  const arr = CFG[d.which], [it] = arr.splice(d.from, 1); arr.splice(to, 0, it); d.from = to; cfgSave(d.which); renderWork();
-  const n = document.querySelector(`.cg.editing .ci[data-ci="${to}"]`); if (n) { n.classList.add("drag"); d.el = n; }
+  cfgFlip(d.which, () => { const arr = CFG[d.which], [it] = arr.splice(d.from, 1); arr.splice(to, 0, it); d.from = to; cfgSave(d.which); renderWork(); });
+  document.querySelector(`.cg.editing .ci[data-uid="${d.uid}"]`)?.classList.add("hole");
 }, true);
-document.addEventListener("pointerup", () => { if (CFG.drag) { CFG.drag = null; document.querySelectorAll(".ci.drag").forEach((x) => x.classList.remove("drag")); } }, true);
+document.addEventListener("pointerup", () => {
+  const d = CFG.drag; if (!d) return; CFG.drag = null;
+  const home = document.querySelector(`.cg.editing .ci[data-uid="${d.uid}"]`), g = d.ghost;
+  if (!home || matchMedia("(prefers-reduced-motion: reduce)").matches) { g.remove(); home?.classList.remove("hole"); return; }
+  setTimeout(() => { if (g.isConnected) { g.remove(); home.classList.remove("hole"); } }, 400);   /* (an animation that never ran: a hidden page) */
+  const r = home.getBoundingClientRect();
+  g.animate([{ left: g.style.left, top: g.style.top, width: g.style.width, height: g.style.height }, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" }],
+    { duration: 160, easing: "cubic-bezier(.2, .8, .2, 1)", fill: "forwards" }).onfinish = () => { g.remove(); home.classList.remove("hole"); home.animate([{ transform: "scale(1.03)" }, { transform: "none" }], { duration: 140 }); };
+}, true);
 
 /* ---- HOME: the favourites at hand (16 pads), and a few shortcuts you choose */
 function homeView() {

@@ -153,7 +153,8 @@ function itemHtml(it, i, which) {
   else if (it.t === "a") { const a = ACT[it.a] || ["?", ""], nx = it.a === "favnext" ? M.favs[(M.favCur + 1) % Math.max(1, M.favs.length)] : it.a === "favprev" ? M.favs[(M.favCur - 1 + M.favs.length) % Math.max(1, M.favs.length)] : null;
     body = `<button class="act" data-act="${it.a}"><b>${a[0]}</b><span class="v num">${it.a === "favnext" ? "›" : it.a === "favprev" ? "‹" : it.a === "play" ? (SQ.playing ? "■" : "▶") : it.a === "rec" ? "●" : "↺"}</span><span class="s">${esc(nx ? nx.name : a[1])}</span></button>`; }
   const sz = [[1, 1], [2, 1], [1, 2], [2, 2]].map(([a, b]) => `<button data-csz="${i}" data-w="${a}" data-h="${b}" aria-pressed="${a === w && b === h}">${a}×${b}</button>`).join("");
-  return `<div class="ci${ed ? " ed" : ""}${CFG.sel === i && ed ? " sel" : ""}" ${at}>${body}${ed ? `<button class="cx" data-cx="${i}" aria-label="Quitar">×</button><span class="cgrip" aria-hidden="true">⋮⋮</span><div class="csz">${sz}</div>` : ""}</div>`;
+  if (!it.uid) it.uid = Math.random().toString(36).slice(2, 8);
+  return `<div class="ci${ed ? " ed" : ""}${CFG.sel === i && ed ? " sel" : ""}" data-uid="${it.uid}" ${at}>${body}${ed ? `<button class="cx" data-cx="${i}" aria-label="Quitar">×</button><span class="cgrip" aria-hidden="true">⋮⋮</span><div class="csz">${sz}</div>` : ""}</div>`;
 }
 function cfgGrid(which, cls) {
   const items = CFG[which];
@@ -172,8 +173,9 @@ function catalog(which) {
 function cfgView(which, title) {
   const ed = CFG.edit === which, lock = which === "live" && S.lock;
   document.body.classList.toggle("cfgediting", !!CFG.edit);
-  const head = `<div class="qhead"><h2>${title}</h2>${ed ? `<span class="hint2">Arrastra por ⋮⋮ para ordenar · × quita · elige el tamaño abajo</span><button class="more" data-creset="${which}">Restablecer</button><button class="more pri" data-cedit="">Listo</button>`
-    : `${which === "live" ? `<button class="more lockb${lock ? " on" : ""}" data-lock="1" aria-pressed="${lock}"><svg class="i"><use href="#i-${lock ? "lock" : "unlock"}"/></svg>${lock ? "Bloqueado" : "Bloquear"}</button>` : ""}${lock ? "" : `<button class="more" data-cedit="${which}">Editar</button>`}`}</div>`;
+  const head = `<div class="qhead"><h2>${title}</h2>${ed ? `<span class="hint2">Arrastra una tarjeta para ordenar · × quita · elige el tamaño abajo</span>` : ""}<div class="qtools">${ed
+    ? `<button data-creset="${which}"><svg class="i"><use href="#i-undo"/></svg>Restablecer</button><button class="pri" data-cedit=""><svg class="i"><use href="#i-check"/></svg>Listo</button>`
+    : `${which === "live" ? `<button class="${lock ? "on" : ""}" data-lock="1" aria-pressed="${lock}"><svg class="i"><use href="#i-${lock ? "lock" : "unlock"}"/></svg>${lock ? "Bloqueado" : "Bloquear"}</button>` : ""}${lock ? "" : `<button data-cedit="${which}"><svg class="i"><use href="#i-edit"/></svg>Editar</button>`}`}</div></div>`;
   return `<div class="cfgwrap${ed ? " editing" : ""}"><div class="cfgw">${head}${cfgGrid(which, which === "live" ? "lg4" : "lg4 short")}</div>${ed ? catalog(which) : ""}</div>`;
 }
 /* LIVE locked: the view stays (the nav and Seguir do not take it away), for playing */
@@ -200,19 +202,44 @@ document.addEventListener("click", (e) => {
     else if (a === "discard") document.querySelector("[data-discard]")?.click();
   }
 });
-/* reorder: in edit, drag an item over another */
+/* reorder: in edit, a card lifts and follows the finger (a ghost), the others make room as it passes (FLIP: they slide
+   from where they were), and on release it settles into its place */
+function cfgFlip(which, change) {
+  const cg = document.querySelector(`.cg[data-cg="${which}"]`), before = new Map();
+  cg?.querySelectorAll(".ci[data-ci]").forEach((el) => before.set(el.dataset.uid, el.getBoundingClientRect()));
+  change();
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll(`.cg[data-cg="${which}"] .ci[data-ci]`).forEach((el) => {
+    const r0 = before.get(el.dataset.uid); if (!r0 || reduce) return;
+    const r1 = el.getBoundingClientRect(), dx = r0.left - r1.left, dy = r0.top - r1.top; if (!dx && !dy) return;
+    el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 180, easing: "cubic-bezier(.2, .8, .2, 1)" });
+  });
+}
 document.addEventListener("pointerdown", (e) => {
   const c = e.target.closest(".cg.editing .ci[data-ci]"); if (!c || e.target.closest("[data-cx],[data-csz]")) return;
-  CFG.drag = { from: +c.dataset.ci, which: c.closest(".cg").dataset.cg, el: c, pid: e.pointerId }; c.classList.add("drag"); e.preventDefault();
+  const r = c.getBoundingClientRect(), g = c.cloneNode(true);
+  g.className = "ci ghost"; Object.assign(g.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+  document.body.append(g);
+  CFG.drag = { from: +c.dataset.ci, which: c.closest(".cg").dataset.cg, uid: c.dataset.uid, ghost: g, dx: e.clientX - r.left, dy: e.clientY - r.top, pid: e.pointerId };
+  c.classList.add("hole"); e.preventDefault();
 }, true);
 document.addEventListener("pointermove", (e) => {
   const d = CFG.drag; if (!d) return;
+  d.ghost.style.left = e.clientX - d.dx + "px"; d.ghost.style.top = e.clientY - d.dy + "px";
   const over = document.elementFromPoint(e.clientX, e.clientY)?.closest(".cg.editing .ci[data-ci]"); if (!over) return;
   const to = +over.dataset.ci; if (to === d.from) return;
-  const arr = CFG[d.which], [it] = arr.splice(d.from, 1); arr.splice(to, 0, it); d.from = to; cfgSave(d.which); renderWork();
-  const n = document.querySelector(`.cg.editing .ci[data-ci="${to}"]`); if (n) { n.classList.add("drag"); d.el = n; }
+  cfgFlip(d.which, () => { const arr = CFG[d.which], [it] = arr.splice(d.from, 1); arr.splice(to, 0, it); d.from = to; cfgSave(d.which); renderWork(); });
+  document.querySelector(`.cg.editing .ci[data-uid="${d.uid}"]`)?.classList.add("hole");
 }, true);
-document.addEventListener("pointerup", () => { if (CFG.drag) { CFG.drag = null; document.querySelectorAll(".ci.drag").forEach((x) => x.classList.remove("drag")); } }, true);
+document.addEventListener("pointerup", () => {
+  const d = CFG.drag; if (!d) return; CFG.drag = null;
+  const home = document.querySelector(`.cg.editing .ci[data-uid="${d.uid}"]`), g = d.ghost;
+  if (!home || matchMedia("(prefers-reduced-motion: reduce)").matches) { g.remove(); home?.classList.remove("hole"); return; }
+  setTimeout(() => { if (g.isConnected) { g.remove(); home.classList.remove("hole"); } }, 400);   /* (an animation that never ran: a hidden page) */
+  const r = home.getBoundingClientRect();
+  g.animate([{ left: g.style.left, top: g.style.top, width: g.style.width, height: g.style.height }, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" }],
+    { duration: 160, easing: "cubic-bezier(.2, .8, .2, 1)", fill: "forwards" }).onfinish = () => { g.remove(); home.classList.remove("hole"); home.animate([{ transform: "scale(1.03)" }, { transform: "none" }], { duration: 140 }); };
+}, true);
 
 /* ---- HOME: the favourites at hand (16 pads), and a few shortcuts you choose */
 function homeView() {
