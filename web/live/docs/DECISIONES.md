@@ -2,6 +2,8 @@
 
 Estado al 12 de noviembre de 2026, rama `main` del fork [Iunikon/clipper-fm1](https://github.com/Iunikon/clipper-fm1) (la antigua rama `live` se fusionó ahí, junto con la página FAVS y los cambios del firmware). Este documento sustituye a `BRIEF.md` donde se contradigan: BRIEF es de antes de las versiones de celular y PC, de Estudio nativo y de LIVE configurable.
 
+El historial de cambios, día a día y con sus commits: [`CAMBIOS.md`](CAMBIOS.md).
+
 Sirve para dos cosas:
 
 1. **Pasarlo por Impeccable** (o Claude Design) para una revisión, sin que la revisión deshaga lo que ya se decidió.

@@ -47,7 +47,7 @@ python3 tools/live_build.py                        # -> web/live.html (one file,
 python3 tools/live_build.py --site build/vercel    # the same, ready to publish
 ```
 
-**Tests:** `tests/live_editor_test.c` checks the v15 protocol (built with ASan / UBSan by `tests/run_tests.sh`). What to try on a real FM-1, step by step: [`web/live/docs/PRUEBAS.md`](web/live/docs/PRUEBAS.md). Design decisions and how to carry on: [`web/live/docs/DECISIONES.md`](web/live/docs/DECISIONES.md) and [`web/live/docs/PRODUCT.md`](web/live/docs/PRODUCT.md) (Spanish). How the code is laid out: [`web/live/README.md`](web/live/README.md).
+**Tests:** `tests/live_editor_test.c` checks the v15 protocol (built with ASan / UBSan by `tests/run_tests.sh`). What to try on a real FM-1, step by step: [`web/live/docs/PRUEBAS.md`](web/live/docs/PRUEBAS.md). Design decisions and how to carry on: [`web/live/docs/DECISIONES.md`](web/live/docs/DECISIONES.md) and [`web/live/docs/PRODUCT.md`](web/live/docs/PRODUCT.md) (Spanish). How the code is laid out: [`web/live/README.md`](web/live/README.md). Everything changed so far, day by day: [`web/live/docs/CAMBIOS.md`](web/live/docs/CAMBIOS.md) (Spanish).
 
 ---
 

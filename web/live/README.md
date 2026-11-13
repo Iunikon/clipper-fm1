@@ -47,7 +47,7 @@ web/live/
     hojas/                lista de sonidos, Guardar, lista de opciones
     idioma/ingles.js      el inglés: DICT (frases) y RX (patrones). Todo texto nuevo en español necesita su entrada
     arranque.js           lo último: conectar, ?mock=1, la primera pintura
-  docs/                   DECISIONES (manda), PRODUCT (las reglas, para revisores), PRUEBAS (con el FM-1),
+  docs/                   DECISIONES (manda), CAMBIOS (el historial), PRODUCT (las reglas, para revisores), PRUEBAS (con el FM-1),
                           BRIEF (la versión anterior), y los informes de Impeccable
   propuestas/             las maquetas que se compararon antes de construir
 ```
