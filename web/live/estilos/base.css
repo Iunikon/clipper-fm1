@@ -1,0 +1,31 @@
+  /* Clipper Live, HOME: the tablet beside the FM-1, an Operate surface used on a dim stage. The UI speaks in the
+     system sans (Roboto on the Android tablet); the readings speak in the FM-1's own Terminus, as measurements do.
+     Three neutral layers (page, panel, control). A parameter's colour is the knob that turns it on its page of the
+     FM-1; white is what is selected or being touched; orange marks a favourite, as on the device. */
+  @font-face { font-family: "Terminus"; src: url(__FONT__) format("truetype"); }
+  :root {
+    --page: #000; --panel: #0d0d0f; --raised: #17171a; --press: #202024;
+    --line: #232327; --line-2: #66666e;
+    --tx: #f2f2f3; --tx-2: #a4a4ad; --tx-3: #8a8a95;
+    --k1: #287cff; --k2: #1ecc70; --k3: #ffc618; --k4: #ff621a; --fav: #ff621a; --kind: #1ecc70; --eng: #6ea8ff; --kind-d: #0a6b36; --eng-d: #1a4fc4; --ok: #1ecc70; --studio: #287cff; --danger: #ff2c34; --fav-d: #b04008; --tx-ink: #55555c; --studio-hi: #4a92ff;
+    --sans: system-ui, Roboto, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --num: "Terminus", ui-monospace, monospace;
+    --r: 0; --r-s: 0;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--page); }
+  body { font: 400 14px/1.35 var(--sans); color: var(--tx); overflow: hidden; -webkit-tap-highlight-color: transparent;
+    font-feature-settings: "tnum"; }
+  body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }   /* an app: no text picked up by a finger */
+  input, textarea { -webkit-user-select: text; user-select: text; }
+  ::selection { background: var(--tx); color: var(--page); }
+  * { scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--tx); outline-offset: 2px; border-radius: 0; }
+  svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: square; stroke-linejoin: miter; flex: none; }
+  .num { font-family: var(--num); -webkit-font-smoothing: none; letter-spacing: 0; }
+
+  .app { display: grid; grid-template-rows: 64px minmax(0, 1fr) 72px; height: var(--vh); }
+

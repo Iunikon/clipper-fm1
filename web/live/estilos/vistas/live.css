@@ -1,0 +1,21 @@
+  /* ==== LIVE and HOME's shortcuts: yours, in your order ==== */
+  .cfgw { min-width: 0; }
+  .cg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: clamp(150px, calc((var(--vh) - 330px) / 4), 180px); grid-auto-flow: row dense; gap: 10px; }
+  .cg.short { grid-auto-rows: 132px; }
+  .ci { position: relative; display: flex; min-width: 0; min-height: 0; } .ci > * { flex: 1; min-width: 0; }
+  .ci > .tl { border-radius: 0; } .ci > .bx { grid-column: auto; grid-row: auto; min-height: 0; }
+  .ci.ed > :first-child { pointer-events: none; outline: 2px dashed var(--line-2); outline-offset: -6px; } .ci.drag { opacity: .6; }
+  .cx { position: absolute; top: 0; right: 0; width: 40px; height: 40px; background: var(--tx); color: #000; font-size: 20px; font-weight: 900; z-index: 2; flex: none; }
+  .cadd { border: 2px dashed var(--line-2); color: var(--tx-2); font-weight: 800; font-size: 14px; display: grid; place-items: center; }
+  .cg.editing .ci { cursor: grab; touch-action: none; }
+  .act { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; padding: 14px; background: var(--panel); border: 1px solid var(--line); text-align: left; }
+  .act b { font-size: 13px; } .act .v { font-family: var(--num); font-size: 40px; line-height: 40px; } .act .s { font-size: 12px; color: var(--tx-3); }
+  .act:active { background: var(--press); }
+  .cat { position: sticky; top: 0; align-self: start; max-height: calc(var(--vh) - 168px); width: auto; background: var(--panel); border-left: 1px solid var(--line-2); padding: 16px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; z-index: 5; box-shadow: -24px 0 48px rgba(0, 0, 0, .6); }
+  .cat h2 { font-size: 18px; font-weight: 800; } .cat h3 { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); margin-top: 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; } .chip { min-height: 36px; padding: 0 10px; background: var(--raised); font-size: 12px; font-weight: 700; color: var(--tx); }
+  .chip.sel { background: var(--tx); color: var(--page); } .chip:active { background: var(--press); }
+  .catp { display: flex; flex-direction: column; gap: 8px; } .catp small { font-size: 11px; color: var(--tx-3); font-weight: 700; letter-spacing: .04em; }
+  .qhead .more.pri { background: var(--tx); color: var(--page); } .qhead .c { color: var(--tx-3); font-size: 16px; margin-right: auto; margin-left: 12px; }
+  .qhead { gap: 8px; }
+

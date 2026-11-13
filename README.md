@@ -18,7 +18,7 @@ Free and open source (GPL-3.0). It grew out of <a href="https://github.com/isod8
 | **SAVE > FAVS**, a page with only your favourites (between USER and TOOLS), and no FAV rows on PRESETS | `firmware/src/ui.c`, `ui_draw.c`, `ui_input.c` | Sent upstream as [isod89/clipper-fm1#48](https://github.com/isod89/clipper-fm1/pull/48) (open) |
 | **Editor protocol v15, "Live"**: the page the synth has open, favourites, the sound list, edited flag, SAVE > TOOLS, play / transport, the synth's scope, the synth pages (LAYER, MORPH, FMX…), state (CPU, scale, REC) and REC | `firmware/src/editor_live.c`, [`web/EDITOR_PROTOCOL.md`](web/EDITOR_PROTOCOL.md#v15-live-a-personal-build-the-tablet-beside-the-fm-1-weblive) | Host tests pass; on the FM-1 in testing |
 | Small firmware fixes for it: an edit from the editor no longer redraws the whole screen (no flicker), an orange **edited** dot after the sound's name | `firmware/src/editor.c`, `ui_draw.c` | In testing |
-| **Clipper Live**, a web app that sits beside the FM-1 (tablet, phone in landscape, PC) | `web/live/` → `web/live.html` | In testing |
+| **Clipper Live**, a web app that sits beside the FM-1 (tablet, phone in landscape, PC) | `web/live/` (styles and code in small files) → one file, `web/live.html` | In testing |
 
 ### Clipper Live
 
@@ -46,7 +46,7 @@ python3 tools/live_build.py                        # -> web/live.html (one file,
 python3 tools/live_build.py --site build/vercel    # the same, ready to publish
 ```
 
-**Tests:** `tests/live_editor_test.c` checks the v15 protocol (built with ASan / UBSan by `tests/run_tests.sh`). What to try on a real FM-1, step by step: [`web/live/PRUEBAS.md`](web/live/PRUEBAS.md). Design decisions and how to carry on: [`web/live/DECISIONES.md`](web/live/DECISIONES.md) and [`web/live/PRODUCT.md`](web/live/PRODUCT.md) (Spanish).
+**Tests:** `tests/live_editor_test.c` checks the v15 protocol (built with ASan / UBSan by `tests/run_tests.sh`). What to try on a real FM-1, step by step: [`web/live/docs/PRUEBAS.md`](web/live/docs/PRUEBAS.md). Design decisions and how to carry on: [`web/live/docs/DECISIONES.md`](web/live/docs/DECISIONES.md) and [`web/live/docs/PRODUCT.md`](web/live/docs/PRODUCT.md) (Spanish). How the code is laid out: [`web/live/README.md`](web/live/README.md).
 
 ---
 

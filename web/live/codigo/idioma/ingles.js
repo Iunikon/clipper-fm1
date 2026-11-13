@@ -133,3 +133,4 @@ function langAsk() {
 }
 document.addEventListener("click", (e) => { const b = e.target.closest("[data-lang]"); if (!b) return; const l = b.dataset.lang; document.querySelector(".langq")?.remove(); if (l !== LANG.cur) setLang(l); });
 const trUi = (t) => (LANG.cur === "en" ? tr(t) : t);   /* (what the DOM does not show: a prompt's question) */
+

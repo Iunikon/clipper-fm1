@@ -1,0 +1,16 @@
+  /* ==== HOME: the favourites at hand, and your shortcuts ==== */
+  .homev { display: flex; flex-direction: column; gap: 14px; }
+  .fpads { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+  .fpad { height: 92px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left; background: var(--panel); border: 1px solid var(--line); min-width: 0; }
+  .fpad .i { font-size: 16px; color: var(--fav); } .fpad b { font-size: 14px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .fpad small { font-size: 11px; white-space: nowrap; overflow: hidden; max-width: 100%; }
+  .fpad.on { background: var(--tx); color: var(--page); } .fpad.on .i { color: var(--fav-d); } .fpad.on .k { color: var(--kind-d); } .fpad.on .e { color: var(--eng-d); }
+  .fpad.free { border-style: dashed; border-color: var(--line-2); background: none; } .fpad.free small { white-space: normal; color: var(--tx-3); }
+  .pos2 { font-size: 13px; color: var(--tx-3); margin-top: auto; }
+
+  /* the favourites rail can go: the left one grows (more room to edit) */
+  body.nofav .body { grid-template-columns: 320px minmax(0, 1fr) 0; } body.nofav .rail.r { display: none; }
+  @media (min-width: 1500px) { body.nofav .body { grid-template-columns: 360px minmax(0, 1fr) 0; } }
+  #favh[aria-pressed="false"] { color: var(--tx-3); } #favh[aria-pressed="true"] { color: var(--tx); }
+  .scope.fm1 .src { display: none; }
+

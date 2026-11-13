@@ -1,0 +1,49 @@
+  /* ==== SEQ > NOTES: the pattern, 16 steps a row; the step playing lit; the picked step's editor under it ==== */
+  .sqb .bh { gap: 16px; }
+  .sqb .bh .c { color: var(--tx-3); font-size: 16px; }
+  .sqp { margin-left: auto; height: 40px; padding: 0 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: .06em; border: 1px solid var(--line-2); color: var(--tx); }
+  .sqp svg { width: 16px; height: 16px; fill: currentColor; stroke: none; }
+  .sqp.on { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .sqw { color: var(--tx-3); font-size: 13px; padding: 8px 0; }
+  .sqg { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 4px; }
+  .sq { position: relative; height: 72px; padding: 6px 6px 8px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left;
+    background: var(--panel); border: 1px solid var(--line); min-width: 0; overflow: hidden; }
+  .sq.beat { border-left: 2px solid var(--line-2); }
+  .sq .si { font-size: 12px; color: var(--tx-3); }
+  .sq .sn { font-size: 16px; color: var(--tx); white-space: nowrap; }
+  .sq .ch { position: absolute; right: 5px; top: 5px; font-size: 12px; color: var(--tx-2); }
+  .sq .sv { position: absolute; left: 0; bottom: 0; height: 3px; width: calc(var(--v) * 100%); background: var(--k1); }
+  .sq.on { background: rgba(40, 124, 255, .16); border-color: rgba(40, 124, 255, .55); }
+  .sq.tie { background: rgba(40, 124, 255, .07); border-style: dashed; border-color: rgba(40, 124, 255, .35); }
+  .sq.tie .sn { color: var(--k1); }
+  .sq .ac { position: absolute; right: 5px; bottom: 9px; width: 8px; height: 8px; background: var(--tx); }
+  .sq .sl { position: absolute; right: 16px; bottom: 9px; width: 12px; height: 8px; background: linear-gradient(to top right, transparent 45%, var(--tx-2) 45%, var(--tx-2) 62%, transparent 62%); }
+  .sq.out { opacity: .3; }
+  .sq.sel { outline: 2px solid var(--tx); outline-offset: -2px; }
+  .sq.ph { box-shadow: inset 0 0 0 999px rgba(242, 242, 243, .14); }
+  .sq.ph .si { color: var(--tx); }
+  .sqe { margin-top: 10px; display: grid; grid-template-columns: 112px minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; align-items: start; padding: 16px; background: var(--panel); border: 1px solid var(--line); }
+  .sqh { display: flex; flex-direction: column; gap: 4px; }
+  .sqh .c { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-3); }
+  .sqh b { font-size: 48px; line-height: 48px; font-weight: 400; -webkit-font-smoothing: none; }
+  .sqh .st { font-size: 12px; color: var(--tx-2); }
+  .sqn { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .sqn .nv { font-size: 48px; line-height: 48px; -webkit-font-smoothing: none; }
+  .nud { display: flex; gap: 6px; } .nud button { flex: 1; height: 40px; background: var(--raised); font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; }
+  .pcs { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; }
+  .pcs button { height: 40px; font-size: 12px; font-weight: 700; background: var(--raised); color: var(--tx-2); padding: 0; }
+  .pcs button.blk { background: var(--page); border: 1px solid var(--line); }
+  .pcs button[aria-checked="true"] { background: var(--k1); color: #000; border-color: var(--k1); }
+  .sqx { display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+  .sqvel { position: relative; flex: 1 1 100%; height: 56px; padding: 8px 12px; display: flex; flex-direction: column; justify-content: space-between; background: var(--raised); cursor: ew-resize; touch-action: none; overflow: hidden; }
+  .sqvel .l { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); position: relative; z-index: 1; }
+  .sqvel .v { font-size: 24px; line-height: 24px; -webkit-font-smoothing: none; position: relative; z-index: 1; }
+  .sqvel .f { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--v) * 100%); background: var(--k1); opacity: .28; }
+  .sqt2 { height: 44px; padding: 0 14px; font-size: 13px; font-weight: 800; letter-spacing: .04em; background: var(--raised); color: var(--tx-2); }
+  .sqt2[aria-pressed="true"] { background: var(--tx); color: var(--page); }
+  .sqt2.del { color: var(--tx-3); border: 1px dashed var(--line-2); background: none; }
+  .rat { display: flex; gap: 3px; } .rat button { width: 44px; height: 44px; font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; background: var(--raised); color: var(--tx-2); }
+  .rat button[aria-checked="true"] { background: var(--tx); color: var(--page); }
+  .sqx .btn.pri { padding: 0 18px; }
+
+

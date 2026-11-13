@@ -1,0 +1,10 @@
+  /* ==== the transport in the bar, the CPU small ==== */
+  .trn { display: flex; gap: 6px; }
+  .tbt { height: 40px; padding: 0 12px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--line-2); font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--tx-2); }
+  .tbt svg { width: 14px; height: 14px; fill: currentColor; stroke: none; } .tbt .num { font-size: 16px; }
+  .tbt.on { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .tbt.rec i { width: 10px; height: 10px; background: #ff3b30; } .tbt.rec.on { background: #ff3b30; border-color: #ff3b30; color: #000; } .tbt.rec.on i { background: #000; }
+  .tbt.rec.arm { border-color: #ff3b30; color: #ff3b30; animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: .45; } }
+  .cpu { font-size: 11px; color: var(--tx-3); white-space: nowrap; } .cpu b { font-weight: 400; color: var(--tx-2); font-size: 13px; } .cpu.hot b { color: var(--k4); }
+

@@ -1,0 +1,12 @@
+  /* ---- movimiento: solo donde dice algo. Nada por encima de 200 ms ---- */
+  @keyframes tag { from { opacity: 0; transform: translateX(-4px); } }
+  @keyframes wk { from { opacity: 0; transform: translateY(5px); } }
+  @keyframes pulse { 0% { background: var(--tx); color: var(--page); } 100% { background: var(--line-2); } }
+  @keyframes pop { 40% { transform: scale(1.3); } }
+  .work.fade > * { animation: wk .16s var(--ease) both; }
+  .tap.pulse { animation: pulse .22s var(--ease); }
+  .ib.pop svg { animation: pop .22s var(--ease); }
+  .tp.t-fd .fl, .tp.t-fd::after { transition: left .14s var(--ease), width .14s var(--ease), opacity .15s var(--ease); }
+  .tp.t-fd.held .fl, .tp.t-fd.held::after { transition: none; }
+  .tp, .btn, .stp button, .arw button, .tp .opts button { transition: background .12s var(--ease), border-color .12s var(--ease), box-shadow .12s var(--ease); }
+

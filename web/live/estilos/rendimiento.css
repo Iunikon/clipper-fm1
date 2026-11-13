@@ -1,0 +1,4 @@
+  /* ---- long lists: what is off screen is not laid out or painted until it comes near */
+  .scs > .sc, .lrows > .lrow, .hyb .pgx, .snds > .sd { content-visibility: auto; contain-intrinsic-size: auto 84px; }
+  .hyb .pgx { contain-intrinsic-size: auto 150px; }
+

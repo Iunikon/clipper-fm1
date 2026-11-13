@@ -1,0 +1,40 @@
+  /* ==== SAVE: the sounds ==== */
+  .sv { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .svl { position: sticky; top: 0; display: flex; flex-direction: column; gap: 16px; max-height: calc(var(--vh) - 168px); overflow-y: auto; }
+  .svk { display: flex; flex-direction: column; gap: 2px; }
+  /* SAVE > TOOLS: the device's three, a second tap to act */
+  .tools { display: flex; flex-direction: column; gap: 6px; border-top: 2px solid var(--line-2); padding-top: 12px; }
+  .tools h3 { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); margin-bottom: 2px; }
+  .tools.dev h3::after { content: "En el sinte"; margin-left: 8px; font-size: 10px; background: var(--tx); color: var(--page); padding: 2px 6px; }
+  .tool { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 12px; min-height: 48px; flex: none; text-align: left; background: var(--panel); border: 1px solid var(--line); }
+  .tool b { font-size: 13px; font-weight: 800; letter-spacing: .04em; }
+  .tool span { font-size: 12px; color: var(--tx-3); }
+  .tool.arm { background: var(--fav); border-color: var(--fav); color: #000; } .tool.arm span { color: rgba(0, 0, 0, .7); }
+  .kf { display: flex; justify-content: space-between; align-items: center; gap: 8px; height: 40px; flex: none; padding: 0 12px; font-size: 14px; font-weight: 700; letter-spacing: .02em; color: var(--tx-2); background: var(--panel); text-align: left; }
+  .kf .num { font-size: 16px; color: var(--tx-3); }
+  .kf.fk { color: var(--fav); margin-bottom: 8px; }
+  .kf:nth-child(2) { margin-bottom: 8px; }
+  .kf[aria-current="true"] { background: var(--tx); color: var(--page); } .kf[aria-current="true"] .num { color: var(--tx-ink); }
+  .kf.fk[aria-current="true"] { background: var(--fav); color: #000; } .kf.fk[aria-current="true"] .num { color: rgba(0, 0, 0, .6); }
+  .svm { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+  .svc { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding: 18px; background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--tx); }
+  .svc.edited { border-left-color: var(--fav); }
+  .svn { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .svn .c { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-3); }
+  .svn b { font-size: 40px; line-height: 44px; font-weight: 800; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .svn .m { display: flex; gap: 10px; font-size: 14px; color: var(--tx-2); flex-wrap: wrap; } .svn .m .k { color: var(--kind); font-weight: 700; } .svn .m .e { color: var(--eng); } .svn .edtx { color: var(--fav); font-weight: 700; }
+  .sva { display: flex; flex-direction: column; gap: 8px; min-width: 260px; }
+  .sva .btn { padding: 0 14px; justify-content: flex-start; } .sva .alg { display: grid; grid-template-columns: 1fr auto; gap: 8px; } .sva .alg .btn:last-child { justify-content: center; }
+  .sva .go2 { margin-top: 4px; }
+  .svh { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--line-2); padding-bottom: 10px; }
+  .svh h2 { font-size: 24px; font-weight: 800; letter-spacing: .02em; } .svh .c { color: var(--tx-3); font-size: 16px; }
+  .scs { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 8px; }
+  .sc { display: flex; flex-direction: column; justify-content: space-between; gap: 10px; min-height: 84px; padding: 12px 14px; text-align: left; background: var(--panel); border: 1px solid var(--line); min-width: 0; }
+  .sc:active { background: var(--press); }
+  .sc .sn { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; overflow: hidden; }
+  .sc .fi { font-size: 16px; color: var(--fav); }
+  .sc .st { width: 14px; height: 14px; color: var(--fav); fill: currentColor; flex: none; }
+  .sc .sm { display: flex; gap: 8px; font-size: 12px; color: var(--tx-3); } .sc .sm .k { color: var(--kind); font-weight: 700; } .sc .sm .e { color: var(--eng); } .sc .sm .num { margin-left: auto; }
+  .sc.cur { background: var(--tx); color: var(--page); border-color: var(--tx); } .sc.cur .sm { color: var(--tx-ink); } .sc.cur .sm .k { color: var(--kind-d); } .sc.cur .sm .e { color: var(--eng-d); } .sc.cur .fi { color: #c2410c; }
+  .sc.free { border-style: dashed; border-color: var(--line-2); background: none; } .sc.free .sn { color: var(--tx-3); font-weight: 600; } .sc.free .sm { font-size: 12px; white-space: normal; }
+

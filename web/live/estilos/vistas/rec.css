@@ -1,0 +1,15 @@
+  /* ==== REC: the device's REC screen ==== */
+  .recv { display: grid; gap: 14px; }
+  .rbig { padding: 22px; background: var(--panel); border: 1px solid var(--line); border-left: 6px solid var(--line-2); }
+  .rbig b { font-size: 48px; line-height: 52px; font-weight: 800; letter-spacing: .02em; } .rbig p { color: var(--tx-2); font-size: 15px; margin-top: 6px; }
+  .rbig.on { border-left-color: #ff3b30; } .rbig.on b { color: #ff3b30; } .rbig.arm { border-left-color: #ff3b30; } .rbig.arm b { animation: blink 1s steps(2) infinite; }
+  .rbtn { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
+  .rrec, .rplay { height: 96px; display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 22px; font-weight: 800; letter-spacing: .06em; border: 2px solid var(--line-2); }
+  .rrec i { width: 22px; height: 22px; background: #ff3b30; } .rrec.on { background: #ff3b30; border-color: #ff3b30; color: #000; } .rrec.on i { background: #000; } .rrec.arm { border-color: #ff3b30; color: #ff3b30; }
+  .rplay svg { width: 22px; height: 22px; fill: currentColor; stroke: none; } .rplay.on { background: var(--tx); color: var(--page); }
+  .rgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .rset { background: var(--panel); border: 1px solid var(--line); padding: 14px; display: flex; flex-direction: column; gap: 12px; } .rset.dis { opacity: .4; }
+  .rl { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); }
+  .rset .opts { display: flex; gap: 4px; } .rset .opts button { flex: 1; height: 48px; background: var(--raised); font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; color: var(--tx-2); }
+  .rset .opts button[aria-pressed="true"] { background: var(--tx); color: var(--page); }
+

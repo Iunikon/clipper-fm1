@@ -1,0 +1,70 @@
+  /* ==== lo que venía de Estudio: matriz, layer, mod seq, tuning, pistas, canción, dispositivo ==== */
+  .blk.wide { grid-column: 1 / -1; }
+  .pce { color: var(--tx-3); font-size: 13px; padding: 14px 16px; border: 1px dashed var(--line-2); background: var(--panel); }
+  [data-pend] { position: relative; }
+  [data-pend]::after { content: ""; position: absolute; inset: 0; border: 1px dashed var(--line-2); pointer-events: none; }
+  /* MATRIX: dos columnas de seis ranuras; cada celda es la baldosa de siempre, más baja */
+  .mx { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 20px; }
+  .mxr { display: grid; grid-template-columns: 26px minmax(0, 1fr) 14px minmax(0, 1fr) minmax(0, 1.1fr); gap: 6px; align-items: stretch; transition: opacity .12s var(--ease); }
+  .mxr .tp { grid-column: auto; grid-row: auto; min-height: 0; padding: 8px 10px; gap: 6px; }   /* la baldosa del bento ocupa 3 x 3: aquí no */
+  .mxr .tv, .mxr .tp.t-arr .tv { font-size: 24px; line-height: 28px; }
+  .mxr .pos { display: none; }
+  .mxr.off > .tp { opacity: .42; }
+  .mxn { align-self: center; font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }
+  .mxa { align-self: center; text-align: center; color: var(--tx-3); font-size: 14px; }
+  /* MOD SEQ: 4 carriles x 16 pasos, la barra sale del centro */
+  .msq { display: grid; gap: 6px; }
+  .msl { display: grid; grid-template-columns: 26px repeat(16, minmax(0, 1fr)); gap: 3px; }
+  .msn { align-self: center; font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }
+  .mss { height: 56px; background: var(--raised); border: 0; position: relative; }
+  .mss::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed var(--line-2); }
+  .mss i { position: absolute; left: 3px; right: 3px; background: var(--c);
+    top: var(--t); height: var(--h); }
+  /* TUNING */
+  .tun { display: grid; gap: 10px; }
+  .tnh { display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch; }
+  .tnh > span { background: var(--panel); border: 1px solid var(--line); padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 110px; }
+  .tnh small { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--tx-3); }
+  .tnh b { font-family: var(--num); font-size: 32px; line-height: 32px; -webkit-font-smoothing: none; font-weight: 400; }
+  .tnh b small { font-size: 16px; margin-left: 2px; }
+  .tnh .btn { margin-left: auto; align-self: center; padding: 0 18px; }
+  .tng { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 4px; }
+  .tnd { background: var(--raised); padding: 6px 8px; display: flex; flex-direction: column; }
+  .tnd small { color: var(--tx-3); font-size: 12px; } .tnd b { font-family: var(--num); font-size: 16px; font-weight: 400; -webkit-font-smoothing: none; }
+  /* PISTAS */
+  .trk { display: grid; gap: 4px; }
+  .trr { display: grid; grid-template-columns: 30px 170px minmax(0, 1fr) 72px 44px; gap: 8px; align-items: center; min-height: 48px; padding: 0 10px; background: var(--panel); border: 1px solid var(--line); }
+  .trr.sel { border-color: var(--tx); }
+  .trr.mute { opacity: .55; }
+  .trn { font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }
+  .tre { display: flex; flex-direction: column; min-width: 0; } .tre b { font-size: 13px; } .tre small { color: var(--tx-3); font-size: 12px; }
+  .trl { height: 36px; background: var(--page); border: 1px solid var(--line); position: relative; overflow: hidden; }
+  .trl i { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--f) * 100%); background: var(--k1); opacity: .35; }
+  .trl span { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; }
+  .trm { height: 36px; font-size: 11px; font-weight: 700; letter-spacing: .06em; background: var(--raised); color: var(--tx-2); border: 0; }
+  .trm[aria-pressed="true"] { background: var(--k4); color: #000; }
+  .tra { font-size: 10px; font-weight: 700; background: var(--k4); color: #000; padding: 2px 5px; justify-self: start; }
+  /* CANCIÓN */
+  .sng { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; margin-bottom: 8px; }
+  .sgs { height: 64px; background: var(--panel); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; padding: 8px 10px; }
+  .sgs span { font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }
+  .sgs b { font-family: var(--num); font-size: 24px; font-weight: 400; color: var(--tx-3); -webkit-font-smoothing: none; }
+  /* SAVE > Dispositivo */
+  .svg2 { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--tx-3); text-transform: uppercase; margin: 4px 0 -8px; }
+  .svk[aria-label="Dispositivo"] .kf:nth-child(2), .kts .kf:nth-child(2) { margin-bottom: 0; }
+  .dvc { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+  .dvs { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto auto; gap: 4px 10px; padding: 12px; background: var(--panel); border: 1px solid var(--line); }
+  .dvs > .num { grid-row: span 2; font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }
+  .dvs b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dvs small { font-size: 12px; color: var(--tx-3); }
+  .dvs .btn, .dvs .dsc { grid-column: 1 / -1; justify-self: start; }
+  .dvs .btn { height: 40px; padding: 0 14px; }
+  .dvs.free { background: var(--page); border-style: dashed; } .dvs.free b { color: var(--tx-3); font-weight: 400; }
+  .kts { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+  .kts .kf { height: 44px; }
+  .pads { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; max-width: 560px; }
+  .pad { aspect-ratio: 1; max-width: 100%; background: var(--panel); border: 1px solid var(--line); border-bottom: 4px solid var(--c); display: flex; align-items: flex-start; padding: 10px; }
+  .pad span { font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }
+  .pad:active { background: var(--c); } .pad:active span { color: #000; }
+  .dsc2[data-arm="1"] { background: var(--fav); border-color: var(--fav); color: #000; }
+

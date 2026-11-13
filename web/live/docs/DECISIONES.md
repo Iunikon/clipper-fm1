@@ -22,7 +22,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 | Fuente | `web/live/` |
 | App montada | `web/live.html` (la genera el build; no editarla a mano) |
 | Firmware de Live | `firmware/src/editor_live.c` (+ pequeños cambios en `editor.c`, `ui_input.c`, `ui_draw.c`, `ui.c`) |
-| Guía de pruebas con el sinte | `web/live/PRUEBAS.md` |
+| Guía de pruebas con el sinte | `web/live/docs/PRUEBAS.md` |
 
 **Modo según Impeccable: Operate.** Es una herramienta: lectura rápida, consistencia y respuesta al dedo, por encima de la expresión.
 
@@ -39,7 +39,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 | **Monitor** | 1920, 2560, 4K | `zoom` de todo el app: 1.2, 1.6 y 2.4. Se ve como la tablet, más grande. |
 
 - **No hay versión vertical** (ni celular ni tablet). Nunca se pidió.
-- **`--vh` / `--vw`:** en `live.css` nunca se escribe `100dvh` ni `100vw`; se usan `var(--vh)` y `var(--vw)`, que dividen entre el zoom. Si no, en un monitor la app se sale de la pantalla.
+- **`--vh` / `--vw`:** en el CSS (`estilos/`) nunca se escribe `100dvh` ni `100vw`; se usan `var(--vh)` y `var(--vw)`, que dividen entre el zoom. Si no, en un monitor la app se sale de la pantalla.
 - **Coordenadas bajo zoom:** las medidas de `getBoundingClientRect` y `clientX` ya vienen escaladas. Para poner algo en `style.left/top` hay que dividir entre `zf()` (`pages.js`), como hace la tarjeta fantasma de LIVE.
 
 **Al revisar, comprobar siempre:** 1400 × 830, 1600 × 950, 852 × 393 y 1920 × 1080.
@@ -75,7 +75,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 
 ## 4. Sistema visual
 
-**Tokens** (`live.css`, `:root`):
+**Tokens** (`estilos/base.css`, `:root`):
 
 | Token | Valor | Uso |
 |---|---|---|
@@ -164,16 +164,15 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 
 ## 7. Arquitectura
 
-| Archivo | Qué hace |
-|---|---|
-| `live.html` | La plantilla: barra, rieles, navegación, hojas (Guardar, sonidos, lista de opciones) e iconos SVG. |
-| `live.css` | Tokens y todos los estilos; al final, los bloques de celular (`max-height: 540px`), ≤1100, zoom de monitor y micro-interacciones. |
-| `live.js` | Protocolo (`Link`, comandos `C`), estado `M`, el FM-1 de ejemplo (mock), barra, SAVE, Guardar, riel izquierdo, osciloscopio, `paintValue` (pinta una vez por fotograma). |
-| `bento.js` | Gráficas, tarjetas (`tileP`), gestos (arrastre, fino, bordes, vibración), Samples/Proyectos. |
-| `pages.js` | Carpetas como el sinte, gráficas extra, LIVE configurable y sus páginas, HOME, SEQ, REC, doble toque, lista de opciones. |
-| `seq.js` | Secuenciador (pasos, MIDI, avanzado). |
-| `studio.js` | Estudio: pestañas, copia de seguridad, Sistema, **HYBRID** y **Biblioteca**. |
-| `i18n.js` | Inglés: `DICT` (frases exactas) y `RX` (patrones). Todo texto nuevo en español necesita su entrada aquí. |
+El código está en muchos archivos pequeños, en carpetas por área: **`web/live/estilos/`** (lo visual) y **`web/live/codigo/`** (la lógica), más `plantilla.html`. `tools/live_build.py` los junta en un solo `web/live.html` en el orden de **`web/live/montaje.txt`** (el orden importa: la cascada del CSS y lo que se ejecuta al cargar). El mapa de qué hay en cada archivo está en [`web/live/README.md`](../README.md).
+
+Lo más buscado:
+- tokens y colores: `estilos/base.css`;
+- celular, ≤1100 y zoom de monitor: `estilos/pantallas/`;
+- protocolo y comandos: `codigo/nucleo/protocolo.js`; el FM-1 de ejemplo: `codigo/nucleo/simulador.js`;
+- tarjetas (`tileP`) y gestos: `codigo/componentes/tarjetas.js` y `gestos.js`;
+- LIVE configurable: `codigo/vistas/live.js`; Estudio: `codigo/vistas/estudio/`;
+- el inglés: `codigo/idioma/ingles.js` (`DICT` y `RX`).
 
 **Ámbitos (scope) de un valor:** `0` parámetro del sonido, `1` global, `3` página del sinte (X_*, p. ej. LAYER, MORPH, FMX), `4` el patch HYBRID (solo en la tablet). Todos usan las mismas tarjetas, arrastre, doble toque y lista.
 
@@ -288,5 +287,5 @@ Commits: en `main`, con el prefijo `Clipper Live:` (o `Clipper 1.4 (FM-1):` si e
 **Después de aplicar cambios:**
 1. `python3 tools/live_build.py` y comprobar que no hay errores de sintaxis.
 2. Mirar 1400 × 830, 1600 × 950, 852 × 393 y 1920 × 1080 (este último en Chrome real).
-3. Si hay textos nuevos en español, añadirlos a `i18n.js` y mirar la app en inglés.
+3. Si hay textos nuevos en español, añadirlos a `codigo/idioma/ingles.js` y mirar la app en inglés.
 4. Commit en `main`, copiar a `~/clipper-out/` y preguntar antes de publicar en Vercel.
