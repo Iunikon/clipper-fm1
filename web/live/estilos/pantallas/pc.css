@@ -1,10 +1,7 @@
-  /* ================================================================ bigger screens: the whole app scaled ===
-     A PC monitor gets the tablet's layout, larger (CSS zoom; the screen units divided by it, so the height still fits:
-     --vh / --vw stand for 100dvh / 100vw everywhere). The tablet (under 1000 px tall) and the phone are never zoomed */
-  :root { --z: 1; --vh: calc(100dvh / var(--z)); --vw: calc(100vw / var(--z)); }
-  @media (min-width: 1800px) and (min-height: 900px) { :root { zoom: 1.5; --z: 1.5; } }
-  @media (min-width: 2300px) and (min-height: 1250px) { :root { zoom: 2; --z: 2; } }
-  @media (min-width: 3400px) and (min-height: 1850px) { :root { zoom: 3; --z: 3; } }
+  /* ================================================================ screen units ===
+     --vh / --vw stand for 100dvh / 100vw everywhere (nothing is zoomed any more: big screens get their own layout, in
+     pantallas/grande.css; --z stays 1 for the code that divides by it) */
+  :root { --z: 1; --vh: 100dvh; --vw: 100vw; }
 
   /* ---- a small tablet or a narrow window (up to 1100 wide, taller than a phone): the left rail as a panel */
   @media (max-width: 1100px) and (min-height: 541px) {

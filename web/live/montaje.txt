@@ -30,6 +30,7 @@ estilos/pantallas/pc.css
 estilos/interacciones.css
 estilos/rendimiento.css
 estilos/revision.css
+estilos/pantallas/escritorio.css
 
 [js]
 codigo/nucleo/base.js

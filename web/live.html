@@ -1124,13 +1124,10 @@
     .work { overflow-x: hidden; }
   }
 
-  /* ================================================================ bigger screens: the whole app scaled ===
-     A PC monitor gets the tablet's layout, larger (CSS zoom; the screen units divided by it, so the height still fits:
-     --vh / --vw stand for 100dvh / 100vw everywhere). The tablet (under 1000 px tall) and the phone are never zoomed */
-  :root { --z: 1; --vh: calc(100dvh / var(--z)); --vw: calc(100vw / var(--z)); }
-  @media (min-width: 1800px) and (min-height: 900px) { :root { zoom: 1.5; --z: 1.5; } }
-  @media (min-width: 2300px) and (min-height: 1250px) { :root { zoom: 2; --z: 2; } }
-  @media (min-width: 3400px) and (min-height: 1850px) { :root { zoom: 3; --z: 3; } }
+  /* ================================================================ screen units ===
+     --vh / --vw stand for 100dvh / 100vw everywhere (nothing is zoomed any more: big screens get their own layout, in
+     pantallas/grande.css; --z stays 1 for the code that divides by it) */
+  :root { --z: 1; --vh: 100dvh; --vw: 100vw; }
 
   /* ---- a small tablet or a narrow window (up to 1100 wide, taller than a phone): the left rail as a panel */
   @media (max-width: 1100px) and (min-height: 541px) {
@@ -1189,8 +1186,8 @@
   .askb input { height: 52px; padding: 0 14px; background: var(--page); border: 1px solid var(--line-2); color: var(--tx); font-family: var(--num); font-size: 24px; -webkit-font-smoothing: none; }
   .askf { display: flex; gap: 8px; justify-content: flex-end; } .askf .btn { height: 44px; padding: 0 18px; }
   .askf .dng { background: var(--danger); border-color: var(--danger); color: #000; }
-  /* faders: halo negro en la cifra, la línea de posición no la tapa */
-  .tp.t-fd .tv { z-index: 2; text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000, 2px 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000; }
+  /* faders: la cifra por encima de la línea de posición */
+  .tp.t-fd .tv { z-index: 2; }   /* (the figure over the position line; no outline: it looked heavy) */
   @media (max-height: 540px) { .ml[data-short] .mlf { display: none; } .ml[data-short]::after { content: attr(data-short); } }   /* celular: DST CHO DLY REV */
   .hrow, .mrow { flex: none; } .ghis, .gmat { overflow-y: auto; }   /* las filas no se aplastan: 40 px y la lista se desplaza */
   button.msm { min-height: 40px; }   /* los carriles S1–S4 del MOD SEQ, a tamaño de dedo */
@@ -1200,6 +1197,42 @@
   .lg .l em { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 1px 4px; border: 1px solid var(--line-2); color: var(--tx-2); }
   .lg .l em.sinte { border-color: var(--tx); color: var(--tx); }   /* el cambio llegó del knob del sinte */
   .hlp p { margin: 0; } .hlp ul { margin: 0; padding-left: 18px; color: var(--tx-2); font-size: 14px; display: grid; gap: 6px; } .hlp b { color: var(--tx); }
+  /* ================================================================ a computer: a mouse, a wide screen ===
+     The tablet and the phone are played with a finger (44 px targets, values to read at arm's length). With a mouse
+     (pointer: fine) from 1200 px wide, a desktop's density: tighter bars and buttons, cards and graphs at a desk's
+     height, and the room used rather than everything grown: a folder's pages two across, LIVE's cards as many as fit.
+     Last in montaje.txt: it wins over the tablet's sizes only here */
+  @media (pointer: fine) and (min-width: 1200px) and (min-height: 600px) {
+    .app { grid-template-rows: 54px minmax(0, 1fr) 58px; }
+    .bar { gap: 12px; padding: 0 12px; }
+    .bar .ib { width: 36px; height: 36px; } .ib svg { width: 18px; height: 18px; }
+    .now .n { font-size: 18px; } .now .m { font-size: 11px; }
+    .svb { height: 34px; } .tbt { height: 34px; } .follow { height: 36px; }
+    .btn { height: 36px; font-size: 13px; }
+    .nav { padding: 4px 8px; } .nb { font-size: 10px; gap: 2px; } .nb svg { width: 18px; height: 18px; }
+    .work { padding: 14px 18px 24px; }
+    .stt button, .seg button, .qtools button, .lpt button { height: 34px; }
+
+    /* cards: a value at desk size, the fader as before */
+    .tp { padding: 10px 12px; gap: 6px; }
+    .tv { font-size: 32px; line-height: 36px; }
+    .prow { gap: 8px; } .prow .tp, .ci .tp { min-height: 88px; }
+    .tl { min-height: 92px; } .tz .tp { min-height: 96px; }
+    .pgr { height: 150px; } .pgr.tall { height: 180px; }
+    .pgh h3 { font-size: 14px; }
+
+    /* LIVE and HOME: as many cards across as fit, a row a desk's height */
+    .cg { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); grid-auto-rows: 152px; gap: 8px; }
+    .cg.short { grid-auto-rows: 132px; }
+    .act .v { font-size: 32px; line-height: 32px; }
+    .stp button { height: 32px; } .tl .stp, .tl .amt { margin: 0 10px 10px; }   /* (a quick card's arrows, steps, TAP: mouse size) */
+  }
+  /* wide enough: a folder's pages two across, in the device's order (left to right, then down) */
+  @media (pointer: fine) and (min-width: 1600px) and (min-height: 600px) {
+    #edit:is([data-folder="ENV"], [data-folder="LFO"], [data-folder="FX"], [data-folder="SEL"], [data-folder="ARP"], [data-folder="GLO"], [data-folder="EDIT"]) > .pgs {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 24px; align-items: start; }
+  }
+
 </style>
 </head>
 <body class="off">

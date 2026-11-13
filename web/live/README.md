@@ -30,7 +30,7 @@ web/live/
     componentes/          accesos de LIVE, bento y tarjetas, bloques, páginas especiales (matriz, layer, mod seq, tuning…)
     vistas/               SAVE, SEQ (+ completo), carpetas como el sinte, REC, LIVE, HOME, Estudio
     hojas/                Guardar
-    pantallas/            tablet, celular (max-height 540), PC (zoom de monitor y ≤1100)
+    pantallas/            tablet, celular (max-height 540), ≤1100, escritorio (con ratón: la densidad de PC; va la última)
     movimiento.css        transiciones básicas
     interacciones.css     micro-interacciones (pulsar, deslizar, rebote, la línea de la carpeta)
     rendimiento.css       content-visibility para listas largas
@@ -55,6 +55,6 @@ web/live/
 ## Reglas al tocar el código
 
 - **El montaje tiene que seguir saliendo bien:** después de mover o partir archivos, `python3 tools/live_build.py` y comparar con lo de antes. Si solo se reorganiza, el `web/live.html` tiene que salir **idéntico byte a byte**.
-- **En CSS no se escribe `100dvh` ni `100vw`:** se usan `var(--vh)` y `var(--vw)` (el zoom de monitor los divide).
+- **En CSS no se escribe `100dvh` ni `100vw`:** se usan `var(--vh)` y `var(--vw)`.
 - **Lo visual va en `estilos/`, la lógica en `codigo/`.** Un componente nuevo suele tener los dos: `estilos/componentes/x.css` y `codigo/componentes/x.js`.
 - Las reglas de diseño (colores, cuadrado, Terminus, naranja, arrastre…) están en `docs/PRODUCT.md` y `docs/DECISIONES.md`.

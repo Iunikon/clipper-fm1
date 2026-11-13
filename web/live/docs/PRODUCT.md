@@ -10,7 +10,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** con el f
 
 - **Quién:** un músico tocando o programando sonidos, con el sinte delante, a menudo en penumbra o en escenario.
 - **Pantalla principal:** tablet Android de 11,5" en horizontal, 1400 × 830 y 1600 × 950 CSS. **Solo táctil.**
-- **También:** celular en horizontal (852 × 393), portátil (1366 × 650) y monitor con zoom 1.5 / 2 / 3. **Sin versión vertical:** en vertical, un aviso para girar el aparato.
+- **También:** celular en horizontal (852 × 393), y PC con ratón, con una densidad de escritorio propia (sin zoom: más tarjetas por fila y páginas de dos en dos, no todo más grande). **Sin versión vertical:** en vertical, un aviso para girar el aparato.
 - **Modo de Impeccable:** **Operate**. Lectura rápida, consistencia y respuesta al dedo, por encima de la expresión.
 
 ## Reglas que no se tocan

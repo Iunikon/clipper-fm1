@@ -22,8 +22,8 @@
   .askb input { height: 52px; padding: 0 14px; background: var(--page); border: 1px solid var(--line-2); color: var(--tx); font-family: var(--num); font-size: 24px; -webkit-font-smoothing: none; }
   .askf { display: flex; gap: 8px; justify-content: flex-end; } .askf .btn { height: 44px; padding: 0 18px; }
   .askf .dng { background: var(--danger); border-color: var(--danger); color: #000; }
-  /* faders: halo negro en la cifra, la línea de posición no la tapa */
-  .tp.t-fd .tv { z-index: 2; text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000, 2px 2px #000, -2px -2px #000, 2px -2px #000, -2px 2px #000; }
+  /* faders: la cifra por encima de la línea de posición */
+  .tp.t-fd .tv { z-index: 2; }   /* (the figure over the position line; no outline: it looked heavy) */
   @media (max-height: 540px) { .ml[data-short] .mlf { display: none; } .ml[data-short]::after { content: attr(data-short); } }   /* celular: DST CHO DLY REV */
   .hrow, .mrow { flex: none; } .ghis, .gmat { overflow-y: auto; }   /* las filas no se aplastan: 40 px y la lista se desplaza */
   button.msm { min-height: 40px; }   /* los carriles S1–S4 del MOD SEQ, a tamaño de dedo */

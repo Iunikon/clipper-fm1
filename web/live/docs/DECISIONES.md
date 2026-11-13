@@ -36,11 +36,11 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 | **Celular Android, horizontal** | ~852 × 393 | `@media (max-height: 540px)`: barra y navegación de 44 px; los dos rieles son paneles que se deslizan (botones ◧ izquierda y favoritos derecha); páginas, tarjetas y gráficas más bajas. |
 | **Tablet pequeña o ventana estrecha** | hasta 1100 de ancho | El riel izquierdo pasa a panel (botón ◧); favoritos se queda. |
 | **Portátil** | 1280–1366 | El diseño base, sin cambios. |
-| **Monitor** | 1920, 2560, 4K | `zoom` de todo el app: 1.2, 1.6 y 2.4. Se ve como la tablet, más grande. |
+| **PC (con ratón)** | desde 1200 de ancho | **Densidad de escritorio** (`estilos/pantallas/escritorio.css`, `pointer: fine`): barras y botones más ajustados, tarjetas y gráficas a altura de escritorio, LIVE con tantas tarjetas por fila como quepan y, desde 1600, las páginas de una carpeta de dos en dos. **Sin zoom:** escalar todo se veía mal. La tablet y el celular (dedo) no cambian. |
 
 - **No hay versión vertical** (ni celular ni tablet). Nunca se pidió.
-- **`--vh` / `--vw`:** en el CSS (`estilos/`) nunca se escribe `100dvh` ni `100vw`; se usan `var(--vh)` y `var(--vw)`, que dividen entre el zoom. Si no, en un monitor la app se sale de la pantalla.
-- **Coordenadas bajo zoom:** las medidas de `getBoundingClientRect` y `clientX` ya vienen escaladas. Para poner algo en `style.left/top` hay que dividir entre `zf()` (`pages.js`), como hace la tarjeta fantasma de LIVE.
+- **`--vh` / `--vw`:** en el CSS (`estilos/`) se usan `var(--vh)` y `var(--vw)` (hoy iguales a `100dvh` / `100vw`; quedan por si vuelve a hacer falta dividir).
+- **Densidad por tipo de puntero:** con dedo (`pointer: coarse`, la tablet y el celular) objetivos de 40–44 px; con ratón (`pointer: fine`) la densidad de escritorio. Un tamaño de ventana no decide el tamaño de los controles: lo decide cómo se toca.
 
 **Al revisar, comprobar siempre:** 1400 × 830, 1600 × 950, 852 × 393 y 1920 × 1080.
 
@@ -181,7 +181,7 @@ El código está en muchos archivos pequeños, en carpetas por área: **`web/liv
 
 Lo más buscado:
 - tokens y colores: `estilos/base.css`;
-- celular, ≤1100 y zoom de monitor: `estilos/pantallas/`;
+- celular, ≤1100 y PC: `estilos/pantallas/` (`escritorio.css`, la densidad con ratón, va la última);
 - protocolo y comandos: `codigo/nucleo/protocolo.js`; el FM-1 de ejemplo: `codigo/nucleo/simulador.js`;
 - tarjetas (`tileP`) y gestos: `codigo/componentes/tarjetas.js` y `gestos.js`;
 - LIVE configurable: `codigo/vistas/live.js`; Estudio: `codigo/vistas/estudio/`;
@@ -223,7 +223,7 @@ Capturas sin abrir el navegador:
 brave --headless=new --hide-scrollbars --force-prefers-reduced-motion --virtual-time-budget=6000 --window-size=1400,830 --screenshot=out.png "file://$PWD/web/live.html?mock=1&follow=0&folder=FX"
 ```
 
-> Las capturas headless **no aplican el zoom de monitor**; para 1920 y más, usar un Chrome de verdad.
+> Las capturas headless **no tienen ratón** (`pointer: none`): salen con la densidad de la tablet. Para ver la de escritorio, usar un Chrome de verdad.
 
 Publicar (pídele permiso al usuario antes):
 
