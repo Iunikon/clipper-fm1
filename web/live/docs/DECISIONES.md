@@ -133,6 +133,8 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 
 ---
 
+**Tamaños de las tarjetas de LIVE y HOME** (medidos en la tablet, el celular y el PC; más chico las corta, así que Editar solo ofrece estos): Efectos y ENV **2×2**; LFO y Filtro **1×2 o 2×2**; Escenas **2×1 o 2×2**; el resto, cualquiera. Una tarjeta guardada en un tamaño que no le cabe pasa sola al más cercano. En Editar, los controles de cada tarjeta (⋮⋮, tamaños, ×) van en una franja abajo, sin tapar su título.
+
 ## 5b. Para tocar en vivo (ideas del LIVE de SLOOP)
 
 Se añaden desde LIVE > Editar > Añadir > **ESCENAS Y SET**. Todo vive en la tablet: **no ocupa nada en el firmware**.

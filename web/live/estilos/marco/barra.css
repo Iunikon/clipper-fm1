@@ -21,7 +21,7 @@
   .now[aria-expanded="true"] .cv { transform: rotate(180deg); }
   .now .m { font-size: 12px; color: var(--tx-2); display: flex; gap: 8px; }
   .now .m .k { color: var(--kind); } .now .m .e { color: var(--eng); }
-  :is(.now .m, .sd .m, .svn .m, .fpad small, .sc .sm) > .k { border: 1px solid currentColor; padding: 0 4px; text-transform: uppercase; line-height: 1.35; }   /* el tipo: verde con recuadro */
+  :is(.now .m, .sd .m, .svn .m, .fpad small, .sc .sm) > .k { text-transform: uppercase; }   /* el tipo: verde, sin recuadro (no casaba con nada más) */
   .right { display: flex; align-items: center; gap: 16px; }
   .where { display: flex; align-items: center; gap: 8px; color: var(--tx-2); font-size: 12px; }
   .where b { color: var(--tx); font-weight: 600; font-size: 13px; }

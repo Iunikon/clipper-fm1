@@ -5,7 +5,7 @@
   .ci { position: relative; display: flex; min-width: 0; min-height: 0; } .ci > * { flex: 1; min-width: 0; }
   .ci > .tl { border-radius: 0; } .ci > .bx { grid-column: auto; grid-row: auto; min-height: 0; }
   .ci.ed > :first-child { pointer-events: none; outline: 2px dashed var(--line-2); outline-offset: -6px; } .ci.drag { opacity: .6; }
-  .cx { position: absolute; top: 0; right: 0; width: 40px; height: 40px; background: var(--tx); color: #000; font-size: 20px; font-weight: 900; z-index: 2; flex: none; }
+  .cx { width: 40px; height: 40px; background: var(--raised); color: var(--tx); font-size: 18px; font-weight: 900; flex: none; }   /* (in the card's edit strip, at its end: no mark over the card) */
   .cadd { border: 2px dashed var(--line-2); color: var(--tx-2); font-weight: 800; font-size: 14px; display: grid; place-items: center; }
   .cg.editing .ci { cursor: grab; touch-action: none; }
   .act { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; padding: 14px; background: var(--panel); border: 1px solid var(--line); text-align: left; }

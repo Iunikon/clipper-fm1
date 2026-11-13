@@ -15,7 +15,8 @@
   .tl { padding: 0; gap: 0; }
   .tl .tg { display: flex; flex-direction: column; gap: 8px; padding: 12px 12px 10px; text-align: left; width: 100%; flex: 1; border-radius: 0; }
   .tl button.tg:active { background: var(--press); }
-  .tl .stp, .tl .amt { margin: 0 12px 12px; }
+  .tl .stp, .tl .amt { margin: 0 12px 8px; }
+  .tl:has(.stp) .tg { gap: 4px; padding-bottom: 4px; } .tl .stp button { height: 40px; }   /* (Transponer, Tempo: whole at 1 x 1, 150 px) */
   .tl .led { width: 10px; height: 10px; border-radius: 0; border: 2px solid var(--line-2); flex: none; }
   .tl.on .led { background: var(--c); border-color: var(--c); }
   .tl .t { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }

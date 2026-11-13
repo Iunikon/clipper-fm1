@@ -26,7 +26,8 @@
   .stt button svg { width: 16px; height: 16px; } .stt button[aria-current="true"] { background: var(--k1); color: #000; border-color: var(--k1); }
   .stt[aria-label="SEQ"] button[aria-current="true"] { background: var(--tx); color: var(--page); border-color: var(--tx); }
   .bkr { display: flex; gap: 10px; margin: 12px 0; } .bkr .btn { padding: 0 18px; height: 52px; cursor: pointer; } .bkr .btn.dis { opacity: .4; pointer-events: none; }
-  .bkbar { height: 6px; background: var(--raised); } .bkbar b { display: block; height: 100%; background: var(--k1); }
+  .bkbar { height: 6px; background: var(--raised); } .bkbar:has(b[style*="width:0%"]) { display: none; }   /* (no bar while nothing runs) */
+  .bkbar b { display: block; height: 100%; background: var(--k1); }
   .bkm { font-size: 14px; color: var(--tx-2); margin-top: 8px; min-height: 20px; }
   .sys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .syr { background: var(--panel); border: 1px solid var(--line); padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
@@ -45,8 +46,11 @@
 
   /* LIVE's edit: the rails make room, the catalogue sits beside the grid; the lock */
   .cfgwrap.editing { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 14px; align-items: start; }
-  body.cfgediting .body { grid-template-columns: 0 minmax(0, 1fr) 0; } body.cfgediting .rail { display: none; }
-  .cgrip { position: absolute; top: 6px; left: 8px; z-index: 2; color: var(--tx-2); font-size: 18px; letter-spacing: -3px; background: var(--page); padding: 2px 6px; }
+  body.cfgediting:has(#edit[data-folder="LIVE"]) .body { grid-template-columns: 0 minmax(0, 1fr) 0; } body.cfgediting:has(#edit[data-folder="LIVE"]) .rail { display: none; }   /* (LIVE's edit: the whole width) */
+  /* HOME's shortcuts in edit: the rails stay; the four knobs step aside, the shortcuts take the row beside the catalogue */
+  .hrow2:has(.cfgwrap.editing) { grid-template-columns: minmax(0, 1fr); } .hrow2:has(.cfgwrap.editing) .hk { display: none; }
+  .hrow2:has(.cfgwrap.editing) .hacc .cg.short { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .cgrip { flex: none; align-self: center; color: var(--tx-3); font-size: 16px; letter-spacing: -3px; padding: 0 6px 0 2px; }   /* (the grip at the start of the edit strip) */
   .csz { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 2px; padding: 4px; background: rgba(0, 0, 0, .85); z-index: 2; height: auto; }
   .csz button { flex: 1; height: 40px; font-family: var(--num); font-size: 14px; color: var(--tx-2); background: var(--raised); -webkit-font-smoothing: none; }
   .csz button[aria-pressed="true"] { background: var(--tx); color: var(--page); }
@@ -98,6 +102,7 @@
   .hyt select.btn { appearance: none; padding-right: 14px; color: var(--tx); font-family: inherit; }
   .hyh { font-size: 13px; font-weight: 800; letter-spacing: .06em; color: var(--tx-3); margin-top: 14px; }
   .hyb .prow .tp { min-height: 112px; }
+  .hyb .prow { grid-template-columns: repeat(4, minmax(0, 1fr)); }   /* (four across, as everywhere: seven made the values run into the fader lines) */
   .hyall { align-self: flex-start; padding: 0 16px; cursor: pointer; }
   .hyb .tp, .hyb .ro { --c: var(--tx-3) !important; }   /* (no knob plays these: no knob colours) */
   .hyb .pgr.tall { height: 170px; }

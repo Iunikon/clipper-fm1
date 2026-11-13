@@ -45,7 +45,7 @@
     .qtools button { height: 40px; padding: 0 10px; }
     .lpt button { height: 40px; padding: 0 10px; }
     .pcs { grid-template-columns: repeat(6, minmax(0, 1fr)); }   /* las 12 notas en dos filas: teclas más anchas */
-    .cg { grid-auto-rows: 112px; gap: 6px; } .cg.short { grid-auto-rows: 100px; }
+    .cg { grid-auto-rows: 136px; gap: 6px; } .cg.short { grid-auto-rows: 136px; }   /* (a quick card needs ~135: smaller cut them) */
     .cfgwrap.editing { grid-template-columns: minmax(0, 1fr) 230px; gap: 8px; }
     .cat { max-height: calc(var(--vh) - 104px); padding: 10px; }
   }

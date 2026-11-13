@@ -25,7 +25,7 @@ function logChange(s, id, old, v, src) {
 function renderLog() {
   if (!M.info) return;
   $("chl").innerHTML = LOG.length ? LOG.map((e, i) => { const d = desc(e.s, e.id); if (!d) return ""; const a = fmtValue(d, e.old), b = fmtValue(d, e.v);
-    return `<div class="lg" role="listitem" style="--c:${KC[kOf(e.s, e.id)]}"><span class="l"><i></i>${esc(d.label)}<em class="${e.src === "sinte" ? "sinte" : "tab"}">${e.src === "sinte" ? trUi("SINTE") : trUi("TABLET")}</em></span>
+    return `<div class="lg" role="listitem" style="--c:${KC[kOf(e.s, e.id)]}"><span class="l"><i></i>${esc(d.label)}<em class="${e.src === "sinte" ? "sinte" : "tab"}">${e.src === "sinte" ? trUi("SINTE") : trUi("APP")}</em></span>
       <span class="vv num">${esc(a[0] + a[1])} → ${esc(b[0] + b[1])}</span><button class="ud" data-undo="${i}" aria-label="Deshacer ${esc(d.label)}: volver a ${esc(a[0] + a[1])}"><svg class="i"><use href="#i-undo"/></svg></button></div>`; }).join("")
     : `<p class="dvn">Lo que cambies, en el sinte o en la tablet, sale aquí. Toca <svg class="i"><use href="#i-undo"/></svg> para volver atrás.</p>`;
 }

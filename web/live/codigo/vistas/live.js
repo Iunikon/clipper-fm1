@@ -56,7 +56,24 @@ document.addEventListener("click", (e) => {
   if (i === CFG.lp && CFG.edit === "live") { ask({ title: "Nombre de la página", input: CFG.lpages[i].name, ok: "Guardar" }).then((n) => { if (n && n.trim()) { CFG.lpages[i].name = n.trim().slice(0, 16).toUpperCase(); cfgSave("live"); renderWork(); } }); return; }
   livePage(i); renderWork();
 });
+/* the sizes a card can take (measured on the tablet, the phone and a PC: smaller cuts it): the FX bars and the envelope
+   2 x 2, the LFO and the filter 1 x 2 or bigger,
+   the scenes two wide; the rest any of the four */
+const SZ_ALL = [[1, 1], [2, 1], [1, 2], [2, 2]];
+function cardSizes(it) {
+  if (it.t === "g" && (it.g === "fx" || it.g === "env")) return [[2, 2]];
+  if (it.t === "g" && (it.g === "lfo" || it.g === "filt")) return [[1, 2], [2, 2]];
+  if (it.t === "sc") return [[2, 1], [2, 2]];
+  return SZ_ALL;
+}
+function cardFit(it) {                           /* (a size it cannot take: the smallest it can that is not smaller) */
+  const ok = cardSizes(it), w = it.w || 1, h = it.h || 1;
+  if (ok.some(([a, b]) => a === w && b === h)) return;
+  const pick = ok.filter(([a, b]) => a >= w && b >= h)[0] || ok[ok.length - 1];
+  it.w = pick[0]; it.h = pick[1];
+}
 function itemHtml(it, i, which) {
+  cardFit(it);
   const ed = CFG.edit === which, w = it.w || 1, h = it.h || 1, at = `style="grid-column:span ${w};grid-row:span ${h}" data-ci="${i}"`;
   let body = "";
   if (it.t === "q") { const q = QSPEC.get(it.key); body = q ? tile(q) : ""; }
@@ -65,9 +82,9 @@ function itemHtml(it, i, which) {
   else if (LXT[it.t]) body = LXT[it.t].html(it, i);
   else if (it.t === "a") { const a = ACT[it.a] || ["?", ""], nx = it.a === "favnext" ? M.favs[(M.favCur + 1) % Math.max(1, M.favs.length)] : it.a === "favprev" ? M.favs[(M.favCur - 1 + M.favs.length) % Math.max(1, M.favs.length)] : null;
     body = `<button class="act" data-act="${it.a}"><b>${a[0]}</b><span class="v num">${it.a === "favnext" ? "›" : it.a === "favprev" ? "‹" : it.a === "play" ? (SQ.playing ? "■" : "▶") : it.a === "rec" ? "●" : a[2] || "↺"}</span><span class="s">${esc(nx ? nx.name : a[1])}</span></button>`; }
-  const sz = [[1, 1], [2, 1], [1, 2], [2, 2]].map(([a, b]) => `<button data-csz="${i}" data-w="${a}" data-h="${b}" aria-pressed="${a === w && b === h}">${a}×${b}</button>`).join("");
+  const sz = cardSizes(it).map(([a, b]) => `<button data-csz="${i}" data-w="${a}" data-h="${b}" aria-pressed="${a === w && b === h}">${a}×${b}</button>`).join("");
   if (!it.uid) it.uid = Math.random().toString(36).slice(2, 8);
-  return `<div class="ci${ed ? " ed" : ""}${CFG.sel === i && ed ? " sel" : ""}" data-uid="${it.uid}" ${at}>${body}${ed ? `<button class="cx" data-cx="${i}" aria-label="Quitar">×</button><span class="cgrip" aria-hidden="true">⋮⋮</span><div class="csz">${sz}</div>` : ""}</div>`;
+  return `<div class="ci${ed ? " ed" : ""}${CFG.sel === i && ed ? " sel" : ""}" data-uid="${it.uid}" ${at}>${body}${ed ? `<div class="csz"><span class="cgrip" aria-hidden="true">⋮⋮</span>${sz}<button class="cx" data-cx="${i}" aria-label="Quitar">×</button></div>` : ""}</div>`;
 }
 function cfgGrid(which, cls) {
   const items = CFG[which];

@@ -3,7 +3,7 @@
   .fpads { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
   .fpad { height: 92px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left; background: var(--panel); border: 1px solid var(--line); min-width: 0; }
   .fpad .i { font-size: 16px; color: var(--fav); } .fpad b { font-size: 14px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-  .fpad small { font-size: 11px; white-space: nowrap; overflow: hidden; max-width: 100%; }
+  .fpad small { font-size: 11px; white-space: nowrap; overflow: hidden; max-width: 100%; } .fpad .k { color: var(--kind); } .fpad .e { color: var(--eng); }
   .fpad.on { background: var(--tx); color: var(--page); } .fpad.on .i { color: var(--fav-d); } .fpad.on .k { color: var(--kind-d); } .fpad.on .e { color: var(--eng-d); }
   .fpad.free { border-style: dashed; border-color: var(--line-2); background: none; } .fpad.free small { white-space: normal; color: var(--tx-3); }
   .pos2 { font-size: 13px; color: var(--tx-3); margin-top: auto; }

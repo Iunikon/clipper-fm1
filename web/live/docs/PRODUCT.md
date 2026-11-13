@@ -18,7 +18,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** con el f
 - Fondo **negro**, todo **cuadrado** (`--r: 0`).
 - **Terminus** (la bitmap del FM-1, embebida) para números y valores, a tamaños de su retícula.
 - **El color de un parámetro es el del knob que lo gira en el FM-1:** K1 azul `#287cff`, K2 verde `#1ecc70`, K3 amarillo `#ffc618`, K4 naranja `#ff621a`.
-- **Los colores con significado comparten tono con los knobs y se separan con forma, no con otro tono:** favorito ★, editado con la etiqueta **EDIT**, tipo de sonido con recuadro, Estudio con su icono, peligro con ⚠, candado 🔒.
+- **Los colores con significado comparten tono con los knobs y se separan con forma, no con otro tono:** favorito ★, editado con la etiqueta **EDIT**, tipo de sonido en mayúsculas y en verde (sin recuadro: no casaba con nada más), Estudio con su icono, peligro con ⚠, candado 🔒.
 - **Naranja solo para favorito, EDIT y Guardar.** **Rojo `--danger` solo para lo que borra o reemplaza, siempre con ⚠ y segundo toque** (al menos 0,4 s después del primero).
 - **Blanco:** lo seleccionado, lo que suena, lo que el sinte tiene abierto y el candado puesto.
 - Nombres del sinte **en inglés** (ENV, FILTER…); la interfaz, en **español**, con inglés opcional en `codigo/idioma/ingles.js`.
