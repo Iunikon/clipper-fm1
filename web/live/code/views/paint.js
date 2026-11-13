@@ -128,7 +128,7 @@ function phoneRail(side) {
   $("lrh").setAttribute("aria-pressed", b.classList.contains("lopen")); if (isPhone()) $("favh").setAttribute("aria-pressed", b.classList.contains("ropen"));
 }
 document.addEventListener("pointerdown", (e) => {
-  if (!document.body.matches(".lopen, .ropen") || e.target.closest(".rail, #lrh, #favh, .sh, .br, .pick")) return;
+  if (!document.body.matches(".lopen, .ropen") || e.target.closest(".rail, #lrh, #favh, #morem, .sh, .br, .pick")) return;
   document.body.classList.remove("lopen", "ropen"); $("lrh").setAttribute("aria-pressed", "false");
 }, true);
 PHONE.addEventListener("change", () => { document.body.classList.remove("lopen", "ropen"); renderWork(); });

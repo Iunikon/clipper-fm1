@@ -74,9 +74,10 @@
     .bh { padding-bottom: 4px; margin-bottom: 4px; } .bh h2 { font-size: 14px; } .bh h2 svg { width: 14px; height: 14px; }
 
     /* graphs and their values */
-    .pgx:has(> .pgr) > .pgr { min-height: 110px; }
+    .pgx:has(> .pgr) { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }   /* (13 nov: «compacta», chosen among 3) */
+    .pgx:has(> .pgr) > .pgr { min-height: 104px; }
     .pgx:has(> .pgr) > .pgr.tall, .hyb .pgx:has(> .pgr) > .pgr.tall { min-height: 120px; }
-    .pgx:has(> .pgr) > .prow { grid-auto-rows: minmax(52px, 1fr); }
+    .pgx:has(> .pgr) > .prow { grid-auto-rows: minmax(50px, 1fr); }
     .prow { gap: 4px; }
     .prow .tp, .ci .tp, .tz .tp { min-height: 44px; padding: 4px 6px; gap: 2px; }
     .tt { font-size: 11px; }
@@ -84,7 +85,8 @@
     .tv small, .rv small { font-family: var(--sans); font-size: 10px; }
     .tp.t-arr .pos { top: 22px; right: 6px; font-size: 11px; }
     .arw button { height: 32px; }
-    .tp.t-two .opts { gap: 2px; } .tp.t-two .opts button { min-height: 32px; font-size: 11px; }
+    .tp.t-two .opts { flex-direction: row; gap: 2px; } .tp.t-two .opts button { min-height: 30px; font-size: 11px; text-align: center; }
+    .prow .tp, .ci .tp, .tz .tp { min-height: 48px; }
     .tp.t-seg .opts button { height: 32px; font-size: 11px; }
     .tp.t-sw .knob { width: 36px; height: 20px; } .tp.t-sw .knob::after { top: 3px; left: 3px; width: 14px; height: 14px; } .tp.t-sw.on .knob::after { transform: translateX(16px); }
 
@@ -104,6 +106,39 @@
     .tl:has(.stp, .arw, .tap) .tg { flex: 1 1 auto; min-height: 0; }
 
 
+    /* no left rail on the phone (13 nov, the owner's call: it made no sense at this size and looked bad); the right one,
+       the favourites, stays behind its button */
+    #lrh, .rail.l { display: none !important; }
+
+    /* REC in two columns (13 nov, chosen among 3): the state and REC / PLAY stacked on the left, the four settings a row
+       each on the right */
+    .recv { height: 100%; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; gap: 6px 8px; }
+    .rbig { grid-column: 1; grid-row: 1; padding: 8px 10px; border-left-width: 4px; } .rbig b { font-size: 18px; line-height: 20px; } .rbig p { font-size: 11px; margin-top: 2px; }
+    .rbtn { grid-column: 1; grid-row: 2 / 4; grid-template-columns: 1fr; grid-template-rows: 1.4fr 1fr; gap: 6px; }
+    .rbtn button.rrec, .rbtn button.rplay { height: auto !important; min-height: 48px; font-size: 16px; gap: 10px; }
+    .rgrid { grid-column: 2; grid-row: 1 / 3; display: flex; flex-direction: column; gap: 4px; }
+    .rset { flex-direction: row; align-items: center; justify-content: space-between; padding: 4px 4px 4px 10px; gap: 8px; }
+    .rset .rl { font-size: 11px; } .rset .opts { flex: 0 1 62%; } .rset .opts button { height: 34px; font-size: 13px; }
+    .recv > .msh { grid-column: 2; grid-row: 3; font-size: 11px; margin: 0; }
+    #edit[data-folder="REC"] { display: flex; flex-direction: column; } #edit[data-folder="REC"] > .recv { flex: 1; min-height: 0; }
+
+    /* LIVE (13 nov, «todo a la vista», chosen among 3): six columns; a big card (Filtro, Efectos…) three wide and two
+       high, a quick card one by one with its name, value and controls at the phone's size */
+    .cfgw .cg, .cfgw .cg.short { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; grid-auto-rows: 76px; gap: 4px; }
+    .cg > .ci { grid-column: span 1 !important; grid-row: span 1 !important; min-height: 0; overflow: hidden; }
+    .cg > .ci[style*="span 2"], .cg > .ci[style*="span 3"], .cg > .ci[style*="span 4"] { grid-column: span 3 !important; grid-row: span 2 !important; }
+    .cg > .ci > * { height: 100%; min-height: 0 !important; }
+    .ci .bx { padding: 6px 8px; gap: 4px; } .ci .bx > header, .ci .bx .bh { margin: 0; padding: 0; } .ci .bx .gr, .ci .bx .pgr { min-height: 44px; flex: 1 1 auto; }
+    .tl .tg { padding: 4px 6px; } .tl .tg > b { font-size: 11px; } .tl .v { font-size: 16px; line-height: 18px; }
+    .tl .stp, .tl .arw, .tl .amt { margin: 0 4px 4px; } .tl .stp button, .tl .arw button, .tl .tap { height: 24px; font-size: 11px; } .tl > .amt { height: 18px; }
+
+    /* the bar (13 nov, chosen among 3): the sound and its favourite on the left, PLAY / REC on the right, the rest in «⋯» */
+    .bar { display: flex !important; align-items: center; gap: 4px; padding: 0 8px; }
+    .bar .snd { flex: 0 1 auto; min-width: 0; } .bar .right { margin-left: auto; gap: 4px; }
+    .bar #saveb, .bar #tmp, .bar .cpu, .bar #mlb, .bar #favh, .bar #helpb, .bar #fs, .bar .where, .bar .follow, .bar #lrh, .bar .conn { display: none !important; }
+    .bar .more { display: grid; place-items: center; font-size: 20px; line-height: 1; color: var(--tx); }
+    .trn button { height: 32px; padding: 0 10px; }
+
     /* the start: Conectar, the demo */
     .gate .box { gap: 8px; } .gate h1 { font-size: 18px; } .gate p { font-size: 12px; } .gate .btn { height: 40px; font-size: 13px; }
 
@@ -112,10 +147,44 @@
     .sqb .seg button, .sqp, .stt button, .sqk, .sqb button.btn, .sqb .sqt2, .sqb [data-sqop], .sqb [data-sqview], .sqb [data-sqlane], .sqb [data-sqpg] { height: 32px; min-height: 32px; font-size: 11px; }
     .sqlane { height: 56px; }
     .pcs button { height: 34px; }
+    /* chosen layout (generate, variant 1): the 16 steps in one row; below, the lane on the left and the step editor on the right */
+    #edit[data-folder="SEQ"] .work { padding: 4px 6px 10px; }
+    .stt { padding-bottom: 2px; } .stt button { height: 30px; }
+    .sqb { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 8px; }
+    .sqb > * { grid-column: 1 / -1; min-width: 0; }
+    .sqb .bh { margin: 0 0 2px; padding-bottom: 2px; } .sqb .bh h2 { font-size: 13px; }
+    .sqtb { padding: 2px 0 4px; }
+    .sqk, .sqtb button { height: 30px; min-height: 30px; padding: 0 8px; }
+    .sqg { grid-template-columns: repeat(16, minmax(0, 1fr)); grid-auto-rows: 48px; gap: 2px; } .sq { height: 48px; min-height: 0; min-width: 0; padding: 4px 4px 6px; }
+    .sqb .bh button, .sqb .bh .seg button { height: 30px; min-height: 30px; }
+    .sqb { align-items: start; }
+    .sqb > .sqlw { grid-column: 1; margin: 0; } .sqlane { height: 96px; }
+    .sqb > .sqe { grid-column: 2; margin: 0; padding: 6px; gap: 6px; }
+    .sqe .pcs { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px; }
+    .sqlc .num { font-size: 10px; letter-spacing: -.02em; } .sqe .pcs button, .sqe .nud button { height: 30px; min-width: 0; padding: 0; }
+    .sqd { grid-template-columns: 1fr; gap: 6px; }
 
     /* SAVE */
     .sc { min-height: 44px; padding: 6px 8px; gap: 2px; } .scs > .sc { contain-intrinsic-size: auto 44px; } .sc .sn { font-size: 13px; } .sc .sm { font-size: 10px; }
     .svc { padding: 6px 8px; gap: 6px; } .svn b { font-size: 16px; line-height: 18px; }
     .sv .btn, .svc .btn { height: 34px; font-size: 12px; }
     .svh h2 { font-size: 14px; }
+    /* chosen layout (generate, variant 3): the folders in one sliding row on top; the list in 3 columns on the left;
+       the sound playing now pinned on the right with its buttons, so it stays in view while scrolling the list */
+    #edit[data-folder="SAVE"] .work { padding: 4px 6px 10px; }
+    .sv { display: flex; flex-direction: column; align-items: stretch; gap: 4px; width: 100%; min-width: 0; }
+    .sv > * { min-width: 0; max-width: 100%; }
+    .svl { display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 4px; overflow-x: auto; scrollbar-width: none; position: static; height: auto; max-height: none; width: auto; }
+    .svk { display: flex; flex-direction: row; gap: 4px; height: auto; flex: none; }
+    .svk .kf { flex: none; width: auto; height: 30px; min-height: 30px; padding: 0 10px; gap: 6px; font-size: 12px; }
+    .svg2 { flex: none; margin: 0 2px 0 6px; font-size: 10px; }
+    .svm { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 236px; grid-template-rows: auto 1fr; gap: 4px 8px; align-items: start; }
+    .svm > .svc { grid-column: 2; grid-row: 1 / 3; position: sticky; top: 0; display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 8px; margin: 0; }
+    .svm > .svc > * { min-width: 0; max-width: 100%; }
+    .svn { width: auto; height: auto; }
+    .sva { display: flex; flex-direction: column; gap: 4px; width: 100%; min-width: 0; } .sva .btn { height: 36px; min-width: 0; }
+    .sva .alg { display: grid; grid-template-columns: 1fr; gap: 4px; width: 100%; }
+    .sva .alg .btn { padding: 0 6px; gap: 4px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .svm > .svh { grid-column: 1; grid-row: 1; padding: 2px 0; margin: 0; } .svh h2 { font-size: 13px; }
+    .svm > .scs { grid-column: 1; grid-row: 2; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; } .sc { min-height: 40px; padding: 4px 6px; } .scs > .sc { contain-intrinsic-size: auto 40px; }
   }

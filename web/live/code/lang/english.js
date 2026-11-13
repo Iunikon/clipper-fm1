@@ -4,7 +4,7 @@
    with numbers or names in them by RX. The device's own names (ENV, CUT, BASS…) are English already */
 const LANG = { cur: (() => { try { return localStorage.getItem("clipperlive:lang"); } catch (e) { return null; } })() };
 const DICT = {
-  "favorito": "favourite", "Ver la demo, sin el sinte": "See the demo, without the synth", "No contesta": "Not answering", "<b>El FM-1 no contesta.</b> Lo que cambies no llega hasta que vuelva.": "<b>The FM-1 is not answering.</b> What you change won't reach it until it's back.",
+  "favorito": "favourite", "Más": "More", "Seguir al sinte": "Follow the synth", "Cómo se toca": "How to play it", "Pantalla completa": "Full screen", "MIDI learn": "MIDI learn", "Ver la demo, sin el sinte": "See the demo, without the synth", "No contesta": "Not answering", "<b>El FM-1 no contesta.</b> Lo que cambies no llega hasta que vuelva.": "<b>The FM-1 is not answering.</b> What you change won't reach it until it's back.",
   "El FM-1 no contesta.": "The FM-1 is not answering.", " Lo que cambies no llega hasta que vuelva.": " What you change won't reach it until it's back.",
   "El FM-1 contesta otra vez": "The FM-1 answers again", "se perdió la conexión con el FM-1": "the connection to the FM-1 was lost", "el FM-1 dejó de contestar": "the FM-1 stopped answering",
   "MIDI learn: tu controlador mueve Live": "MIDI learn: your controller moves Live",

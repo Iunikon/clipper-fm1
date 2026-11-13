@@ -96,6 +96,7 @@ Todo lo hecho en el fork [Iunikon/clipper-fm1](https://github.com/Iunikon/clippe
 - **Harden:** «No contesta» en la barra y la pantalla atenuada cuando el FM-1 deja de responder (vuelve sola); una subida o una restauración cortada dice qué pasó y qué hacer; cerrar la página a mitad de una escritura pregunta antes; un firmware sin Live lo dice con su versión.
 - **Optimize:** la Terminus solo con los glifos que usa Live (de 101 a ~45 KB): la app pasa de 613 a 561 KiB.
 - **Para compartir:** carpetas y archivos en inglés (`code/`, `styles/`, `build-order.txt`, `template.html`, `docs/CHANGELOG.md`…), todos los comentarios del código en inglés y el README de `web/live` en inglés. La interfaz sigue en español con su inglés en `code/lang/english.js`.
+- **Celular elegido entre variantes (Impeccable `generate`):** carpetas con gráfica «compactas» (gráfica a la izquierda, valores 2 × 2); REC en dos columnas (estado y REC/PLAY a un lado, los cuatro ajustes al otro); LIVE «todo a la vista» (seis columnas: Filtro y Efectos de 3 × 2, los accesos de uno en uno); la barra de arriba solo con el sonido, el favorito y PLAY / REC, y lo demás en un menú «⋯»; sin barra izquierda en el celular; SEQ con los 16 pasos en una fila y, debajo, el carril a la izquierda y el editor del paso a la derecha; SAVE con las carpetas en una fila arriba, la lista en 3 columnas y el sonido actual fijo a la derecha.
 - Auditoría de Impeccable (16/20) y sus arreglos: marcas de los pasos y «RANGO» a 11 px, el FM-1 de ejemplo ya no mueve el paso bajo el dedo, la pantalla solo sigue al paso del sinte si la rejilla está a la vista.
 
 ---
@@ -109,9 +110,7 @@ Todo lo hecho en el fork [Iunikon/clipper-fm1](https://github.com/Iunikon/clippe
 - el celular y el PC con el sinte de verdad.
 
 **Pendientes de diseño y de código:**
-- `/impeccable harden` (desconexión a mitad de una subida, otro firmware, el FM-1 que no contesta);
-- `/impeccable clarify` (textos en español e inglés);
-- `/impeccable optimize`: la app pesa unos 590 KB, sobre todo por la fuente; dejar solo los glifos usados;
+- la versión de escritorio, aparte de la del celular;
 - el manifiesto del sitio con `"orientation": "landscape"`.
 
 **Con el creador:**

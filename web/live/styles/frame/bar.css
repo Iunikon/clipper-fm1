@@ -30,3 +30,9 @@
     transition: background .15s var(--ease), color .15s var(--ease); }
   .seg button[aria-pressed="true"] { background: var(--tx); color: var(--page); }
 
+
+  /* the phone's «⋯» and its menu (screens/phone.css shows them) */
+  .bar .more, .morem[hidden] { display: none; }
+  .morem { position: fixed; top: 42px; right: 6px; z-index: 30; min-width: 200px; display: flex; flex-direction: column; padding: 4px; background: var(--panel); border: 1px solid var(--line-2); }
+  .morem button { height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px; font-size: 13px; font-weight: 700; color: var(--tx); text-align: left; }
+  .morem button:active { background: var(--press); } .morem .ms { font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }
