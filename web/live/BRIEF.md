@@ -143,7 +143,7 @@ Las decisiones vienen del feedback del usuario, en orden aproximado. **Una audit
 | Gráficas como las del sinte. | Las de la web se veían distintas (la envolvente plana, el LFO). |
 | Estudio en violeta. | Debe destacar como salida a otra herramienta. |
 | Sin teclado de piano en pantalla. | El usuario lo descartó en las propuestas. |
-| Ver propuestas antes de construir. | Es como prefiere trabajar el usuario: comparar opciones (`web/live-proposals.html`, `web/live-home-variants.html`). |
+| Ver propuestas antes de construir. | Es como prefiere trabajar el usuario: comparar opciones (`web/live/propuestas/`). |
 
 ## 6. Restricciones
 
