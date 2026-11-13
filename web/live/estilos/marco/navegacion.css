@@ -5,10 +5,9 @@
   .nb:hover { color: var(--tx-2); background: var(--raised); }
   .nb[aria-current="page"] { color: var(--tx); background: var(--raised); }
   .nb.dev::after { content: ""; position: absolute; top: 7px; right: calc(50% - 16px); width: 6px; height: 6px; border-radius: 0; background: var(--tx); }
-  .nb.est { margin-left: 8px; color: #000; background: var(--studio); box-shadow: none; font-weight: 700; }
+  .nb.est { color: #000; background: var(--studio); box-shadow: none; font-weight: 700; }
   .nb.est svg { color: #000; }
   .nb.est:hover, .nb.est:active { color: #000; background: var(--studio-hi); }
-  .nb.est::before { content: ""; position: absolute; left: -6px; top: 10px; bottom: 10px; width: 1px; background: var(--line); }
 
   .toast { display: none; position: fixed; top: 72px; left: 50%; transform: translateX(-50%); z-index: 30; margin: 0; opacity: 0; pointer-events: none;
     background: var(--raised); border: 1px solid var(--line-2); border-radius: 0; padding: 10px 14px; display: flex; align-items: center; gap: 10px;

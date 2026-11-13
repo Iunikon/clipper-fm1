@@ -28,7 +28,6 @@
     .gate { padding: 12px; } .gate .box { gap: 10px; } .gate h1 { font-size: 22px; } .gate p { font-size: 13px; }
     .nav { grid-template-columns: repeat(12, minmax(0, 1fr)) minmax(0, 1.2fr); padding: 3px 4px; gap: 2px; }
     .nb { gap: 1px; font-size: 11px; letter-spacing: -.02em; min-height: 0; padding: 0; } .nb svg { width: 17px; height: 17px; }
-    .nb.est { margin-left: 4px; } .nb.est::before { left: -4px; top: 6px; bottom: 6px; }
     .nb.dev::after { top: 3px; right: calc(50% - 13px); width: 5px; height: 5px; }
     .toast { top: 50px; min-width: 0; font-size: 13px; padding: 8px 12px; }
     .scrim { inset: 44px 0 0 0; }
