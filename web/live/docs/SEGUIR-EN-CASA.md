@@ -69,7 +69,13 @@ npx vercel@latest deploy --prod --yes
    - ◀ ▶ junto a cada selector de tipo (filtro, forma del LFO, algoritmo);
    - la memoria del FM-1 a la vista (ranuras USER usadas, espacio libre para samples).
 5. **Ideas de prioridad baja / grandes:** un banco que envíe solo las ranuras que cambiaron y escuchar antes de cargar; exportar un patrón de SEQ a `.mid`; separar en GLO lo que es del sonido de lo que es del aparato.
-6. **Con el creador:** el PR #48 (FAVS) sigue abierto; cuando publique su actualización, mezclarla en `main`, compilar y medir.
+6. **Lo que dejó la auditoría de lo nuevo (16/20, sin fallos graves):**
+   - el botón «Deshacer» de la línea de estado mide 24 px de alto; en la tableta, que se toca con el dedo, debería tener 44 px de zona de toque (`styles/frame/status.css`, `.stl .stu`);
+   - al cerrar la ficha de un valor el foco se va al inicio de la página: devolverlo a la tarjeta (`code/frame/info.js`, `infoSheet`);
+   - la ayuda de SPACE dice «reverb y delay», pero en el firmware también abre las voces en estéreo (`voice.c`, `P_MAC4` suma a SPREAD): completarla (`HELP[99]` en `info.js` y su inglés);
+   - menores: ⌘Z también deshace las perillas giradas en el sinte (salen en Cambios); la ficha se abre con Shift+F10 sobre la tarjeta, pero no está dicho en «Cómo se toca»; la línea de estado no anuncia «No contesta» a un lector de pantalla;
+   - de antes, no de hoy: dos grises con poco contraste (#5d5d5f y #424246 sobre el negro) y «MIDI» de la barra a 10 px.
+7. **Con el creador:** el PR #48 (FAVS) sigue abierto; cuando publique su actualización, mezclarla en `main`, compilar y medir.
 
 ## Cómo se eligieron las variantes (por si se repite)
 
