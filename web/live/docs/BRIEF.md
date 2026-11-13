@@ -2,9 +2,9 @@
 
 Documento de contexto para revisar el diseño de Clipper Live con Claude Design o Impeccable (`critique`, `audit`, `polish`, `layout`). Explica qué es el producto, quién lo usa, cómo está construido y qué decisiones se tomaron, con su porqué. Así la revisión parte de lo que ya se decidió y no lo deshace sin querer.
 
-> **Versión anterior (y archivos de antes: hoy el código está en `estilos/` y `codigo/`, ver `../README.md`).** Para el estado actual (celular, PC, Estudio nativo, LIVE configurable, HYBRID, Biblioteca) y las instrucciones de revisión, ver **`DECISIONES.md`**, que manda donde se contradigan.
+> **Versión anterior (y archivos de antes: hoy el código está en `estilos/` y `codigo/`, ver `../README.md`).** Para el estado actual (celular, PC, Estudio nativo, LIVE configurable, HYBRID, Biblioteca) y las instrucciones de revisión, ver **`DECISIONS.md`**, que manda donde se contradigan.
 
-> **Proyecto personal.** Clipper Live vive en `main` del fork Iunikon/clipper-fm1 (antes, la rama `live`). Ver `DECISIONES.md`.
+> **Proyecto personal.** Clipper Live vive en `main` del fork Iunikon/clipper-fm1 (antes, la rama `live`). Ver `DECISIONS.md`.
 
 ## Dónde está
 
@@ -143,7 +143,7 @@ Las decisiones vienen del feedback del usuario, en orden aproximado. **Una audit
 | Gráficas como las del sinte. | Las de la web se veían distintas (la envolvente plana, el LFO). |
 | Estudio en violeta. | Debe destacar como salida a otra herramienta. |
 | Sin teclado de piano en pantalla. | El usuario lo descartó en las propuestas. |
-| Ver propuestas antes de construir. | Es como prefiere trabajar el usuario: comparar opciones (`web/live/propuestas/`). |
+| Ver propuestas antes de construir. | Es como prefiere trabajar el usuario: comparar opciones (`web/live/proposals/`). |
 
 ## 6. Restricciones
 

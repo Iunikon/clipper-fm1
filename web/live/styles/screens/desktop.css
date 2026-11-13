@@ -1,0 +1,37 @@
+
+  /* ================================================================ a computer: a mouse, a wide screen ===
+     The tablet and the phone are played with a finger (44 px targets, values to read at arm's length). With a mouse
+     (pointer: fine) from 1200 px wide, a desktop's density: tighter bars and buttons, cards and graphs at a desk's
+     height, and the room used rather than everything grown: a folder's pages two across, LIVE's cards as many as fit.
+     Last in build-order.txt: it wins over the tablet's sizes only here */
+  @media (pointer: fine) and (min-width: 1200px) and (min-height: 600px) {
+    .app { grid-template-rows: 54px minmax(0, 1fr) 58px; }
+    .bar { gap: 12px; padding: 0 12px; }
+    .bar .ib { width: 36px; height: 36px; } .ib svg { width: 18px; height: 18px; }
+    .now .n { font-size: 18px; } .now .m { font-size: 11px; }
+    .svb { height: 34px; } .tbt { height: 34px; } .follow { height: 36px; }
+    .btn { height: 36px; font-size: 13px; }
+    .nav { padding: 4px 8px; } .nb { font-size: 10px; gap: 2px; } .nb svg { width: 18px; height: 18px; }
+    .work { padding: 14px 18px 24px; }
+    .stt button, .seg button, .qtools button, .lpt button { height: 34px; }
+
+    /* cards: a value at desk size, the fader as before */
+    .tp { padding: 10px 12px; gap: 6px; }
+    .tv { font-size: 32px; line-height: 36px; }
+    .prow { gap: 8px; } .prow .tp, .ci .tp { min-height: 88px; }
+    .tl { min-height: 92px; } .tz .tp { min-height: 96px; }
+    .pgr { height: 150px; } .pgr.tall { height: 180px; }
+    .pgh h3 { font-size: 14px; }
+
+    /* LIVE and HOME: as many cards across as fit, a row a desk's height */
+    .cg { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); grid-auto-rows: 152px; gap: 8px; }
+    .cg.short { grid-auto-rows: 132px; }
+    .act .v { font-size: 32px; line-height: 32px; }
+    .sqlane { height: 84px; }   /* (the advanced sequencer's lane: a desk's height) */
+    .stp button { height: 32px; } .tl .stp, .tl .amt { margin: 0 10px 10px; }   /* (a quick card's arrows, steps, TAP: mouse size) */
+  }
+  /* wide enough: a folder's pages two across, in the device's order (left to right, then down) */
+  @media (pointer: fine) and (min-width: 1600px) and (min-height: 600px) {
+    #edit:is([data-folder="ENV"], [data-folder="LFO"], [data-folder="FX"], [data-folder="SEL"], [data-folder="ARP"], [data-folder="GLO"], [data-folder="EDIT"]) > .pgs {
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 24px; align-items: start; }
+  }

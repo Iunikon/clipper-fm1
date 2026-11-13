@@ -1,0 +1,32 @@
+  /* ---- the bar: the FM-1, the sound, where the device is, the mode */
+  .bar { display: grid; grid-template-columns: 240px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 0 16px;
+    background: var(--panel); border-bottom: 1px solid var(--line); }
+  .conn { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .conn .dot { width: 8px; height: 8px; border-radius: 0; background: var(--ok); box-shadow: 0 0 0 3px rgba(30, 204, 112, .16); flex: none; }
+  .conn.off .dot { background: var(--tx-3); box-shadow: none; }
+  .conn b { font-weight: 600; }
+  .conn span { color: var(--tx-2); font-size: 12px; display: block; }
+  .snd { display: flex; align-items: center; gap: 8px; justify-self: center; min-width: 0; }
+  .ib { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 0; color: var(--tx-2);
+    transition: background .15s var(--ease), color .15s var(--ease); }
+  .ib:hover { background: var(--raised); color: var(--tx); }
+  .ib:active { background: var(--press); }
+  .ib.fav { color: var(--fav); }
+  .ib.fav svg { fill: currentColor; }
+  .now { display: flex; flex-direction: column; align-items: center; min-width: 220px; padding: 0 8px; }
+  .now .n { font-size: 20px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  .now { border-radius: 0; padding: 4px 12px; transition: background .15s var(--ease); }
+  .now:hover, .now[aria-expanded="true"] { background: var(--raised); }
+  .now .cv { width: 16px; height: 16px; color: var(--tx-3); transition: transform .2s var(--ease); }
+  .now[aria-expanded="true"] .cv { transform: rotate(180deg); }
+  .now .m { font-size: 12px; color: var(--tx-2); display: flex; gap: 8px; }
+  .now .m .k { color: var(--kind); } .now .m .e { color: var(--eng); }
+  :is(.now .m, .sd .m, .svn .m, .fpad small, .sc .sm) > .k { text-transform: uppercase; }   /* the kind: green, no box (it matched nothing else) */
+  .right { display: flex; align-items: center; gap: 16px; }
+  .where { display: flex; align-items: center; gap: 8px; color: var(--tx-2); font-size: 12px; }
+  .where b { color: var(--tx); font-weight: 600; font-size: 13px; }
+  .seg { display: flex; background: var(--page); border: 1px solid var(--line); border-radius: 0; padding: 3px; }
+  .seg button { height: 44px; padding: 0 16px; border-radius: 0; color: var(--tx-2); font-weight: 600; font-size: 13px; letter-spacing: .02em;
+    transition: background .15s var(--ease), color .15s var(--ease); }
+  .seg button[aria-pressed="true"] { background: var(--tx); color: var(--page); }
+

@@ -1,0 +1,121 @@
+  /* ================================================================ the phone's own layout (13 nov) ===
+     A phone in landscape (under 540 px tall) gets its own layout, not the tablet's scaled down: everything at a
+     phone's size, so a page fits in the height there is.
+     - a page with a graph: the graph on the left, its four values two by two on the right;
+     - at the folder bar's scale (13 nov, asked after seeing it): labels 11 px, values in the 16 px Terminus, tiles
+       from 44 px, buttons 32–34 px, graphs from 110 px;
+     - a tile with only a choice in it (the arrows of a list, two options, a segment) takes a column, not the width;
+     - the phone's targets are 32–40 px, as the folder bar's (PRODUCT.md).
+     Last in build-order.txt: it wins over phone-base.css and the tablet's sizes, and only on the phone */
+  @media (max-height: 540px) {
+    .work { padding: 6px 8px 12px; gap: 6px; }
+    .pgs { gap: 8px; }
+    .pgx { gap: 4px; }
+    .pgh { padding-bottom: 2px; } .pgh h3 { font-size: 12px; }
+
+    /* a page with a graph: two columns */
+    .pgx:has(> .pgr) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 4px 8px; }
+    .pgx:has(> .pgr) > .pgh { grid-column: 1 / -1; }
+    .pgx:has(> .pgr) > .pgr { grid-column: 1; grid-row: 2; height: auto; min-height: 150px; }
+    .pgx:has(> .pgr) > .pgr.tall, .hyb .pgx:has(> .pgr) > .pgr.tall { height: auto; min-height: 170px; }
+    .pgx:has(> .pgr) > .prow { grid-column: 2; grid-row: 2; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(72px, 1fr); align-content: stretch; }
+    .pgx:has(> .pgr) > :not(.pgh):not(.pgr):not(.prow) { grid-column: 1 / -1; }
+
+    /* the values: a phone's size */
+    .prow { gap: 6px; }
+    .prow .tp, .ci .tp { min-height: 64px; padding: 6px 8px; gap: 4px; }
+    .tp .tv, .tv { font-size: 24px; line-height: 26px; }
+    .tp.t-seg .tv, .tp.t-arr .tv { font-size: 24px; line-height: 28px; }
+    .tv small, .rv small { font-size: 16px; }
+    .tp.t-arr .pos { top: 34px; right: 8px; font-size: 12px; }
+    .arw button { height: 40px; }
+    .tp.t-two .opts { gap: 4px; } .tp.t-two .opts button { min-height: 40px; padding: 0 8px; }
+    .tp.t-seg .opts { padding: 2px; gap: 2px; } .tp.t-seg .opts button { height: 40px; }
+    .tp.t-sw .knob { width: 44px; height: 26px; } .tp.t-sw .knob::after { width: 18px; height: 18px; } .tp.t-sw.on .knob::after { transform: translateX(18px); }
+
+    /* a page without a graph: always four columns, so one or two values (a lone choice too) take their column, not the width */
+    .pgx:not(:has(> .pgr)) > .prow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .bb .bx { min-height: 0; }
+    .tz .tp { flex: 1 1 140px; min-height: 64px; }
+    .tz .tp.t-sw, .tz .tp.t-two { flex: 0 1 160px; }
+
+    /* the sequencer: its tools in a line, its steps lower */
+    .sqb .bh { margin-bottom: 4px; padding-bottom: 4px; gap: 6px; } .sqb .bh h2 { font-size: 15px; }
+    .stt { padding-bottom: 4px; }
+    .sqb .seg button, .sqp { height: 36px; }
+    .sqb button.btn, .sqb .sqt2, .sqb [data-sqop], .sqb [data-sqview], .sqb [data-sqlane], .sqb [data-sqpg] { height: 36px; min-height: 36px; padding: 0 8px; font-size: 12px; }
+    .sq { min-height: 52px; }
+    .sqtb { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 4px 0 6px; gap: 4px; }   /* the tools in one line that scrolls */
+    .sqtb > * { flex: none; }
+    .sqk { height: 36px; padding: 0 8px; font-size: 12px; }
+    .sqsep { height: 22px; margin: 0 2px; }
+    .sqpg { padding-bottom: 4px; }
+    .sqlane { height: 72px; }
+    .stt button { height: 36px; }
+
+    /* SAVE: the sounds four across and lower; the one playing in a shorter box */
+    .scs { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+    .sc { min-height: 56px; padding: 8px 10px; gap: 4px; }
+    .svc { padding: 8px 10px; gap: 8px; } .svn b { font-size: 24px; line-height: 26px; }
+
+    /* LIVE: a quick card's level bar keeps its 28 px (the toggle above gives way, not the bar) */
+    .tl > .tg { min-height: 0; flex: 1 1 auto; } .tl > .amt { flex: none; height: 28px; }
+  }
+
+  /* ---- the phone at the folder bar's scale (13 nov): everything one size down from the first pass above ---- */
+  @media (max-height: 540px) {
+    .app { grid-template-rows: 40px minmax(0, 1fr) 46px; }
+    .bar .ib { width: 34px; height: 34px; } .svb, .trn button { height: 32px; } .follow { height: 34px; }
+    .now .n { font-size: 14px; } .now .m { font-size: 10px; }
+    .tmp { font-size: 13px; }
+    .rail.l, .rail.r { top: 40px; } .scrim { inset: 40px 0 0 0; } .toast { top: 44px; }
+    .work { padding: 4px 6px 10px; gap: 4px; }
+    .pgs { gap: 6px; } .pgh h3 { font-size: 11px; }
+    .bh { padding-bottom: 4px; margin-bottom: 4px; } .bh h2 { font-size: 14px; } .bh h2 svg { width: 14px; height: 14px; }
+
+    /* graphs and their values */
+    .pgx:has(> .pgr) > .pgr { min-height: 110px; }
+    .pgx:has(> .pgr) > .pgr.tall, .hyb .pgx:has(> .pgr) > .pgr.tall { min-height: 120px; }
+    .pgx:has(> .pgr) > .prow { grid-auto-rows: minmax(52px, 1fr); }
+    .prow { gap: 4px; }
+    .prow .tp, .ci .tp, .tz .tp { min-height: 44px; padding: 4px 6px; gap: 2px; }
+    .tt { font-size: 11px; }
+    .tp .tv, .tv, .tp.t-seg .tv, .tp.t-arr .tv { font-size: 16px; line-height: 18px; }
+    .tv small, .rv small { font-family: var(--sans); font-size: 10px; }
+    .tp.t-arr .pos { top: 22px; right: 6px; font-size: 11px; }
+    .arw button { height: 32px; }
+    .tp.t-two .opts { gap: 2px; } .tp.t-two .opts button { min-height: 32px; font-size: 11px; }
+    .tp.t-seg .opts button { height: 32px; font-size: 11px; }
+    .tp.t-sw .knob { width: 36px; height: 20px; } .tp.t-sw .knob::after { top: 3px; left: 3px; width: 14px; height: 14px; } .tp.t-sw.on .knob::after { transform: translateX(16px); }
+
+    /* LIVE and HOME: lower cards */
+    .cg, .cg.short { grid-auto-rows: 104px; gap: 4px; }
+    .cfgw > :not(.qhead):not(.lpt) { margin-top: 4px; }
+    .qtools button, .lpt button { height: 34px; padding: 0 8px; font-size: 12px; }
+    .tl > .amt { height: 24px; }
+    .act .v { font-size: 16px; line-height: 18px; }
+    .cg, .cg.short { grid-auto-rows: 112px; }
+    .ci h3 { font-size: 13px; } .ci h3 svg { width: 13px; height: 13px; }
+    .rv, .mv, .tl .v { font-size: 24px; line-height: 26px; } .rv small, .mv small, .tl .v small { font-family: var(--sans); font-size: 10px; }
+    .stp button { height: 30px; font-size: 12px; }
+    .tl .tlb, .tl .tg > b { font-size: 12px; }
+    .tl .tg { padding: 6px 8px; gap: 2px; } .tl .v { font-size: 16px; line-height: 18px; } .tl .s { display: none; }   /* (the hint under a quick card: the tablet has room for it) */
+    .tl .stp, .tl .amt, .tl .arw { margin: 0 6px 6px; } .tl .stp button, .tl .arw button, .tl .tap { height: 28px; }
+    .tl:has(.stp, .arw, .tap) .tg { flex: 1 1 auto; min-height: 0; }
+
+
+    /* the start: Conectar, the demo */
+    .gate .box { gap: 8px; } .gate h1 { font-size: 18px; } .gate p { font-size: 12px; } .gate .btn { height: 40px; font-size: 13px; }
+
+    /* SEQ */
+    .sq { min-height: 40px; }
+    .sqb .seg button, .sqp, .stt button, .sqk, .sqb button.btn, .sqb .sqt2, .sqb [data-sqop], .sqb [data-sqview], .sqb [data-sqlane], .sqb [data-sqpg] { height: 32px; min-height: 32px; font-size: 11px; }
+    .sqlane { height: 56px; }
+    .pcs button { height: 34px; }
+
+    /* SAVE */
+    .sc { min-height: 44px; padding: 6px 8px; gap: 2px; } .scs > .sc { contain-intrinsic-size: auto 44px; } .sc .sn { font-size: 13px; } .sc .sm { font-size: 10px; }
+    .svc { padding: 6px 8px; gap: 6px; } .svn b { font-size: 16px; line-height: 18px; }
+    .sv .btn, .svc .btn { height: 34px; font-size: 12px; }
+    .svh h2 { font-size: 14px; }
+  }

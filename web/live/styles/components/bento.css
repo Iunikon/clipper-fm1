@@ -1,0 +1,125 @@
+  /* ==== the bento: 12 columns. A graph is a module (6 x 6) with its readouts; every other parameter a tile of its own,
+     as wide as what it is: a switch or a choice of two 2 columns, a choice or a fader 3. The rows don't follow the
+     device's pages of four ==== */
+  .bento { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-rows: 40px; grid-auto-flow: row dense; gap: 10px; }
+  .bx { grid-column: span 6; grid-row: span 6; background: var(--panel); border: 1px solid var(--line); border-radius: 0; display: flex; flex-direction: column;
+    min-width: 0; min-height: 0; overflow: hidden; position: relative; transition: border-color .15s var(--ease), box-shadow .15s var(--ease); }
+  .bx.dev { border-color: var(--tx); box-shadow: 0 0 0 1px var(--tx); }
+  .tp.dev { border-color: var(--tx); box-shadow: inset 0 3px 0 var(--tx), 0 0 0 1px var(--tx); }
+  .bx.flash, .tp.flash { animation: flash 1.2s var(--ease); }
+  .bx header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px 10px; }
+  .bx > .gr:first-child { margin-top: 12px; }
+  .bx h3 { font-size: 18px; font-weight: 700; letter-spacing: .02em; display: flex; align-items: center; gap: 10px; color: var(--tx); white-space: nowrap; }
+  .bx h3 svg { width: 18px; height: 18px; color: var(--tx-3); }
+  .live2 { animation: tag .14s var(--ease) both; font-size: 11px; font-weight: 700; letter-spacing: .06em; background: var(--tx); color: var(--page); padding: 5px 9px; border-radius: 0; white-space: nowrap; }
+  .hint2 { font-size: 12px; color: var(--tx-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* a graph: the module's body, on a faint grid; its handles big enough for a finger */
+  .gr { flex: 1; margin: 0 12px; border-radius: 0; background-color: var(--page); border: 1px solid var(--line); position: relative; min-height: 0; touch-action: pan-y;
+    background-image: linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
+    background-size: 100% 25%, 12.5% 100%; background-position: 0 -1px, -1px 0; }
+  .gin { position: absolute; inset: 20px; }
+  .gs { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .gs .line { fill: none; stroke: var(--gc, var(--k1)); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: miter; stroke-linecap: square; }
+  .gs .axis { stroke: var(--line-2); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 4 4; }
+  .g-echo .gs, .g-verb .gs, .g-eq .gs { --gc: var(--k2); }
+  .hd::after { content: ""; position: absolute; inset: -14px; }   /* 40 x 40 to the finger, 12 x 12 to the eye */
+  .hd { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; background: var(--c); box-shadow: 0 0 0 2px var(--page); cursor: grab; touch-action: none; transition: transform .1s var(--ease); }
+  .hd::after { content: ""; position: absolute; inset: -16px; }   /* (the finger's reach: 44 px) */
+  .hd:active, .gr.held .hd { transform: scale(1.35); }
+  .g-filt .gr, .g-lfo .gr { cursor: ew-resize; }
+
+  /* a graph's readouts: a value slides sideways (its level a line at the foot), a choice steps on a tap */
+  .ros { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; padding: 10px 12px 12px; }
+  .ro { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; padding: 9px 10px 13px; border-radius: 0; background: var(--raised);
+    border: 1px solid transparent; text-align: left; min-width: 0; touch-action: pan-y; cursor: ew-resize; transition: border-color .15s var(--ease); }
+  .ro.ch { cursor: pointer; }
+  .ro.held { border-color: var(--tx); } .ro.hot { border-color: var(--c); animation: flash 1.2s var(--ease); }
+  .rl, .tlb { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); display: flex; align-items: center; gap: 6px; white-space: nowrap; min-width: 0; }
+  .rl i, .tlb i, .al i { width: 8px; height: 8px; border-radius: 0; background: var(--c); display: inline-block; flex: none; }
+  .rv { font-family: var(--num); font-size: 32px; line-height: 32px; color: var(--tx); -webkit-font-smoothing: none; white-space: nowrap; overflow: hidden; }
+  .rv small, .tv small { font-size: 16px; color: var(--tx-3); margin-left: 2px; }
+  .ro.ch .rv { font-size: 24px; line-height: 32px; }
+  /* LIVE fits the height there is, no scroll: the grid shares what is left */
+  #edit[data-folder="LIVE"] { overflow: hidden; padding-bottom: 16px; grid-template-rows: auto minmax(0, 1fr); align-content: stretch; }
+  #edit[data-folder="LIVE"] .quick2 { grid-auto-rows: minmax(0, 1fr); min-height: 0; }
+  #edit[data-folder="LIVE"] .qhead { margin-bottom: 4px; }
+  .rf { position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+    background: linear-gradient(90deg, transparent calc(var(--lo) * 100%), var(--c) calc(var(--lo) * 100%), var(--c) calc(var(--hi) * 100%), transparent calc(var(--hi) * 100%)); }
+
+  /* meters (the sends, the macros): tall bars, the value over them */
+  .g-meters .gr, .g-arcs .gr { background: none; border: 0; margin: 0 6px 8px; touch-action: auto; }
+  .meters { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 12px; padding: 4px 8px 8px; height: 100%; }
+  .mt { display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 0; min-width: 0; }
+  .mv { font-family: var(--num); font-size: 32px; line-height: 32px; color: var(--tx); -webkit-font-smoothing: none; white-space: nowrap; }
+  .mv small { font-size: 16px; color: var(--tx-3); margin-left: 2px; }
+  .mtr { flex: 1; width: 100%; position: relative; cursor: ns-resize; touch-action: none; min-height: 40px; }
+  .mtr i { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--line-2); }
+  .mtr b { position: absolute; left: calc(50% - 1px); width: 3px; bottom: calc(var(--lo) * 100%); height: calc((var(--hi) - var(--lo)) * 100%); background: var(--c); }
+  .mtr s { position: absolute; left: calc(50% - 14px); width: 28px; height: 3px; bottom: calc(var(--f) * 100% - 1px); background: var(--c); }
+  .mtr.bi::before { content: ""; position: absolute; left: calc(50% - 10px); width: 20px; top: 50%; border-top: 1px dashed var(--line-2); }
+  .mt.off .mtr b, .mt.off .mtr s { opacity: .25; } .mt.off .mv { color: var(--tx-3); }
+  .ml { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); padding: 8px 12px; border-radius: 0; white-space: nowrap; }
+  button.ml { border: 1px solid var(--line-2); min-height: 44px; display: inline-flex; align-items: center; }
+  button.ml[aria-checked="true"] { background: var(--c); color: #000; border-color: var(--c); }
+  .mt.hot .mtr s { background: var(--tx); }
+  /* arcs (HOME's four): large dials */
+  .arcs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 8px; height: 100%; align-items: center; }
+  .arc { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: ns-resize; touch-action: none; min-width: 0; }
+  .arc svg { width: min(120px, 94%); height: auto; }
+  .av { font-family: var(--num); font-size: 32px; line-height: 32px; -webkit-font-smoothing: none; white-space: nowrap; }
+  .av small { font-size: 16px; color: var(--tx-3); margin-left: 2px; }
+  .al { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--tx-2); display: flex; align-items: center; gap: 6px; }
+  .arc.hot .av { color: var(--c); }
+
+  /* a parameter's tile */
+  .tp { grid-column: span 3; grid-row: span 3; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px; padding: 14px;
+    border-radius: 0; background: var(--panel); border: 1px solid var(--line); text-align: left; min-width: 0; color: var(--tx);
+    transition: border-color .15s var(--ease), background .15s var(--ease); }
+  .tp.t-sw, .tp.t-two { grid-column: span 2; }
+  .tt { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 2px 8px; position: relative; z-index: 1; min-width: 0; }
+  .pg { font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--tx-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .tv { font-family: var(--num); font-size: 48px; line-height: 48px; color: var(--tx); -webkit-font-smoothing: none; white-space: nowrap; overflow: hidden; position: relative; z-index: 1; }
+  /* a fader: the tile is the fader, its level a field of the knob's colour; slide it sideways */
+  .tp.t-fd { cursor: ew-resize; touch-action: pan-y; justify-content: space-between; }
+  .tp.t-fd .fl { position: absolute; top: 0; bottom: 0; left: calc(var(--lo) * 100%); width: calc((var(--hi) - var(--lo)) * 100%); background: var(--c); opacity: .2; transition: opacity .15s var(--ease); }
+  .tp.t-fd::after { content: ""; position: absolute; top: 0; bottom: 0; width: 3px; left: clamp(0px, calc(var(--f) * 100% - 1.5px), calc(100% - 3px)); background: var(--c); }
+  .tp.t-bi::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 1px dashed var(--line-2); }
+  .tp.t-fd.held, .tp.t-fd.hot { border-color: var(--c); } .tp.t-fd.held .fl, .tp.t-fd.hot .fl { opacity: .38; }
+  /* a switch: the whole tile; on, it takes the knob's colour */
+  .tp.t-sw { cursor: pointer; justify-content: space-between; }
+  .tp.t-sw .knob { width: 56px; height: 32px; border-radius: 0; background: var(--line-2); position: relative; flex: none; }
+  .tp.t-sw .knob::after { content: ""; position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 0; background: var(--tx-2); transition: transform .15s var(--ease); }
+  .tp.t-sw.on { border-color: var(--c); box-shadow: inset 4px 0 0 var(--c); }
+  .tp.t-sw.on::before { content: ""; position: absolute; inset: 0; background: var(--c); opacity: .22; pointer-events: none; }
+  .tp.t-sw.on > * { position: relative; z-index: 1; }
+  .tp.t-sw.on .knob { background: rgba(242, 242, 243, .22); } .tp.t-sw.on .knob::after { background: var(--c); transform: translateX(24px); }
+  .tp.t-sw.hot { border-color: var(--c); }
+  /* a choice: its options as buttons (two stacked; three or four in a row, the value over them); more, arrows */
+  .tp .opts { display: flex; gap: 6px; min-height: 0; }
+  .tp.t-two .opts { flex-direction: column; flex: 1; }
+  .tp.t-seg .opts { margin-top: auto; background: var(--page); border-radius: 0; padding: 4px; gap: 4px; }
+  .tp .opts button { flex: 1; min-width: 0; border-radius: 0; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--tx-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 6px; }
+  .tp.t-two .opts button { background: var(--raised); text-align: left; padding: 0 12px; min-height: 40px; }
+  .tp.t-seg .opts button { height: 44px; font-size: 12px; padding: 0 4px; }
+  .tp .opts button[aria-checked="true"] { background: var(--c); color: #000; }
+  .tp.t-seg .tv, .tp.t-arr .tv { font-size: 32px; line-height: 40px; }
+  .tp.t-arr .pos { position: absolute; right: 14px; top: 64px; font-size: 16px; color: var(--tx-3); }
+  .tp.t-arr .arw { margin-top: auto; }
+  .tp.hot { border-color: var(--c); animation: flash 1.2s var(--ease); }
+  .arw { display: flex; gap: 6px; } .arw button { flex: 1; height: 44px; border-radius: 0; background: var(--raised); display: grid; place-items: center; color: var(--tx-2); }
+  .arw button:active, .tp .opts button:active, .ro.ch:active { background: var(--press); }
+  .tp.away p { color: var(--tx-3); font-size: 13px; line-height: 1.4; }
+  .tp.away .tlb { white-space: normal; }
+  .go2 { margin-top: auto; display: inline-flex; align-items: center; gap: 4px; color: var(--studio); font-size: 13px; font-weight: 700; text-decoration: none; }
+  .go2 svg { width: 14px; height: 14px; }
+  @media (max-width: 1100px) { .bx { grid-column: span 12; } .tp { grid-column: span 4; } .tp.t-sw, .tp.t-two { grid-column: span 3; } }
+
+  /* RÁPIDO as a bento */
+  .quick2 { grid-auto-rows: 44px; }
+  .q-filt { grid-column: span 5; grid-row: span 5; } .q-fx { grid-column: span 7; grid-row: span 5; }
+  .q-arp { grid-column: span 4; grid-row: span 3; } .q-tr, .q-tempo { grid-column: span 3; grid-row: span 3; } .q-panic { grid-column: span 2; grid-row: span 3; }
+  .q-s { grid-column: span 2; grid-row: span 3; }
+  .qb { display: flex; min-width: 0; min-height: 0; } .qb > .tl { flex: 1; min-height: 0; border-radius: 0; }
+  .qb .tl .s { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+

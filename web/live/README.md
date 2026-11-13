@@ -1,60 +1,68 @@
-# Clipper Live: el código
+# Clipper Live: the code
 
-Clipper Live se escribe en muchos archivos pequeños y se publica como **uno solo**: `tools/live_build.py` los junta en `web/live.html` (con la fuente Terminus y los datos de ejemplo dentro). Ese archivo único es el que se descarga, funciona sin internet en la tablet y el celular, y se sube a Vercel.
+Clipper Live is written in many small files and shipped as **one**: `tools/live_build.py` joins them into `web/live.html`, with the Terminus font (only the glyphs Live uses, when fontTools is installed) and the example data inside. That single file is what gets downloaded, runs offline on the tablet and the phone, and goes up to Vercel.
 
 ```bash
 python3 tools/live_build.py                        # -> web/live.html
-python3 tools/live_build.py --site build/vercel    # lo mismo, listo para publicar
+python3 tools/live_build.py --site build/vercel    # the same, ready to publish
+pip install fonttools                              # optional: the font subset (about 55 KiB less)
 ```
 
-Para verlo sin el sinte: `web/live.html?mock=1&follow=0` (ver `docs/DECISIONES.md`, sección 8).
+To see it without the synth, tap **See the demo** on the start screen, or open `web/live.html?mock=1&follow=0`.
 
-## El orden: `montaje.txt`
+## No framework, on purpose
 
-`montaje.txt` dice qué archivos se juntan y **en qué orden**. El orden importa:
+Plain HTML, CSS and JavaScript, no dependencies and no bundler. The app has to open from a file on a tablet with no internet, next to the synth, and every byte of it ships in that file. The state is small (one sound, one page, one pattern), the UI redraws by view, and values are painted once a frame, so a framework would add weight and a build step without solving a problem the app has.
 
-- **CSS:** lo que va después gana (la cascada). Por eso las pantallas (`pantallas/celular.css`, `pantallas/pc.css`) y los ajustes de la revisión van al final.
-- **Código:** todo acaba en un solo `<script>`. Las funciones se pueden usar desde cualquier archivo, pero lo que se **ejecuta al cargar** (constantes, `addEventListener`, `arranque.js`) necesita que lo que usa esté antes.
+## The order: `build-order.txt`
 
-Un archivo nuevo se añade a `montaje.txt` en su sitio; si no está ahí, no entra en la app.
+`build-order.txt` says which files are joined and **in what order**. The order matters:
 
-## Dónde está cada cosa
+- **CSS:** what comes later wins (the cascade). That is why the screens (`screens/phone.css`, `screens/desktop.css`) and the review's adjustments go last.
+- **Code:** everything ends up in one `<script>`. Functions can be used from any file, but what **runs as the page loads** (constants, `addEventListener`, `start.js`) needs what it uses to come before it.
+
+A new file goes into `build-order.txt` in its place; if it is not there, it is not in the app.
+
+## Where things are
 
 ```
 web/live/
-  plantilla.html          el esqueleto: barra, rieles, navegación, hojas, iconos SVG (huecos __CSS__ __MOCK__ __JS__)
-  montaje.txt             el orden en que se juntan estilos y código
-  estilos/
-    base.css              tokens (:root), la fuente, lo básico
-    marco/                barra, cuerpo y rieles, navegación (+ avisos y lista de sonidos), conexión, transporte
-    componentes/          accesos de LIVE, bento y tarjetas, bloques, páginas especiales (matriz, layer, mod seq, tuning…)
-    vistas/               SAVE, SEQ (+ completo), carpetas como el sinte, REC, LIVE, HOME, Estudio
-    hojas/                Guardar
-    pantallas/            tablet, celular (max-height 540), ≤1100, escritorio (con ratón: la densidad de PC; va la última)
-    movimiento.css        transiciones básicas
-    interacciones.css     micro-interacciones (pulsar, deslizar, rebote, la línea de la carpeta)
-    rendimiento.css       content-visibility para listas largas
-    revision.css          lo de la revisión con Impeccable (EDIT, --danger, hojas propias, 40 px…)
-  codigo/
-    nucleo/               base (store, formatos), protocolo (Link, comandos C), simulador (el FM-1 de ejemplo),
-                          estado (M), conexión, recibir (lo que dice el FM-1), enviar, entrada (teclas y toques)
-    marco/                riel izquierdo (En el sinte, Cambios), avisos, osciloscopio, transporte (PLAY / REC)
-    componentes/          gráficas, tarjetas (tileP), páginas especiales, pintar (una vez por fotograma), gestos
-                          (arrastre, fino, bordes, vibración), gráficas de páginas, doble toque
-    vistas/               pintar (renderWork y la barra), SAVE, dispositivo, carpetas, REC, LIVE, HOME, RÁPIDO
-      seq/                pasos, completo, generar y MIDI, gestos
-      estudio/            pestañas, samples, copia de seguridad, sistema, HYBRID, biblioteca
-    hojas/                lista de sonidos, Guardar, lista de opciones
-    idioma/ingles.js      el inglés: DICT (frases) y RX (patrones). Todo texto nuevo en español necesita su entrada
-    arranque.js           lo último: conectar, ?mock=1, la primera pintura
-  docs/                   DECISIONES (manda), CAMBIOS (el historial), PRODUCT (las reglas, para revisores), PRUEBAS (con el FM-1),
-                          BRIEF (la versión anterior), y los informes de Impeccable
-  propuestas/             las maquetas que se compararon antes de construir
+  template.html          the skeleton: bar, rails, nav, sheets, SVG icons (slots __CSS__ __MOCK__ __JS__)
+  build-order.txt        the order styles and code are joined in
+  styles/
+    base.css             tokens (:root), the font, the basics
+    frame/               bar, body and rails, nav (+ toasts and the sound list), connection, transport, set
+    components/          LIVE's shortcuts, bento and tiles, blocks, special pages (matrix, layer, mod seq, tuning…), scenes
+    views/               SAVE, SEQ (+ advanced), folders as on the synth, REC, LIVE, HOME, Studio
+    sheets/              Save
+    screens/             tablet, phone-base and phone (under 540 px tall: the phone's own layout), pc (≤1100),
+                         desktop (with a mouse: a desk's density)
+    motion.css           basic transitions
+    interactions.css     micro-interactions (press, slide, bounce, the folder line)
+    performance.css      content-visibility for long lists
+    review.css           what the Impeccable reviews brought (EDIT, --danger, our own sheets, «No contesta»…)
+  code/
+    core/                base (store, formats), protocol (Link, the C commands), mock (the example FM-1),
+                         state (M), connection, receive (what the FM-1 says), send, input (keys and taps)
+    frame/               left rail (On the synth, Changes), toasts, scope, transport (PLAY / REC), set
+    components/          graphs, cards (tileP), special pages, paint (once a frame), gestures (drag, fine, edges,
+                         vibration), page graphs, double tap, scenes
+    views/               paint (renderWork and the bar), SAVE, device, folders, REC, LIVE, HOME, quick
+      seq/               steps, full (advanced), generate and MIDI, gestures
+      studio/            tabs, samples, backup, system, HYBRID, library
+    sheets/              sound list, Save, option list
+    lang/english.js      English: DICT (phrases) and RX (patterns). The UI is written in Spanish; every new Spanish
+                         text needs its entry here
+    start.js             last: connect, the demo, ?mock=1, the first paint
+  docs/                  DECISIONS (rules), CHANGELOG (history), PRODUCT (the rules, for reviewers), TESTING (with the FM-1),
+                         BRIEF (the earlier version) and the Impeccable reports. In Spanish, the owner's language
+  proposals/             the mock-ups compared before building
 ```
 
-## Reglas al tocar el código
+## Rules when touching the code
 
-- **El montaje tiene que seguir saliendo bien:** después de mover o partir archivos, `python3 tools/live_build.py` y comparar con lo de antes. Si solo se reorganiza, el `web/live.html` tiene que salir **idéntico byte a byte**.
-- **En CSS no se escribe `100dvh` ni `100vw`:** se usan `var(--vh)` y `var(--vw)`.
-- **Lo visual va en `estilos/`, la lógica en `codigo/`.** Un componente nuevo suele tener los dos: `estilos/componentes/x.css` y `codigo/componentes/x.js`.
-- Las reglas de diseño (colores, cuadrado, Terminus, naranja, arrastre…) están en `docs/PRODUCT.md` y `docs/DECISIONES.md`.
+- **The build has to keep coming out right:** after moving or splitting files, run `python3 tools/live_build.py` and compare. A pure reorganization must give a **byte-identical** `web/live.html`.
+- **No `100dvh` or `100vw` in CSS:** use `var(--vh)` and `var(--vw)`.
+- **Looks go in `styles/`, logic in `code/`.** A new component usually has both: `styles/components/x.css` and `code/components/x.js`.
+- **Comments and names in English;** the UI text in Spanish, with its English in `code/lang/english.js`.
+- The design rules (colours, square, Terminus, orange, drag…) are in `docs/PRODUCT.md` and `docs/DECISIONS.md`.

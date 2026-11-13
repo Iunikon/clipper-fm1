@@ -1,0 +1,141 @@
+  /* ==== ESTUDIO inside: the editor over the whole work area ==== */
+  .stu { display: flex; flex-direction: column; height: 100%; }
+  .stub { display: flex; align-items: center; gap: 14px; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--tx-2); }
+  .stub > b { font-size: 16px; color: var(--tx); } .stub .more { margin-left: auto; }
+  #stuf { flex: 1; width: 100%; border: 0; background: #fff; }
+  .chs { display: flex; align-items: center; gap: 6px; padding: 0 16px 8px; flex-wrap: wrap; } .chs:empty { display: none; }
+  .chs .edtx { font-size: 12px; font-weight: 700; margin-right: auto; } .chs .btn { height: 40px; padding: 0 10px; font-size: 12px; } .chs .btn svg { width: 16px; height: 16px; }
+  .tmp { display: flex; align-items: baseline; gap: 4px; white-space: nowrap; } .tmp b { font-size: 24px; line-height: 24px; font-weight: 400; } .tmp small { font-size: 11px; color: var(--tx-3); margin-right: 4px; }
+  .tag2 { font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; padding: 2px 6px; color: var(--tx); align-self: center; }
+  .tag2.trn { box-shadow: inset 0 0 0 1px var(--k1); }   /* TRN is turned by SEL 2's KNOB 1: a blue border, no fill */
+  .toast { min-width: 260px; justify-content: center; font-size: 15px; padding: 12px 18px; } .toast .num { font-size: 16px; }
+  /* HOME: the four knobs beside your shortcuts */
+  .hrow2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
+  .hrow2 .bx.hk { grid-column: auto; grid-row: auto; min-height: 300px; }
+  .hacc .cg.short { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(120px, auto); }
+  .hacc .cfgw.editing { margin-right: 0; }
+  .fpad { height: 80px; }
+  /* the bar, full: the conn narrower, Guardar an icon until there is room */
+  .bar { grid-template-columns: 190px minmax(0, 1fr) auto; }
+  @media (max-width: 1599px) { .svb span { display: none; } .svb { padding: 0 10px; } .where { display: none; } }
+
+  /* ==== ESTUDIO, Live's own: tabs, then the tab ==== */
+  .stv { display: flex; flex-direction: column; gap: 14px; }
+  .stt { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, auto); gap: 4px; border-bottom: 2px solid var(--line-2); padding-bottom: 8px; }
+  .stt button { height: 44px; padding: 0 10px; white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--tx-2); background: var(--panel); border: 1px solid var(--line); }
+  .stt button svg { width: 16px; height: 16px; } .stt button[aria-current="true"] { background: var(--k1); color: #000; border-color: var(--k1); }
+  .stt[aria-label="SEQ"] button[aria-current="true"] { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .bkr { display: flex; gap: 10px; margin: 12px 0; } .bkr .btn { padding: 0 18px; height: 52px; cursor: pointer; } .bkr .btn.dis { opacity: .4; pointer-events: none; }
+  .bkbar { height: 6px; background: var(--raised); } .bkbar:has(b[style*="width:0%"]) { display: none; }   /* (no bar while nothing runs) */
+  .bkbar b { display: block; height: 100%; background: var(--k1); }
+  .bkm { font-size: 14px; color: var(--tx-2); margin-top: 8px; min-height: 20px; }
+  .sys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .syr { background: var(--panel); border: 1px solid var(--line); padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+  .syr span { font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--tx-3); } .syr b { font-size: 24px; font-weight: 400; -webkit-font-smoothing: none; }
+
+  /* NOTES: Pasos | MIDI; the MIDI view, the whole pattern as a roll */
+  .sqvw { margin-left: auto; } .sqvw + .sqst { margin-left: 0; }
+  .sqmidi { display: grid; gap: 1px; max-height: 420px; overflow-y: auto; background: var(--page); border: 1px solid var(--line); padding: 4px; }
+  .mr, .mhd { display: grid; grid-template-columns: 40px repeat(var(--cols), minmax(0, 1fr)); gap: 1px; }
+  .mhd { position: sticky; top: 0; background: var(--page); z-index: 1; } .mhd span { font-size: 11px; color: var(--tx-3); }
+  .mr.bk .mc { background: #111114; } .mr.c { border-bottom: 1px solid var(--line-2); }
+  .mn { font-size: 13px; color: var(--tx-3); align-self: center; text-align: right; padding-right: 6px; }
+  .mc { height: 16px; background: var(--raised); border: 0; padding: 0; min-width: 0; }
+  .mc.beat { box-shadow: inset 2px 0 0 var(--line-2); } .mc.on { background: var(--k1); } .mc.tie { background: rgba(40, 124, 255, .45); }
+  .mc.sel { box-shadow: inset 0 0 0 99px rgba(242, 242, 243, .07); } .mc.sel.on { outline: 2px solid var(--tx); outline-offset: -2px; } .mc.ph { box-shadow: inset 0 0 0 99px rgba(242, 242, 243, .18); } .mc.on.ph { background: var(--tx); }
+
+  /* LIVE's edit: the rails make room, the catalogue sits beside the grid; the lock */
+  .cfgwrap.editing { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 14px; align-items: start; }
+  body.cfgediting:has(#edit[data-folder="LIVE"]) .body { grid-template-columns: 0 minmax(0, 1fr) 0; } body.cfgediting:has(#edit[data-folder="LIVE"]) .rail { display: none; }   /* (LIVE's edit: the whole width) */
+  /* HOME's shortcuts in edit: the rails stay; the four knobs step aside, the shortcuts take the row beside the catalogue */
+  .hrow2:has(.cfgwrap.editing) { grid-template-columns: minmax(0, 1fr); } .hrow2:has(.cfgwrap.editing) .hk { display: none; }
+  .hrow2:has(.cfgwrap.editing) .hacc .cg.short { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .cgrip { flex: none; align-self: center; color: var(--tx-3); font-size: 16px; letter-spacing: -3px; padding: 0 6px 0 2px; }   /* (the grip at the start of the edit strip) */
+  .csz { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 2px; padding: 4px; background: rgba(0, 0, 0, .85); z-index: 2; height: auto; }
+  .csz button { flex: 1; height: 40px; font-family: var(--num); font-size: 14px; color: var(--tx-2); background: var(--raised); -webkit-font-smoothing: none; }
+  .csz button[aria-pressed="true"] { background: var(--tx); color: var(--page); }
+  .ci.ed { animation: none; } .ci.ed > :first-child { outline: 2px dashed var(--k1); }
+  .lockb svg { width: 16px; height: 16px; } .lockb.on { background: var(--k3); color: #000; border-color: var(--k3); }
+  body.locked .nav .nb:not([aria-current="page"]) { opacity: .3; }
+  .langq { display: flex; flex-direction: column; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--line-2); } .langq b { font-size: 14px; color: var(--tx-2); }
+  .langq div, .syl { display: flex; gap: 8px; align-items: center; } .langq .btn, .syl .btn { flex: 1; height: 48px; } .syl { margin-top: 12px; } .syl span { font-size: 13px; color: var(--tx-2); width: 160px; }
+  .syl .btn.pri { background: var(--tx); color: var(--page); }
+
+  /* the options' list: a sheet over the page */
+  .pick { position: fixed; top: 72px; left: 50%; width: min(760px, calc(var(--vw) - 32px)); max-height: calc(var(--vh) - 160px); transform: translate(-50%, -8px); background: var(--panel);
+    border: 1px solid var(--line-2); z-index: 9; display: grid; grid-template-rows: auto minmax(0, 1fr); opacity: 0; pointer-events: none; transition: opacity .15s var(--ease), transform .15s var(--ease); box-shadow: 0 24px 64px rgba(0, 0, 0, .7); }
+  .pick.on { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+  .pkl { overflow-y: auto; padding: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+  .pkl button { height: 56px; display: flex; align-items: center; gap: 10px; padding: 0 12px; text-align: left; background: var(--raised); font-family: var(--num); font-size: 18px; -webkit-font-smoothing: none; color: var(--tx); }
+  .pkl button span { font-size: 13px; color: var(--tx-3); min-width: 20px; } .pkl button[aria-selected="true"] { background: var(--k1); color: #000; } .pkl button[aria-selected="true"] span { color: rgba(0, 0, 0, .6); }
+  .arw .pkb, .stp .pkb { flex: 0 0 44px; }
+
+  /* the header's tools: one strip at the right of the title */
+  .qtools { margin-left: auto; display: flex; border: 1px solid var(--line-2); }
+  .qtools button { height: 40px; padding: 0 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--tx-2); background: var(--panel); }
+  .qtools button + button { border-left: 1px solid var(--line-2); } .qtools button svg { width: 16px; height: 16px; }
+  .qtools button.on { background: var(--k3); color: #000; } .qtools [data-lock].on { background: var(--tx); color: var(--page); }
+  body:has(.qtools [data-lock].on) .follow { opacity: .4; }   /* with the lock on, the lock wins */ .qtools button.pri { background: var(--tx); color: var(--page); }
+  .qtools button:active { background: var(--press); }
+  .qhead .hint2 { margin-left: 12px; }
+  /* the card being moved: a ghost under the finger, a hole where it goes */
+  .ci.ghost { position: fixed; z-index: 40; pointer-events: none; box-shadow: 0 18px 40px rgba(0, 0, 0, .7), 0 0 0 2px var(--k1); transform: rotate(-1.5deg) scale(1.03); opacity: .95; }
+  .ci.ghost .cx, .ci.ghost .csz, .ci.ghost .cgrip { display: none; }
+  .ci.hole > * { visibility: hidden; } .ci.hole { outline: 2px dashed var(--k1); outline-offset: -2px; background: rgba(40, 124, 255, .08); }
+
+  /* LIVE's pages */
+  .lpt { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+  .lpt button { height: 44px; padding: 0 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: .04em; color: var(--tx-2); background: var(--panel); border: 1px solid var(--line); }
+  .lpt button[aria-current="true"] { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .lpx { width: 22px; height: 22px; display: grid; place-items: center; background: var(--fav); color: #000; }
+  .lpadd { border-style: dashed !important; color: var(--tx-3) !important; }
+  /* fine: held still while dragging */
+  .fine { outline: 2px solid var(--tx) !important; outline-offset: -2px; }
+  body.finemode::after { content: var(--fine-txt, "FINO ×¼"); position: fixed; top: 72px; left: 50%; transform: translateX(-50%); z-index: 31; font: 800 13px var(--sans); letter-spacing: .08em; background: var(--tx); color: #000; padding: 6px 12px; pointer-events: none; }
+
+  /* ESTUDIO > HYBRID: the patch's name, its tools, its pages */
+  .hyb .bh { flex-wrap: wrap; }
+  .hyn { height: 44px; width: 12ch; padding: 0 12px; background: var(--page); border: 1px solid var(--line-2); color: var(--tx); font-family: var(--num); font-size: 26px; letter-spacing: .04em; text-transform: uppercase; -webkit-font-smoothing: none; outline: none; }
+  .hyn:focus { border-color: var(--tx-3); }
+  .hyt { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+  .hyt .btn { padding: 0 14px; cursor: pointer; }
+  .hyt select.btn { appearance: none; padding-right: 14px; color: var(--tx); font-family: inherit; }
+  .hyh { font-size: 13px; font-weight: 800; letter-spacing: .06em; color: var(--tx-3); margin-top: 14px; }
+  .hyb .prow .tp { min-height: 112px; }
+  .hyb .prow { grid-template-columns: repeat(4, minmax(0, 1fr)); }   /* (four across, as everywhere: seven made the values run into the fader lines) */
+  .hyall { align-self: flex-start; padding: 0 16px; cursor: pointer; }
+  .hyb .tp, .hyb .ro { --c: var(--tx-3) !important; }   /* (no knob plays these: no knob colours) */
+  .hyb .pgr.tall { height: 170px; }
+
+  /* ESTUDIO > Biblioteca: the tablet's sounds, their tags, a USER slot to send one to */
+  .tlib .bh .c { color: var(--tx-3); font-size: 14px; }
+  .lflt { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .lq { height: 44px; width: 260px; padding: 0 12px; background: var(--page); border: 1px solid var(--line-2); color: var(--tx); font: inherit; font-size: 15px; outline: none; }
+  .lq:focus { border-color: var(--tx-3); }
+  .tg2 { height: 36px; padding: 0 14px; background: var(--raised); border: 1px solid var(--line); color: var(--tx-2); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .tg2.on { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .lrows { display: flex; flex-direction: column; gap: 6px; }
+  .lrow { display: grid; grid-template-columns: minmax(0, 1.2fr) 90px minmax(0, 1fr) 96px auto; align-items: center; gap: 12px; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); }
+  .lrow > b { font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lrow .e { color: var(--eng); font-size: 13px; font-weight: 700; }
+  .lrow small { color: var(--tx-3); font-size: 13px; }
+  .ltg { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+  .ltg span { padding: 2px 8px; border: 1px solid var(--line-2); color: var(--tx-2); font-size: 12px; }
+  .lrow .dva { display: flex; gap: 6px; }
+  .lrow .dva .btn, .lrow .dva .dsc { padding: 0 12px; cursor: pointer; }
+  .lsl { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .lsl > .c { grid-column: 1 / -1; color: var(--tx-3); font-size: 13px; }
+  .lsl .btn { height: 52px; flex-direction: column; gap: 2px; cursor: pointer; }
+  .lsl .btn small { font-size: 11px; color: var(--tx-3); font-weight: 500; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lsl .btn.used { border-color: var(--line-2); }
+  .lsl .btn:last-child { grid-column: span 2; }
+  .tlib .bh { flex-wrap: wrap; }
+  .hyb .t-arr .pos { display: none; }   /* (seven across: the name needs the room) */
+
+  /* SAVE > Herramientas: the three, large, in the main area (not squeezed at the foot of the list) */
+  .svm .tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; border-top: 0; padding-top: 0; }
+  .svm .tools h3 { display: none; }
+  .svm .tool { min-height: 150px; padding: 18px; justify-content: space-between; cursor: pointer; }
+  .svm .tool b { font-size: 28px; }
+  .svm .tool span { font-size: 15px; }
+
