@@ -4,6 +4,13 @@
    with numbers or names in them by RX. The device's own names (ENV, CUT, BASS…) are English already */
 const LANG = { cur: (() => { try { return localStorage.getItem("clipperlive:lang"); } catch (e) { return null; } })() };
 const DICT = {
+  "MIDI learn: tu controlador mueve Live": "MIDI learn: your controller moves Live",
+  "¿Seguro?": "Sure?", "Salida, en el sinte y cambios": "Output, on the synth and changes", "Lo editado se descartó": "The edits were discarded",
+  "Mueve un parámetro del sonido y vuelve: se fija aquí su valor para este paso.": "Move one of the sound's parameters and come back: its value is locked here for this step.",
+  "la secuencia de modulación": "the modulation sequence", "los proyectos": "the projects", "la afinación": "the tuning", "las pistas": "the tracks", "los kits": "the kits", "los samples": "the samples",
+  "la biblioteca": "the library", "el patrón": "the pattern", "los favoritos": "the favourites", "las ranuras": "the slots",
+  "El FM-1 no contestó a esto. El FM-1 de ejemplo no lo sabe hacer; con el sinte de verdad sale aquí.": "The FM-1 didn't answer this. The example FM-1 can't do it; with the real synth it shows here.",
+  "El FM-1 no contestó a esto. con el sinte de verdad sale aquí.": "The FM-1 didn't answer this. With the real synth it shows here.",
   "Avanzado": "Advanced", "Modo": "Mode",
   "Escenas": "Scenes", "Guardar aquí": "Save here", "Ya": "Now", "compases": "bars", "de golpe": "at once", "Parar": "Stop",
   "ESCENAS Y SET": "SCENES AND SET", "Reloj del set": "Set clock", "RELOJ": "CLOCK", "Grabar set": "Record set", "GRABAR SET": "RECORD SET", "Toca para parar y guardar": "Tap to stop and save",
@@ -94,13 +101,14 @@ const DICT = {
 const RX = [
   [/^Escena (\d+): (.+)$/, "Scene $1: $2"], [/^Escena (\d+), libre$/, "Scene $1, free"], [/^S(\d+): ¿encima\?$/, "S$1: over it?"], [/^CC (\d+) · canal (\d+)$/, "CC $1 · channel $2"], [/^Nota (\d+) · canal (\d+)$/, "Note $1 · channel $2"],
   [/^en (\d+) compás$/, "over $1 bar"], [/^en (\d+) compases$/, "over $1 bars"], [/^guardada: (.+)$/, "saved: $1"], [/^: (.+), en tus descargas$/, ": $1, in your downloads"],
-  [/^(.+): anterior$/, "$1: previous"], [/^(.+): siguiente$/, "$1: next"], [/^(.+): apagado$/, "$1: off"], [/^(.+): encendido$/, "$1: on"], [/^(.+): menos$/, "$1: less"], [/^(.+): más$/, "$1: more"], [/^(.+): nivel$/, "$1: level"],
+  [/^(.+): anterior$/, (m, x) => `${DICT[x] || x}: previous`], [/^(.+): siguiente$/, (m, x) => `${DICT[x] || x}: next`], [/^(.+): apagado$/, (m, x) => `${DICT[x] || x}: off`], [/^(.+): encendido$/, (m, x) => `${DICT[x] || x}: on`],
+  [/^(.+): menos$/, (m, x) => `${DICT[x] || x}: less`], [/^(.+): más$/, (m, x) => `${DICT[x] || x}: more`], [/^(.+): nivel$/, (m, x) => `${DICT[x] || x}: level`],
   [/^Paso (\d+): vacío$/, "Step $1: empty"], [/^Paso (\d+): ligado$/, "Step $1: tied"], [/^Paso (\d+): (.+)$/, "Step $1: $2"], [/^Deshacer (.+): volver a (.+)$/, "Undo $1: back to $2"],
   [/^Editar (.+)$/, (m, x) => `Edit ${DICT[x] || x}`], [/^Abrir (.+)$/, (m, x) => `Open ${DICT[x] || x}`], [/^(\d+) pasos$/, "$1 steps"], [/^(\d+) sonidos$/, "$1 sounds"], [/^(\d+) de (\d+)$/, "$1 of $2"],
   [/^(\d+) zonas? · (.+)$/, (m, n, k) => `${n} zone${n === "1" ? "" : "s"} · ${k}`], [/^Anterior en (.+)$/, "Previous in $1"], [/^Banco (\d+)$/, "Bank $1"], [/^Proyecto (\d+)$/, "Project $1"],
   [/^Acorde de (\d+) notas$/, "Chord of $1 notes"], [/^Favorito (\d+): quitar$/, "Favourite $1: remove"], [/^Favorito (\d+) de (\d+)$/, "Favourite $1 of $2"], [/^Guardar en (U\d+)$/, "Save to $1"], [/^Reemplazar (U\d+)$/, "Replace $1"],
   [/^Se reemplaza (.+)\.$/, "Replaces $1."], [/^Guarda encima de (.+), el que suena\.$/, "Saves over $1, the one playing."], [/^Hasta 12 letras\. Sin nombre se llama (.+)\.$/, "Up to 12 letters. Without a name it is called $1."],
-  [/^Poner (.+)$/, "Put $1"], [/^Generar en (.+)$/, "Generate in $1"], [/^Leyendo (.+) del FM-1…$/, "Reading $1 from the FM-1…"], [/^(.+) como se cargó (.+)$/, "$1 as loaded $2"],
+  [/^Poner (.+)$/, "Put $1"], [/^Generar en (.+)$/, "Generate in $1"], [/^Leyendo (.+) del FM-1…$/, (m, x) => `Reading ${DICT[x] || x} from the FM-1…`], [/^(.+) como se cargó (.+)$/, "$1 as loaded $2"],
   [/^Leyendo (\d+) de (\d+) KiB…$/, "Reading $1 of $2 KiB…"], [/^Escribiendo (.+)$/, "Writing $1"], [/^Copia guardada: (\d+) KiB\. Está en tus descargas\.$/, "Backup saved: $1 KiB. It is in your downloads."], [/^No se pudo: (.+)$/, "Couldn't: $1"],
   [/^([A-G]#?-?\d+), paso (\d+)(, suena)?$/, (m, n, k, on) => `${n}, step ${k}${on ? ", sounding" : ""}`],
   [/^No pude hacer la copia de lo de ahora, así que no restauro: (.+)$/, "Couldn't back up what is there now, so not restoring: $1"], [/^Copia del proyecto de ahora en tus descargas \((.+)\)$/, "Backup of the project playing in your downloads ($1)"],
@@ -126,12 +134,12 @@ function trNode(root) {
   const els = root.querySelectorAll ? [root, ...root.querySelectorAll("[aria-label],[title],[placeholder]")] : [];
   for (const e of els) for (const a of ["aria-label", "title", "placeholder"]) { const v = e.getAttribute && e.getAttribute(a); if (v) { const t2 = tr(v); if (t2 !== v) e.setAttribute(a, t2); } }
 }
-const trObs = new MutationObserver((ms) => { if (LANG.cur !== "en") return; for (const m of ms) { if (m.type === "characterData") trNode(m.target); else m.addedNodes.forEach(trNode); } });
+const trObs = new MutationObserver((ms) => { if (LANG.cur !== "en") return; for (const m of ms) { if (m.type === "characterData") trNode(m.target); else if (m.type === "attributes") { const v = m.target.getAttribute(m.attributeName); if (v) { const t2 = tr(v); if (t2 !== v) m.target.setAttribute(m.attributeName, t2); } } else m.addedNodes.forEach(trNode); } });
 function setLang(l) {
   const was = LANG.cur; LANG.cur = l; try { localStorage.setItem("clipperlive:lang", l); } catch (e) { /* (asked again next time) */ }
   document.documentElement.lang = l;
   document.documentElement.style.setProperty("--fine-txt", l === "en" ? '"FINE ×¼"' : '"FINO ×¼"');
-  if (l === "en") { trNode(document.body); trObs.observe(document.body, { childList: true, subtree: true, characterData: true }); }
+  if (l === "en") { trNode(document.body); trObs.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["aria-label", "title", "placeholder"] }); }
   else if (was === "en") { trObs.disconnect(); location.reload(); }   /* (back to Spanish: the page as written) */
 }
 /* asked the first time, over the connect screen; then Estudio > Sistema */

@@ -5,7 +5,8 @@
    then move the controller's knob or press its key. The links are kept in the tablet ("midimap"); a CC sets a value
    across its range, a note toggles a switch, triggers an action or goes to a scene. The FM-1's own port is left alone */
 const ML = { on: false, target: null, map: store.get("midimap") || {}, ready: false };
-const mlSave = () => store.set("midimap", ML.map);
+const mlSave = () => { store.set("midimap", ML.map); $("mlb")?.classList.toggle("has", Object.keys(ML.map).length > 0); };
+setTimeout(() => $("mlb")?.classList.toggle("has", Object.keys(ML.map).length > 0), 0);
 const mlName = (t) => (t.s != null ? (desc(t.s, t.id) || {}).label || "?" : t.act ? (ACT[t.act] || [t.act])[0] : t.scn != null ? `S${t.scn + 1}` : "?");
 const mlKeyName = (k) => { const [kind, ch, n] = k.split(":"); return kind === "cc" ? `CC ${n} · canal ${+ch + 1}` : `Nota ${n} · canal ${+ch + 1}`; };
 async function mlAttach() {
@@ -37,7 +38,7 @@ function mlMsg(e) {
   if (kind === 0xB0) (ML.hi = ML.hi || {})[k] = b >= 64;        /* (a CC as a button: once each time it crosses 64) */
 }
 function mlToggle() {
-  ML.on = !ML.on; ML.target = null; document.body.classList.toggle("learning", ML.on);
+  ML.on = !ML.on; ML.target = null; document.body.classList.toggle("learning", ML.on); $("mlb")?.setAttribute("aria-pressed", ML.on);
   if (ML.on) { mlAttach(); toast(-1, "<b>MIDI learn</b>: toca un control y mueve tu controlador"); }
   document.querySelectorAll(".lrn-t").forEach((x) => x.classList.remove("lrn-t")); renderWork();
 }
@@ -45,7 +46,7 @@ function mlToggle() {
 const ML_SEL = "[data-fd],[data-cell],[data-act],[data-scn],.tl[data-tl]";
 function mlPick(e) {
   if (!ML.on) return;
-  const el = e.target.closest(ML_SEL); if (!el || e.target.closest("[data-mloff],.lrnbar,[data-act=learn]")) return;
+  const el = e.target.closest(ML_SEL); if (!el || e.target.closest("[data-mloff],.lrnbar,[data-act=learn],#mlb")) return;
   e.preventDefault(); e.stopPropagation();
   if (e.type !== "click") return;
   let t = null;
@@ -60,7 +61,7 @@ function mlPick(e) {
 }
 ["pointerdown", "click"].forEach((ev) => document.addEventListener(ev, mlPick, true));
 document.addEventListener("click", (e) => {
-  if (e.target.closest("[data-mloff]")) { mlToggle(); return; }
+  if (e.target.closest("[data-mloff],#mlb")) { mlToggle(); return; }   /* (#mlb: the bar's MIDI button) */
   const x = e.target.closest("[data-mldel]"); if (x) { delete ML.map[x.dataset.mldel]; mlSave(); renderWork(); }
 });
 ACT.learn = ["MIDI learn", "Tu controlador mueve Live", "◎"]; ACT.learn.run = mlToggle;

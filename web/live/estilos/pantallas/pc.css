@@ -9,6 +9,8 @@
     .bar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; }
     .conn, .right .cpu { display: none !important; }
     .snd { justify-self: start; } .now { min-width: 0; max-width: 260px; } .now .n > span { overflow: hidden; text-overflow: ellipsis; }
+    .snd { min-width: 0; overflow: hidden; } .now { max-width: 200px; }      /* (the sound never runs under the right side) */
+    .right { gap: 6px; } .tmp small { display: none; } .follow { font-size: 0; gap: 0; padding: 0 6px; }   /* (Seguir: its switch alone) */
     .body:has(#edit[data-folder="SAVE"]) { grid-template-columns: 0 minmax(0, 1fr) 0; }
     .rail.l { display: flex !important; position: fixed; top: 64px; bottom: 72px; left: 0; width: 280px; z-index: 12; overflow-y: auto;
       transform: translateX(-102%); box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0); transition: transform .2s var(--ease), box-shadow .2s var(--ease); }

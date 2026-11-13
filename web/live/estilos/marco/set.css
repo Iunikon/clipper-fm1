@@ -14,3 +14,7 @@
   body.setrec .bar::after { content: "● SET"; position: absolute; left: 50%; top: 2px; transform: translateX(-50%); font-size: 10px; font-weight: 800; letter-spacing: .08em; color: #ff3b30; }
   .bar { position: relative; }
   @media (max-height: 540px) { .lrnbar { bottom: calc(52px + env(safe-area-inset-bottom, 0px)); font-size: 12px; } .mlr { grid-template-columns: 130px minmax(0, 1fr) 40px; } }
+  /* the bar's MIDI button: MIDI learn from anywhere; white while learning (and with links kept, its text brighter) */
+  .mlb b { font: 800 10px var(--sans); letter-spacing: .06em; }
+  .bar .mlb[aria-pressed="true"], .bar .mlb[aria-pressed="true"]:hover { background: var(--tx); color: var(--page); }
+  .mlb.has { color: var(--tx); }
