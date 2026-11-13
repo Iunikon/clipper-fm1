@@ -157,7 +157,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 | Importar páginas de LIVE las **añade**; importar ajustes **reemplaza** con segundo toque | Las páginas son para compartir y combinar; los ajustes son una copia completa para restaurar. |
 | Sin teclado de piano en pantalla | Descartado en propuestas. |
 | Sin Drum kits | Clipper no tiene batería. |
-| El sinte no se adorna desde la tablet | La ventana flotante del valor en el FM-1 es su opción MENU > ZOOM, no Live. |
+| El sinte no se adorna desde la tablet | Editar desde la tablet no redibuja la pantalla del FM-1 ni le añade nada; el aviso del cambio sale solo en la tablet. |
 | Ver propuestas antes de cambios grandes | Así prefiere trabajar el usuario. (Para el celular y PC pidió construir directo.) |
 
 ---

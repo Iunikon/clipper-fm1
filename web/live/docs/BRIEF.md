@@ -153,7 +153,7 @@ Las decisiones vienen del feedback del usuario, en orden aproximado. **Una audit
 - **Contraste:** todo el texto ≥ 4.5:1 sobre su fondo.
 - **`prefers-reduced-motion`** quita las transiciones.
 - **Es una app, no una página:** el texto no se puede seleccionar (solo el campo del nombre en Guardar).
-- **El sinte no se adorna desde la web:** editar desde la tablet no debe redibujar toda la pantalla del FM-1 ni mostrar nada de más. El aviso del cambio se ve solo en la web. El recuadro grande del valor tocado en el sinte es la opción MENU > ZOOM del FM-1.
+- **El sinte no se adorna desde la web:** editar desde la tablet no debe redibujar toda la pantalla del FM-1 ni mostrar nada de más. El aviso del cambio se ve solo en la web.
 - **Sin teclado en pantalla propio:** solo el nativo de Android, en el campo del nombre de Guardar.
 
 ## 7. Estado y pendientes conocidos

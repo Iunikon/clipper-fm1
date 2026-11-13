@@ -11,7 +11,7 @@ Free and open source (GPL-3.0). It grew out of <a href="https://github.com/isod8
 
 ## This fork: FAVS, the Live protocol and Clipper Live
 
-> **Fork of [isod89/clipper-fm1](https://github.com/isod89/clipper-fm1) by [Iunikon](https://github.com/Iunikon).** Everything below is on top of Clipper 1.3.1 and lives on `main` here. It is **not part of the official Clipper** and it is **still being tested on a real FM-1**: use it at your own risk, with a backup.
+> **Fork of [isod89/clipper-fm1](https://github.com/isod89/clipper-fm1) by [Iunikon](https://github.com/Iunikon).** Everything below is on top of the latest Clipper, **1.3.1** (with the newer flash chip, UC25HQ80, of the FM-1 units sold from late 2026), and lives on `main` here. It is **not part of the official Clipper** and it is **still being tested on a real FM-1**: use it at your own risk, with a backup.
 
 | What | Where | Status |
 |---|---|---|
