@@ -110,7 +110,7 @@ document.addEventListener("change", async (e) => {
   if (e.target.id !== "bkf" || !e.target.files[0] || STU.busy || !M.link) return;
   const f = e.target.files[0]; let file;
   try { file = JSON.parse(await f.text()); } catch (er) { STU.msg = "Ese archivo no se puede leer."; renderWork(); return; }
-  if (!confirm(`¿Restaurar «${f.name}»? Se reemplaza todo lo que hay en el FM-1.`)) return;
+  if (!(await ask({ title: `¿Restaurar «${f.name}»?`, text: "Se reemplaza todo lo que hay en el FM-1.", ok: "Restaurar", danger: true }))) return;
   STU.busy = true; STU.prog = 0; STU.msg = "Antes, una copia de lo que hay ahora (por si acaso)…"; renderWork();
   try { await backupSave(null, "antes-de-restaurar"); } catch (er) { STU.msg = "No pude hacer la copia de lo de ahora, así que no restauro: " + er.message; STU.busy = false; renderWork(); return; }
   STU.msg = "Comprobando la copia…"; bkStep(0);
@@ -422,8 +422,8 @@ document.addEventListener("click", async (e) => {
   } else if (w === "nosl") { LIBV.slotFor = -1; renderWork(); }
   else if (!p) return;
   else if (w === "slot") { LIBV.slotFor = LIBV.slotFor === n ? -1 : n; US.slots = null; renderWork(); }
-  else if (w === "tags") { const t = prompt(trUi("Etiquetas, separadas por comas"), p.tags.join(", ")); if (t == null) return; p.tags = libTags(t); p.modified = new Date().toISOString(); libKeep(all); renderWork(); }
-  else if (w === "ren") { const t = prompt(trUi("Nombre (hasta 12 letras)"), p.name); if (t == null) return; p.name = cleanName(t).slice(0, 12) || p.name; p.modified = new Date().toISOString(); libKeep(all); renderWork(); }
+  else if (w === "tags") { ask({ title: "Etiquetas, separadas por comas", input: p.tags.join(", "), ok: "Guardar" }).then((t) => { if (t == null) return; p.tags = libTags(t); p.modified = new Date().toISOString(); libKeep(all); renderWork(); }); }
+  else if (w === "ren") { ask({ title: "Nombre (hasta 12 letras)", input: p.name, ok: "Guardar" }).then((t) => { if (t == null) return; p.name = cleanName(t).slice(0, 12) || p.name; p.modified = new Date().toISOString(); libKeep(all); renderWork(); }); }
   else if (w === "del") { if (b.dataset.arm !== "1") { arm(b, "Borrar", "¿Seguro?"); return; } all.splice(n, 1); libKeep(all); LIBV.slotFor = -1; renderWork(); toast(-1, `<b>${esc(p.name)}</b> fuera de la biblioteca`); }
   else if (w === "put") {
     const k = +b.dataset.k, u = US.slots && US.slots[k];

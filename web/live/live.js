@@ -539,14 +539,14 @@ function tileInner(q) {
   } else if (q.kind === "nudge") {
     foot = `<div class="stp">${q.steps.map((n) => `<button data-qn="${key}" data-d="${n}" aria-label="${esc(q.name)} ${n > 0 ? "+" : ""}${n}">${n > 0 ? "+" : "−"}${Math.abs(n)}</button>`).join("")}</div>`;
   } else if (q.kind === "tempo") {
-    foot = `<div class="stp"><button data-qn="${key}" data-d="-1" aria-label="Tempo −1">−</button><button class="tap" data-tap="1">TAP</button><button data-qn="${key}" data-d="1" aria-label="Tempo +1">+</button></div>`;
+    foot = `<div class="stp"><button class="tap" data-tap="1">TAP</button></div>`;
   } else if (q.kind === "choice" || q.step) {
     foot = `<div class="stp"><button data-qstep="${key}" data-d="-1" aria-label="${esc(q.name)}: anterior"><svg class="i"><use href="#i-prev"/></svg></button>
       ${d.names && d.names.length > 4 ? `<button class="pkb" data-pick="${key}" aria-label="${esc(q.name)}: lista"><svg class="i"><use href="#i-list"/></svg></button>` : ""}<button data-qstep="${key}" data-d="1" aria-label="${esc(q.name)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div>`;
   }
   const top = `<span class="t"><b>${esc(q.name)}</b>${q.kind === "choice" || q.kind === "tempo" ? "" : `<i class="led" aria-hidden="true"></i>`}</span>
     <span class="v">${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}</span><span class="s">${esc(note)}</span>`;
-  return (q.kind === "choice" || q.kind === "tempo" ? `<div class="tg">${top}</div>` : `<button class="tg" role="switch" aria-checked="${on}" data-qtog="${key}" aria-label="${esc(q.name)}: ${on ? "encendido" : "apagado"}">${top}</button>`) + foot;
+  return (q.kind === "tempo" ? `<div class="tg tgd" data-fd="${key}" role="slider" tabindex="0" aria-label="${esc(q.name)}">${top}</div>` : q.kind === "choice" ? `<div class="tg">${top}</div>` : `<button class="tg" role="switch" aria-checked="${on}" data-qtog="${key}" aria-label="${esc(q.name)}: ${on ? "encendido" : "apagado"}">${top}</button>`) + foot;
 }
 const tile = (q) => `<section class="tl${qOn(q) ? " on" : ""}${q.kind === "panic" ? " panic" : ""}" style="--c:${KC[q.k]}" data-tl="${qkey(q)}">${tileInner(q)}</section>`;
 function paintTile(s, id) {
@@ -618,7 +618,7 @@ function renderNav() {
 }
 function renderMeta() {                                   /* (the sound edited: keep it or go back, by the changes) */
   const n = entryNow();
-  $("metal").innerHTML = M.edited ? `<span class="edtx">Editado</span><button class="btn" data-save="1"><svg class="i"><use href="#i-disk"/></svg>Guardar</button>${n >= 0 ? `<button class="btn" data-discard="1"><svg class="i"><use href="#i-undo"/></svg>Descartar</button>` : ""}` : "";
+  $("metal").innerHTML = M.edited ? `<span class="edtx" title="Editado">EDIT</span><button class="btn" data-save="1"><svg class="i"><use href="#i-disk"/></svg>Guardar</button>${n >= 0 ? `<button class="btn" data-discard="1"><svg class="i"><use href="#i-undo"/></svg>Descartar</button>` : ""}` : "";
 }
 function renderBar() {
   const n = entryNow(), x = M.list[n], fav = M.favCur >= 0;
@@ -696,7 +696,7 @@ function soundsView() {
         <button class="kf" data-skind="TOOLS" aria-current="${SV.kind === "TOOLS"}"><span>Herramientas</span></button></nav></div>
     <div class="svm">
       <section class="svc${M.edited ? " edited" : ""}"><div class="svn"><span class="c">Suena ahora</span><b>${esc(name)}</b>
-        <span class="m">${x ? `<span class="k">${esc(x.kind)}</span>` : ""}<span class="e">${esc(M.info.engines[M.engine] || "USER")}</span><span class="num">${n >= 0 ? `${n + 1}/${M.list.length}` : ""}</span>${M.edited ? '<span class="edtx">Editado</span>' : ""}</span></div>
+        <span class="m">${x ? `<span class="k">${esc(x.kind)}</span>` : ""}<span class="e">${esc(M.info.engines[M.engine] || "USER")}</span><span class="num">${n >= 0 ? `${n + 1}/${M.list.length}` : ""}</span>${M.edited ? '<span class="edtx" title="Editado">EDIT</span>' : ""}</span></div>
         <div class="sva">
           <button class="btn pri2${M.edited ? " ed" : ""}" data-save="1"><svg class="i"><use href="#i-disk"/></svg>Guardar</button>
           <button class="btn${fav ? " on" : ""}" data-svfav="1"><svg class="i"><use href="#i-star"/></svg>${fav ? `Favorito ${M.favCur + 1}: quitar` : "Marcar como favorito"}</button>
@@ -714,7 +714,7 @@ function soundsView() {
     </div></div>`;
 }
 
-/* SAVE > TOOLS, as on the device (CLRSQ, INIT, NEW), each a second tap within 3 s to act (the device's two detents) */
+/* SAVE > TOOLS, as on the device (CLRSQ, INIT, NEW), each a second tap (at least 0.4 s later) to act (the device's two detents) */
 const TOOLS = [["CLRSQ", "Borrar el patrón"], ["INIT", "Iniciar el sonido"], ["NEW", "Proyecto nuevo"]];
 const toolArm = { id: -1, t: 0 };
 function toolsHtml() {
@@ -725,8 +725,9 @@ function toolsHtml() {
   return `<section class="tools${lv ? " dev" : ""}" data-title="TOOLS" aria-label="TOOLS"><h3>TOOLS</h3>${TOOLS.map(btn).join("")}</section>`;
 }
 async function toolTap(id) {
+  if (toolArm.id === id && performance.now() - (toolArm.at || 0) < 400) return;   /* un doble toque rápido no borra */
   if (toolArm.id !== id) {
-    toolArm.id = id; clearTimeout(toolArm.t);
+    toolArm.id = id; toolArm.at = performance.now(); clearTimeout(toolArm.t);
     const off = (e) => { if (e.target.closest(`[data-tool="${id}"]`)) return;
       toolArm.id = -1; document.removeEventListener("pointerdown", off, true); if (S.folder === "SAVE") renderWork(); };
     setTimeout(() => document.addEventListener("pointerdown", off, true), 0);
@@ -768,15 +769,65 @@ function logChange(s, id, old, v, src) {
 function renderLog() {
   if (!M.info) return;
   $("chl").innerHTML = LOG.length ? LOG.map((e, i) => { const d = desc(e.s, e.id); if (!d) return ""; const a = fmtValue(d, e.old), b = fmtValue(d, e.v);
-    return `<div class="lg" role="listitem" style="--c:${KC[kOf(e.s, e.id)]}"><span class="l"><i></i>${esc(d.label)}<em>${e.src === "sinte" ? "en el sinte" : "aquí"}</em></span>
+    return `<div class="lg" role="listitem" style="--c:${KC[kOf(e.s, e.id)]}"><span class="l"><i></i>${esc(d.label)}<em class="${e.src === "sinte" ? "sinte" : "tab"}">${e.src === "sinte" ? trUi("SINTE") : trUi("TABLET")}</em></span>
       <span class="vv num">${esc(a[0] + a[1])} → ${esc(b[0] + b[1])}</span><button class="ud" data-undo="${i}" aria-label="Deshacer ${esc(d.label)}: volver a ${esc(a[0] + a[1])}"><svg class="i"><use href="#i-undo"/></svg></button></div>`; }).join("")
     : `<p class="dvn">Lo que cambies, en el sinte o en la tablet, sale aquí. Toca <svg class="i"><use href="#i-undo"/></svg> para volver atrás.</p>`;
 }
-/* una acción que no se puede deshacer pide un segundo toque; se desarma sola a los 3 s */
+/* una acción que no se puede deshacer pide un segundo toque (0,4 s después como mínimo); sigue armada hasta tocar en otro sitio */
+/* una hoja propia en lugar de confirm() y prompt(): se ve como el resto y sigue el idioma. Con danger, rojo con ⚠ y segundo
+   toque (al menos 0,4 s después). Resuelve con true o el texto escrito, o null si se cancela */
+function ask({ title, text = "", input = null, ok = "Aceptar", danger = false }) {
+  return new Promise((res) => {
+    const w = document.createElement("div"); w.className = "askw";
+    w.innerHTML = `<div class="askb" role="dialog" aria-modal="true" aria-label="${esc(trUi(title))}"><h2>${esc(trUi(title))}</h2>${text ? `<p>${esc(trUi(text))}</p>` : ""}
+      ${input != null ? `<input class="aski" aria-label="${esc(trUi(title))}" value="${esc(input)}">` : ""}
+      <div class="askf"><button class="btn" data-askno="1">${esc(trUi("Cancelar"))}</button><button class="btn pri${danger ? " dng" : ""}" data-askok="1">${danger ? "⚠ " : ""}${esc(trUi(ok))}</button></div></div>`;
+    document.body.appendChild(w);
+    const inp = w.querySelector(".aski"), okb = w.querySelector("[data-askok]"); let armed = 0;
+    const done = (v) => { w.remove(); document.removeEventListener("keydown", key, true); res(v); };
+    const key = (e) => { if (e.key === "Escape") { e.preventDefault(); done(null); } else if (e.key === "Enter" && inp) { e.preventDefault(); okb.click(); } };
+    document.addEventListener("keydown", key, true);
+    w.addEventListener("click", (e) => {
+      if (e.target === w || e.target.closest("[data-askno]")) { done(null); return; }
+      if (!e.target.closest("[data-askok]")) return;
+      if (danger) { const now = performance.now(); if (!armed) { armed = now; okb.textContent = "⚠ " + trUi("¿Seguro?"); return; } if (now - armed < 400) return; }
+      done(inp ? inp.value : true);
+    });
+    setTimeout(() => (inp || okb).focus(), 30);
+  });
+}
+
+/* la ayuda de los gestos: la primera vez que se abre una carpeta con valores, y siempre con el botón «?» de la barra */
+function helpSheet() {
+  const w = document.createElement("div"); w.className = "askw";
+  const li = (a, b) => `<li><b>${esc(trUi(a))}</b> ${esc(trUi(b))}</li>`;
+  w.innerHTML = `<div class="askb hlp" role="dialog" aria-modal="true" aria-label="${esc(trUi("Cómo se toca"))}"><h2>${esc(trUi("Cómo se toca"))}</h2><ul>
+    ${li("Arrastra en horizontal", "sobre una tarjeta para cambiar su valor; en vertical, la página se desplaza.")}
+    ${li("Deja el dedo quieto", "un momento mientras arrastras: modo fino ×¼, hasta que lo levantes.")}
+    ${li("Doble toque", "en un valor: vuelve a como se cargó el sonido.")}
+    ${li("Lo que borra", "pide un segundo toque, en rojo con ⚠.")}
+    ${li("En los pasos de SEQ:", "‹ › nudge (adelanta o retrasa), F fill, L lock, ' acento, ~ slide.")}
+    ${li("Con ratón:", "la rueda cambia el valor, Shift = fino, Inicio / Fin = mínimo / máximo.")}
+  </ul><div class="askf"><button class="btn pri" data-askok="1">${esc(trUi("Entendido"))}</button></div></div>`;
+  document.body.appendChild(w);
+  const close = () => { w.remove(); document.removeEventListener("keydown", key, true); };
+  const key = (e) => { if (e.key === "Escape") close(); };
+  document.addEventListener("keydown", key, true);
+  w.addEventListener("click", (e) => { if (e.target === w || e.target.closest("[data-askok]")) close(); });
+  setTimeout(() => w.querySelector("[data-askok]").focus(), 30);
+}
+setTimeout(() => { const f = $("favh"); if (!f) return; const b = document.createElement("button");   /* (después de cargar: trUi se define al final) */ b.className = f.className; b.id = "helpb";
+  b.setAttribute("aria-label", trUi("Ayuda: cómo se toca")); b.innerHTML = '<b style="font: 800 18px var(--sans)">?</b>'; f.before(b);
+  b.addEventListener("click", helpSheet); }, 0);
+/* un segundo toque demasiado rápido sobre algo armado no cuenta (0,4 s) */
+document.addEventListener("click", (e) => {
+  const b = e.target.closest && e.target.closest('[data-arm="1"]');
+  if (b && b.dataset.armAt && performance.now() - +b.dataset.armAt < 400) { e.stopImmediatePropagation(); e.preventDefault(); }
+}, true);
 function disarm(b, txt) { b.dataset.arm = ""; b.textContent = txt; }
 function arm(b, txt, ask) {
   document.querySelectorAll('[data-arm="1"]').forEach((o) => disarm(o, o.dataset.armTxt || txt));
-  b.dataset.arm = "1"; b.dataset.armTxt = txt; b.textContent = ask;
+  b.dataset.arm = "1"; b.dataset.armTxt = txt; b.dataset.armAt = performance.now(); b.textContent = ask;
   const off = (e) => { if (b.contains(e.target)) return;         /* se desarma al tocar en otro sitio, no por reloj */
     disarm(b, txt); document.removeEventListener("pointerdown", off, true); };
   setTimeout(() => document.addEventListener("pointerdown", off, true), 0);
@@ -898,7 +949,8 @@ document.addEventListener("click", (e) => {
   else if (b.id === "follow") { S.follow = !S.follow; b.setAttribute("aria-pressed", S.follow); if (S.follow && M.page) followPage(); }
   else if (b.dataset.f === "ESTUDIO" && !(S.lock && S.folder === "LIVE")) openStudio();
   else if (b.dataset.f && S.lock && S.folder === "LIVE") toast(-1, "LIVE está bloqueado: toca el candado para moverte");
-  else if (b.dataset.f) { CFG.edit = null; document.body.classList.remove("cfgediting"); S.folder = b.dataset.f; renderNav(); renderWork(); $("edit").scrollTop = 0; fade(); }
+  else if (b.dataset.f) { if (/^(EDIT|ENV|LFO|FX|SEL|ARP|SEQ)$/.test(b.dataset.f) && !store.get("hlp")) { store.set("hlp", true); setTimeout(helpSheet, 300); }   /* la pista, solo la primera vez */
+    CFG.edit = null; document.body.classList.remove("cfgediting"); S.folder = b.dataset.f; renderNav(); renderWork(); $("edit").scrollTop = 0; fade(); }
 });
 
 

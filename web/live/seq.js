@@ -257,7 +257,8 @@ function sqOp(op, d, el) {
     case "all": SQ.r0 = 0; SQ.r1 = len - 1; SQ.ext = false; break;
     case "copy": SQ.clip = arr; toast(-1, `Copiados <b class="num">${arr.length}</b> pasos`); break;
     case "paste": if (SQ.clip) sqApply(a, SQ.clip.slice(0, len - a).map(cpStep)); break;
-    case "clear": sqApply(a, arr.map((s) => ({ ...sqEmpty(s), notes: [0, 0, 0, 0] }))); break;
+    case "clear": if (el.dataset.arm !== "1") { arm(el, "Borrar", "¿Seguro?"); return; }   /* borra pasos: segundo toque con ⚠ */
+      disarm(el, "Borrar"); sqApply(a, arr.map((s) => ({ ...sqEmpty(s), notes: [0, 0, 0, 0] }))); break;
     case "tr": sqApply(a, arr.map((s) => on(s) ? { ...s, notes: s.notes.map((x, k) => k < s.n ? Math.max(0, Math.min(127, x + d)) : x) } : s)); break;
     case "shift": if (arr.length > 1) sqApply(a, d > 0 ? [arr[arr.length - 1], ...arr.slice(0, -1)] : [...arr.slice(1), arr[0]]); break;
     case "rev": sqApply(a, arr.slice().reverse()); break;
@@ -329,7 +330,8 @@ document.addEventListener("click", (e) => {
   }
   const lk = t.closest("[data-sqlock]");
   if (lk) {
-    if (lk.dataset.arm !== "1") { lk.dataset.arm = "1"; lk.classList.add("arm"); return; }
+    if (lk.dataset.arm !== "1") { lk.dataset.arm = "1"; lk.dataset.armAt = performance.now(); lk.classList.add("arm"); return; }
+    if (performance.now() - +lk.dataset.armAt < 400) return;
     const id = +lk.dataset.sqlock, i = SQ.sel;
     rq(C_LOCK_SET, [SQX.tr & 127, i & 127, id & 127], { quiet: true, retries: 0, timeout: 900 })
       .then(() => { SQX.locks = SQX.locks.filter((l) => !(l.step === i && l.param === id)); renderWork(); }).catch(() => toast(-1, "El FM-1 no contestó"));

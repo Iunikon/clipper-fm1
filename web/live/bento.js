@@ -82,7 +82,7 @@ function gMeters(s, ids, toggles) {
     const q = toggles && QSPEC.get(keyOf(s, id)), off = q && !qOn(q);
     return `<div class="mt${off ? " off" : ""}" style="--c:${KC[k]};--lo:${Math.min(f, z)};--hi:${Math.max(f, z)};--f:${f}" data-mt="${keyOf(s, id)}"><span class="mv num">${esc(t)}<small>${esc(u)}</small></span>
       <div class="mtr${z ? " bi" : ""}" data-drag="v" data-k="${keyOf(s, id)}"><i></i><b></b><s></s></div>
-      ${q ? `<span class="mlw"><button class="ml" data-qtog="${keyOf(s, id)}" role="switch" aria-checked="${!off}">${esc(q.name)}</button><button class="mle" data-fxedit="${FXPAGE[id] || "FX"}" aria-label="Editar ${esc(q.name)}"><svg class="i"><use href="#i-edit"/></svg></button></span>` : `<span class="ml">${esc(d.label)}</span>`}</div>`; }).join("");
+      ${q ? `<span class="mlw"><button class="ml" data-short="${esc(d.label)}" data-qtog="${keyOf(s, id)}" role="switch" aria-checked="${!off}"><span class="mlf">${esc(q.name)}</span></button><button class="mle" data-fxedit="${FXPAGE[id] || "FX"}" aria-label="Editar ${esc(q.name)}"><svg class="i"><use href="#i-edit"/></svg></button></span>` : `<span class="ml">${esc(d.label)}</span>`}</div>`; }).join("");
 }
 function gArcs(s, ids) {
   return live(ids).map(({ id, k }) => { const d = desc(s, id); if (!d) return ""; const v = val(s, id), a = frac(d, v), z = d.min < 0 && d.max > 0 ? -d.min / (d.max - d.min) : 0;
@@ -104,7 +104,8 @@ const zeroOf = (d) => (d.min < 0 && d.max > 0 ? -d.min / (d.max - d.min) : 0);
 function fillVars(d, v) { const f = frac(d, v), z = zeroOf(d); return `--lo:${Math.min(f, z)};--hi:${Math.max(f, z)};--f:${f}`; }
 const isChoice = (d) => isEnum(d) || isOnOff(d);
 const nextOf = (d, v) => (v >= d.max ? d.min : v + 1);
-const valHtml = (d, v) => { const [t, u] = fmtValue(d, v); return `${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}`; };
+const valHtml = (d, v) => { let [t, u] = fmtValue(d, v); if (d.min < 0 && d.max > 0 && /^\d/.test(t)) t = "+" + t;   /* bipolar: con signo */
+  return `${esc(t)}${u ? `<small>${esc(u)}</small>` : ""}`; };
 
 /* a graph's readout: a value slides sideways, a choice steps on a tap */
 function readout(s, id, k) {
@@ -695,6 +696,8 @@ function effPt(e) {
 }
 $("edit").addEventListener("pointermove", (ev) => {
   if (!bdrag) return;
+  if (ev.shiftKey && !bdrag.fine && (bdrag.kind || bdrag.on)) {           /* con ratón: Shift = fino ×¼ */
+    bdrag.fine = { ax: ev.clientX, ay: ev.clientY, ex: ev.clientX, ey: ev.clientY }; bdrag.el.classList.add("fine"); document.body.classList.add("finemode"); }
   const e = effPt(ev); fineArm({ x: ev.clientX, y: ev.clientY }, e);
   if (bdrag.kind) { graphDrag(e); return; }
   const dx = e.clientX - bdrag.x0, dy = bdrag.y0 - e.clientY;
@@ -707,7 +710,7 @@ $("edit").addEventListener("pointermove", (ev) => {
   const span = bdrag.d.max - bdrag.d.min;
   if (bdrag.dir === "abs") { if (!bdrag.armed) { if (Math.abs(dy) < 6) return; bdrag.armed = true; bdrag.el.classList.add("held"); } barAt(e); return; }
   if (bdrag.w == null) bdrag.w = bdrag.el.getBoundingClientRect().width;    /* (measured once a drag, not once a move) */
-  const want = bdrag.dir === "v" ? bdrag.v0 + dy * span / 220 : bdrag.v0 + dx * span / Math.max(220, bdrag.w * 1.4);
+  const want = bdrag.dir === "v" ? bdrag.v0 + dy * span / 220 : bdrag.v0 + (bdrag.el.classList.contains("tgd") ? dx / 4 : dx * span / Math.max(220, bdrag.w * 1.4));
   edgeAt(want < bdrag.d.min ? -1 : want > bdrag.d.max ? 1 : 0);
   setVal(bdrag.s, bdrag.id, want);
 });
@@ -744,8 +747,26 @@ $("edit").addEventListener("click", (e) => {
   const [s, id] = b.dataset.set.split(":").map(Number);
   setVal(s, id, +b.dataset.v);
 });
-$("edit").addEventListener("keydown", (e) => {
-  const el = e.target.closest("[data-fd]"), st = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1, PageUp: 8, PageDown: -8 }[e.key];
-  if (!el || !st) return; e.preventDefault();
-  const [s, id] = el.dataset.fd.split(":").map(Number); setVal(s, id, val(s, id) + st);
+$("edit").addEventListener("keydown", (e) => {   /* ← → (Shift: de uno en uno), RePág / AvPág, Inicio / Fin */
+  const el = e.target.closest("[data-fd]"); if (!el) return;
+  const [s, id] = el.dataset.fd.split(":").map(Number), d = desc(s, id); if (!d) return;
+  const big = Math.max(1, Math.round((d.max - d.min) / 64)), one = e.shiftKey ? 1 : big;
+  const st = { ArrowRight: one, ArrowUp: one, ArrowLeft: -one, ArrowDown: -one, PageUp: 8 * big, PageDown: -8 * big }[e.key];
+  if (e.key === "Home" || e.key === "End") { e.preventDefault(); setVal(s, id, e.key === "Home" ? d.min : d.max); return; }
+  if (!st) return; e.preventDefault(); setVal(s, id, val(s, id) + st);
 });
+/* solo horizontal: donde el navegador no deja bloquear el giro, un aviso en vertical */
+(() => { const d = document.createElement("div"); d.className = "rot"; d.setAttribute("role", "alert");
+  d.innerHTML = `<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20"/><path d="M3 12a9 9 0 0 1 9-9M21 12a9 9 0 0 1-9 9"/></svg><b>Gira el aparato</b><span>Clipper Live se usa en horizontal.</span>`;
+  document.body.appendChild(d); })();
+/* con ratón: la rueda sobre una tarjeta cambia el valor (si no estabas desplazando la página); Shift, de uno en uno */
+let lastScrollT = 0;
+$("edit").addEventListener("scroll", () => { lastScrollT = performance.now(); }, { passive: true });
+$("edit").addEventListener("wheel", (e) => {
+  const el = e.target.closest("[data-fd]"); if (!el || performance.now() - lastScrollT < 400 || !e.deltaY) return;
+  e.preventDefault();
+  const [s, id] = el.dataset.fd.split(":").map(Number), d = desc(s, id); if (!d) return;
+  const big = Math.max(1, Math.round((d.max - d.min) / 64));
+  setVal(s, id, val(s, id) + (e.deltaY < 0 ? 1 : -1) * (e.shiftKey ? 1 : big));
+}, { passive: false });
+

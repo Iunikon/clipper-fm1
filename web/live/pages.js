@@ -99,7 +99,7 @@ function renderTransport() {
   setHtml(t, `<button class="tbt${SQ.playing ? " on" : ""}" data-tplay="1" aria-pressed="${SQ.playing}"><svg class="i"><use href="#i-${SQ.playing ? "stop" : "play"}"/></svg><span class="num">${SQ.playing ? pos : "PLAY"}</span></button>
     <button class="tbt rec${recOn || free ? " on" : armed || ci ? " arm" : ""}" data-trec="1" aria-pressed="${!!(recOn || armed)}"><i></i><span>${free ? "TOMA" : ci ? "CUENTA" : armed ? "ARMADO" : "REC"}</span></button>`);
   const sel2 = LAYOUT.find((x) => x.title === "SEL 2"), trn = sel2 && desc(0, sel2.ids[0]) ? val(0, sel2.ids[0]) | 0 : 0, oct = M.state ? M.state.oct | 0 : 0, bpm = desc(1, 0) ? val(1, 0) : null;
-  setHtml($("tmp"), `${bpm != null ? `<b class="num">${bpm}</b><small>BPM</small>` : ""}${oct ? `<span class="tag2 num">OCT ${oct > 0 ? "+" : ""}${oct}</span>` : ""}${trn ? `<span class="tag2 num">TRN ${trn > 0 ? "+" : ""}${trn}</span>` : ""}`);
+  setHtml($("tmp"), `${bpm != null ? `<b class="num">${bpm}</b><small>BPM</small>` : ""}${oct ? `<span class="tag2 num">OCT ${oct > 0 ? "+" : ""}${oct}</span>` : ""}${trn ? `<span class="tag2 trn num">TRN ${trn > 0 ? "+" : ""}${trn}</span>` : ""}`);
   const c = $("cpu"); if (c && M.state) { setHtml(c, `CPU <b class="num">${M.state.cpu}%</b>${M.state.late ? ` LATE <b class="num">${M.state.late}</b>` : ""}`); c.classList.toggle("hot", M.state.cpu > 85 || M.state.late > 0); }
 }
 document.addEventListener("click", (e) => {
@@ -180,15 +180,15 @@ document.addEventListener("click", async (e) => {
 /* LIVE's pages: a tab each (in Edit: rename by a tap on the open one, × removes, + adds) */
 function lpTabs() {
   const ed = CFG.edit === "live";
-  return `<nav class="lpt" aria-label="Páginas de LIVE">${CFG.lpages.map((pg, i) => `<button data-lp="${i}" aria-current="${i === CFG.lp}">${esc(pg.name)}${ed && CFG.lpages.length > 1 && i === CFG.lp ? `<span class="lpx" data-lpdel="${i}" aria-label="Quitar la página">×</span>` : ""}</button>`).join("")}
+  return `<nav class="lpt" aria-label="Páginas de LIVE">${CFG.lpages.map((pg, i) => `<button data-lp="${i}" aria-current="${i === CFG.lp}">${esc(pg.name)}${ed && CFG.lpages.length > 1 && i === CFG.lp ? `<span class="lpx" data-lpdel="${i}" aria-label="Quitar la página">⚠ ×</span>` : ""}</button>`).join("")}
     ${ed || CFG.lpages.length < 2 ? `<button class="lpadd" data-lpadd="1">+ Página</button>` : ""}</nav>`;
 }
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-lp],[data-lpadd]"); if (!b) return;
-  if (e.target.closest("[data-lpdel]")) { if (!confirm(trUi(`¿Quitar la página «${CFG.lpages[CFG.lp].name}»?`))) return; CFG.lpages.splice(CFG.lp, 1); livePage(CFG.lp - 1); cfgSave("live"); renderWork(); return; }
+  if (e.target.closest("[data-lpdel]")) { const k = CFG.lp; ask({ title: `¿Quitar la página «${CFG.lpages[k].name}»?`, ok: "Quitar la página", danger: true }).then((v) => { if (!v) return; CFG.lpages.splice(k, 1); livePage(k - 1); cfgSave("live"); renderWork(); }); return; }
   if (b.dataset.lpadd) { CFG.lpages.push({ name: "LIVE " + (CFG.lpages.length + 1), items: [] }); livePage(CFG.lpages.length - 1); cfgSave("live"); if (!CFG.edit) { CFG.edit = "live"; document.body.classList.add("cfgediting"); } renderWork(); return; }
   const i = +b.dataset.lp;
-  if (i === CFG.lp && CFG.edit === "live") { const n = prompt(trUi("Nombre de la página"), CFG.lpages[i].name); if (n && n.trim()) { CFG.lpages[i].name = n.trim().slice(0, 16).toUpperCase(); cfgSave("live"); renderWork(); } return; }
+  if (i === CFG.lp && CFG.edit === "live") { ask({ title: "Nombre de la página", input: CFG.lpages[i].name, ok: "Guardar" }).then((n) => { if (n && n.trim()) { CFG.lpages[i].name = n.trim().slice(0, 16).toUpperCase(); cfgSave("live"); renderWork(); } }); return; }
   livePage(i); renderWork();
 });
 function itemHtml(it, i, which) {
