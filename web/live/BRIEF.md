@@ -4,7 +4,7 @@ Documento de contexto para revisar el diseño de Clipper Live con Claude Design 
 
 > **Versión anterior.** Para el estado actual (celular, PC, Estudio nativo, LIVE configurable, HYBRID, Biblioteca) y las instrucciones de revisión, ver **`DECISIONES.md`**, que manda donde se contradigan.
 
-> **Proyecto personal.** Clipper Live vive en la rama local `live` de `clipper-fm1`, un firmware de la comunidad para el sintetizador FM-1. No se propone al repositorio original ni se envía upstream.
+> **Proyecto personal.** Clipper Live vive en `main` del fork Iunikon/clipper-fm1 (antes, la rama `live`). Ver `DECISIONES.md`.
 
 ## Dónde está
 

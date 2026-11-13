@@ -4,7 +4,7 @@
 
 ## Qué es
 
-Una web app de un solo archivo que va al lado del sintetizador **FM-1** con el firmware **Clipper 1.3.1** (protocolo Live 15). Se conecta por USB con Web MIDI (SysEx), sigue lo que hace el sinte y permite editarlo con más espacio que su pantalla. Proyecto personal: rama `live` de `clipper-fm1`; nunca va al repositorio original.
+Una web app de un solo archivo que va al lado del sintetizador **FM-1** con el firmware **Clipper 1.3.1** (protocolo Live 15). Se conecta por USB con Web MIDI (SysEx), sigue lo que hace el sinte y permite editarlo con más espacio que su pantalla. Vive en `main` del fork [Iunikon/clipper-fm1](https://github.com/Iunikon/clipper-fm1); compartirlo con el creador se decide aparte.
 
 ## Para quién y dónde
 

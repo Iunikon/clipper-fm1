@@ -1,13 +1,13 @@
 # Clipper Live: decisiones e instrucciones para seguir
 
-Estado al 12 de noviembre de 2026 (commit `fae2cc7`, rama `live`). Este documento sustituye a `BRIEF.md` donde se contradigan: BRIEF es de antes de las versiones de celular y PC, de Estudio nativo y de LIVE configurable.
+Estado al 12 de noviembre de 2026, rama `main` del fork [Iunikon/clipper-fm1](https://github.com/Iunikon/clipper-fm1) (la antigua rama `live` se fusionó ahí, junto con la página FAVS y los cambios del firmware). Este documento sustituye a `BRIEF.md` donde se contradigan: BRIEF es de antes de las versiones de celular y PC, de Estudio nativo y de LIVE configurable.
 
 Sirve para dos cosas:
 
 1. **Pasarlo por Impeccable** (o Claude Design) para una revisión, sin que la revisión deshaga lo que ya se decidió.
 2. **Seguir trabajando** desde aquí: cómo montar, probar, publicar y qué queda pendiente.
 
-> **Proyecto personal.** Clipper Live vive en la rama local `live` de `clipper-fm1`. Nunca se envía al repositorio original ([isod89/clipper-fm1](https://github.com/isod89/clipper-fm1)) ni se abre un PR allí. La rama **solo está en este PC**: no se ha subido a ningún remoto.
+> **Proyecto personal.** Todo está en `main` del fork del usuario. **No se hace push al repositorio original ([isod89/clipper-fm1](https://github.com/isod89/clipper-fm1)) ni se abre un PR allí sin que el usuario lo decida.** El PR [#48](https://github.com/isod89/clipper-fm1/pull/48) (la página FAVS) sigue abierto desde la rama `favs-page`, que se conserva junto con `favs-screens` (sus imágenes) hasta que el creador responda.
 
 ---
 
@@ -219,7 +219,7 @@ python3 tools/live_build.py --site build/vercel
 cd build/vercel && PATH=$HOME/.local/opt/node/bin:$PATH vercel deploy --prod --yes --project clipper-live
 ```
 
-Commits: en la rama `live`, con el prefijo `Clipper Live (personal):`. Copia a `~/clipper-out/clipper-live.html` después de cada build que importe.
+Commits: en `main`, con el prefijo `Clipper Live:` (o `Clipper 1.4 (FM-1):` si es firmware). Copia a `~/clipper-out/clipper-live.html` después de cada build que importe.
 
 ---
 
@@ -288,4 +288,4 @@ Commits: en la rama `live`, con el prefijo `Clipper Live (personal):`. Copia a `
 1. `python3 tools/live_build.py` y comprobar que no hay errores de sintaxis.
 2. Mirar 1400 × 830, 1600 × 950, 852 × 393 y 1920 × 1080 (este último en Chrome real).
 3. Si hay textos nuevos en español, añadirlos a `i18n.js` y mirar la app en inglés.
-4. Commit en `live`, copiar a `~/clipper-out/` y preguntar antes de publicar en Vercel.
+4. Commit en `main`, copiar a `~/clipper-out/` y preguntar antes de publicar en Vercel.

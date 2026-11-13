@@ -9,6 +9,47 @@ Free and open source (GPL-3.0). It grew out of <a href="https://github.com/isod8
 
 > **Status: 1.3.1.** Clipper runs on the FM-1. 1.3.1 knows the newer flash chip of the FM-1 units sold recently (see [New in 1.3.1](#new-in-131-the-newer-flash-chip)); 1.3 is a bug-fix release (see [New in 1.3](#new-in-13-a-bug-fix-release)); 1.2 brought SLOOP 2.8.3's fixes (see [New in 1.2](#new-in-12-sloop-283s-fixes-a-steadier-second-core-the-ewi-as-one-voice)). It passes its whole test suite on a computer. There is still a lot to do (see [What is left to do](#what-is-left-to-do)). Install it at your own risk, and keep a backup made with the editor. You can go back to the official firmware (V16 or V15) from the installer page, or to SLOOP with its own `INSTALL-SLOOP.bat`.
 
+## This fork: FAVS, the Live protocol and Clipper Live
+
+> **Fork of [isod89/clipper-fm1](https://github.com/isod89/clipper-fm1) by [Iunikon](https://github.com/Iunikon).** Everything below is on top of Clipper 1.3.1 and lives on `main` here. It is **not part of the official Clipper** and it is **still being tested on a real FM-1**: use it at your own risk, with a backup.
+
+| What | Where | Status |
+|---|---|---|
+| **SAVE > FAVS**, a page with only your favourites (between USER and TOOLS), and no FAV rows on PRESETS | `firmware/src/ui.c`, `ui_draw.c`, `ui_input.c` | Sent upstream as [isod89/clipper-fm1#48](https://github.com/isod89/clipper-fm1/pull/48) (open) |
+| **Editor protocol v15, "Live"**: the page the synth has open, favourites, the sound list, edited flag, SAVE > TOOLS, play / transport, the synth's scope, the synth pages (LAYER, MORPH, FMX…), state (CPU, scale, REC) and REC | `firmware/src/editor_live.c`, [`web/EDITOR_PROTOCOL.md`](web/EDITOR_PROTOCOL.md#v15-live-a-personal-build-the-tablet-beside-the-fm-1-weblive) | Host tests pass; on the FM-1 in testing |
+| Small firmware fixes for it: an edit from the editor no longer redraws the whole screen (no flicker), an orange **edited** dot after the sound's name | `firmware/src/editor.c`, `ui_draw.c` | In testing |
+| **Clipper Live**, a web app that sits beside the FM-1 (tablet, phone in landscape, PC) | `web/live/` → `web/live.html` | In testing |
+
+### Clipper Live
+
+One HTML file, no libraries, works offline. It connects to the FM-1 over USB with Web MIDI (Chrome / Edge) and:
+
+- **follows the synth:** the page you open and the knob you turn show up on the screen, with what changed and an undo;
+- **edits with room to spare:** every folder laid out like the synth's pages, envelopes / LFO / effects as graphs you drag, a fine mode (hold your finger still), a double tap to go back to the sound as loaded;
+- **LIVE**, your own pages of controls for playing, with a lock; **HOME** with the 16 favourites;
+- **SEQ** (steps or a MIDI view), **REC** like the synth's, and **Estudio**: an advanced sequencer, the whole **HYBRID** patch, samples, a library with tags (the editor's `felucca-library` format), projects, a full backup, settings;
+- Spanish interface, English optional.
+
+**Try it without a synth:** open `web/live.html?mock=1` (an example FM-1). Published build: <https://clipper-live-eta.vercel.app>.
+
+**With the FM-1** it needs the firmware from this fork (protocol 15):
+
+```bash
+sh build.sh                                        # -> build/felucca.fwsc
+python3 tools/fm1_install.py build/felucca.fwsc    # needs mido and python-rtmidi; or the installer page
+```
+
+**Build the web app** after changing `web/live/`:
+
+```bash
+python3 tools/live_build.py                        # -> web/live.html (one file, the font and example data inside)
+python3 tools/live_build.py --site build/vercel    # the same, ready to publish
+```
+
+**Tests:** `tests/live_editor_test.c` checks the v15 protocol (built with ASan / UBSan by `tests/run_tests.sh`). What to try on a real FM-1, step by step: [`web/live/PRUEBAS.md`](web/live/PRUEBAS.md). Design decisions and how to carry on: [`web/live/DECISIONES.md`](web/live/DECISIONES.md) and [`web/live/PRODUCT.md`](web/live/PRODUCT.md) (Spanish).
+
+---
+
 SLOOP is a groovebox. **Clipper is a synthesizer** with 23 engines and 407 sounds, one instrument (two in MULTI) like the original FM-1 firmware, Felucca and Baudgirl's FM-1+VA. It has no tracks, no drum machine, no song mode and no built-in samples. It keeps SLOOP's 12 sound engines, effects, arpeggiator, step sequencer, USB audio and MIDI, and adds **HYBRID**: one voice built from three oscillators, two filters and a modulation matrix, with the whole patch editable in the browser.
 
 ## At a glance
