@@ -4675,9 +4675,9 @@ const DT = { key: "", t: 0, x: 0, y: 0, down: 0 };
 document.addEventListener("pointerdown", (e) => { DT.down = performance.now(); DT.x0 = e.clientX; DT.y0 = e.clientY; }, true);
 document.addEventListener("pointerup", (e) => {
   const el = e.target.closest && e.target.closest("#edit [data-cell], #edit .mt[data-mt], #edit .arc[data-k]"); if (!el || !M.link || CFG.edit) return;
-  if (performance.now() - DT.down > 280 || Math.hypot(e.clientX - DT.x0, e.clientY - DT.y0) > 12) { DT.key = ""; return; }   /* (a drag is no tap) */
+  if (performance.now() - DT.down > 400 || Math.hypot(e.clientX - DT.x0, e.clientY - DT.y0) > 16) { DT.key = ""; return; }   /* (a drag is no tap; a tap may last 0.4 s) */
   const key = el.dataset.cell || el.dataset.mt || el.dataset.k, now = performance.now();
-  if (key === DT.key && now - DT.t < 320) {
+  if (key === DT.key && now - DT.t < 550) {                 /* (the second tap: up to 0.55 s after the first) */
     DT.key = ""; const [s, id] = key.split(":").map(Number), d = desc(s, id); if (!d) return;
     const back = s === 0 && M.orig && M.orig.p[id] != null ? M.orig.p[id] : d.def != null ? d.def : d.min;
     setVal(s, id, back); const [t, u] = fmtValue(d, back);
