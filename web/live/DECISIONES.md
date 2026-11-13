@@ -141,6 +141,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 | Nombres del sinte en inglés (ENV, FILTER…) | La tablet habla como la pantalla del FM-1. La interfaz está en español, con **inglés opcional** (Sistema > Idioma, o la pregunta al entrar). |
 | Todo cuadrado | Encaja con el pixel art del FM-1. |
 | Valores continuos arrastrables, sin −/+ | Más rápido con el dedo. |
+| **La rueda del ratón no cambia valores**, solo desplaza la página (con ratón: arrastrar, Shift = fino, Inicio / Fin) | Al desplazar una página larga con la rueda, la tarjeta que quedaba bajo el puntero se editaba sin querer. |
 | Naranja solo para favorito, editado y Guardar | Es lo que significa en el sinte. |
 | LIVE configurable, con páginas y candado | Cada uno elige qué tener a mano para tocar. |
 | HOME: favoritos rápidos + los 4 knobs principales + accesos | El selector de sonidos ya está en la barra. |

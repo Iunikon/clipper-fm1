@@ -759,14 +759,5 @@ $("edit").addEventListener("keydown", (e) => {   /* ← → (Shift: de uno en un
 (() => { const d = document.createElement("div"); d.className = "rot"; d.setAttribute("role", "alert");
   d.innerHTML = `<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20"/><path d="M3 12a9 9 0 0 1 9-9M21 12a9 9 0 0 1-9 9"/></svg><b>Gira el aparato</b><span>Clipper Live se usa en horizontal.</span>`;
   document.body.appendChild(d); })();
-/* con ratón: la rueda sobre una tarjeta cambia el valor (si no estabas desplazando la página); Shift, de uno en uno */
-let lastScrollT = 0;
-$("edit").addEventListener("scroll", () => { lastScrollT = performance.now(); }, { passive: true });
-$("edit").addEventListener("wheel", (e) => {
-  const el = e.target.closest("[data-fd]"); if (!el || performance.now() - lastScrollT < 400 || !e.deltaY) return;
-  e.preventDefault();
-  const [s, id] = el.dataset.fd.split(":").map(Number), d = desc(s, id); if (!d) return;
-  const big = Math.max(1, Math.round((d.max - d.min) / 64));
-  setVal(s, id, val(s, id) + (e.deltaY < 0 ? 1 : -1) * (e.shiftKey ? 1 : big));
-}, { passive: false });
+/* (sin rueda: al desplazar la página con ella, una tarjeta bajo el puntero se editaba sin querer; con ratón, arrastrar) */
 

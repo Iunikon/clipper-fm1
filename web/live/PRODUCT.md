@@ -22,7 +22,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** con el f
 - **Naranja solo para favorito, EDIT y Guardar.** **Rojo `--danger` solo para lo que borra o reemplaza, siempre con ⚠ y segundo toque** (al menos 0,4 s después del primero).
 - **Blanco:** lo seleccionado, lo que suena, lo que el sinte tiene abierto y el candado puesto.
 - Nombres del sinte **en inglés** (ENV, FILTER…); la interfaz, en **español**, con inglés opcional en `i18n.js`.
-- **Valores continuos: se arrastran en horizontal, nunca botones − / +.** Dedo quieto mientras arrastras = fino ×¼; doble toque = vuelve a como se cargó. Con ratón: rueda, Shift = fino, Inicio / Fin.
+- **Valores continuos: se arrastran en horizontal, nunca botones − / +.** Dedo quieto mientras arrastras = fino ×¼; doble toque = vuelve a como se cargó. Con ratón: se arrastra igual (Shift = fino, Inicio / Fin); **la rueda solo desplaza la página, nunca cambia un valor** (al desplazar se editaba lo que quedaba bajo el puntero).
 - **Un archivo, sin conexión, sin librerías ni CDN ni fuentes externas.**
 - Nombres, rangos y unidades **salen del firmware**; no se inventan.
 - Las carpetas son **las páginas del sinte, en su orden**. La barra de abajo tiene 14 destinos y se queda así.

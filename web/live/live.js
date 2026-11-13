@@ -807,7 +807,7 @@ function helpSheet() {
     ${li("Doble toque", "en un valor: vuelve a como se cargó el sonido.")}
     ${li("Lo que borra", "pide un segundo toque, en rojo con ⚠.")}
     ${li("En los pasos de SEQ:", "‹ › nudge (adelanta o retrasa), F fill, L lock, ' acento, ~ slide.")}
-    ${li("Con ratón:", "la rueda cambia el valor, Shift = fino, Inicio / Fin = mínimo / máximo.")}
+    ${li("Con ratón:", "arrastra en horizontal; Shift mientras arrastras = fino ×¼; Inicio / Fin = mínimo / máximo. La rueda solo desplaza la página.")}
   </ul><div class="askf"><button class="btn pri" data-askok="1">${esc(trUi("Entendido"))}</button></div></div>`;
   document.body.appendChild(w);
   const close = () => { w.remove(); document.removeEventListener("keydown", key, true); };
