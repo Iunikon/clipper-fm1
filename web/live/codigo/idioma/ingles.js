@@ -4,6 +4,14 @@
    with numbers or names in them by RX. The device's own names (ENV, CUT, BASS…) are English already */
 const LANG = { cur: (() => { try { return localStorage.getItem("clipperlive:lang"); } catch (e) { return null; } })() };
 const DICT = {
+  "Escenas": "Scenes", "Guardar aquí": "Save here", "Ya": "Now", "compases": "bars", "de golpe": "at once", "Parar": "Stop",
+  "ESCENAS Y SET": "SCENES AND SET", "Reloj del set": "Set clock", "RELOJ": "CLOCK", "Grabar set": "Record set", "GRABAR SET": "RECORD SET", "Toca para parar y guardar": "Tap to stop and save",
+  "El audio USB del FM-1 a un archivo": "The FM-1's USB audio to a file", "Tu controlador mueve Live": "Your controller moves Live", "Aprender": "Learn", "Aprendiendo… (Listo)": "Learning… (Done)",
+  "Toca un control, una acción o una escena": "Tap a control, an action or a scene", "Listo": "Done", "Pausar el set": "Pause the set", "Empezar el set": "Start the set", "El set a cero": "Set to zero",
+  "Sin audio USB del FM-1: no puedo grabar": "No USB audio from the FM-1: can't record", "Este navegador no puede grabar": "This browser can't record", "No se pudo empezar a grabar": "Couldn't start recording",
+  "Sin permiso para MIDI": "No MIDI permission", "Grabando el set": "Recording the set", "desde el audio USB del FM-1": "from the FM-1's USB audio", "Set grabado": "Set recorded",
+  "Sin enlaces. Conecta un controlador MIDI, toca Aprender, luego un control de Live y mueve una perilla.": "No links. Plug in a MIDI controller, tap Learn, then a Live control, and turn a knob.",
+  ": ahora mueve la perilla o pulsa la tecla": ": now turn the knob or press the key", ": mueve la perilla o pulsa la tecla": ": turn the knob or press the key", ": toca un control y mueve tu controlador": ": tap a control and move your controller",
   "Conecta el FM-1": "Connect the FM-1", "Conectar el FM-1": "Connect the FM-1",
   "Conéctalo por USB y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.": "Plug it in over USB and tap Connect. The first time, Chrome asks to use MIDI devices.",
   "Descargar para usar sin internet": "Download to use offline", "Datos de ejemplo": "Example data", "FM-1 (ejemplo)": "FM-1 (example)", "Sin conectar": "Not connected",
@@ -83,6 +91,8 @@ const DICT = {
 
 };
 const RX = [
+  [/^Escena (\d+): (.+)$/, "Scene $1: $2"], [/^Escena (\d+), libre$/, "Scene $1, free"], [/^S(\d+): ¿encima\?$/, "S$1: over it?"], [/^CC (\d+) · canal (\d+)$/, "CC $1 · channel $2"], [/^Nota (\d+) · canal (\d+)$/, "Note $1 · channel $2"],
+  [/^en (\d+) compás$/, "over $1 bar"], [/^en (\d+) compases$/, "over $1 bars"], [/^guardada: (.+)$/, "saved: $1"], [/^: (.+), en tus descargas$/, ": $1, in your downloads"],
   [/^(.+): anterior$/, "$1: previous"], [/^(.+): siguiente$/, "$1: next"], [/^(.+): apagado$/, "$1: off"], [/^(.+): encendido$/, "$1: on"], [/^(.+): menos$/, "$1: less"], [/^(.+): más$/, "$1: more"], [/^(.+): nivel$/, "$1: level"],
   [/^Paso (\d+): vacío$/, "Step $1: empty"], [/^Paso (\d+): ligado$/, "Step $1: tied"], [/^Paso (\d+): (.+)$/, "Step $1: $2"], [/^Deshacer (.+): volver a (.+)$/, "Undo $1: back to $2"],
   [/^Editar (.+)$/, (m, x) => `Edit ${DICT[x] || x}`], [/^Abrir (.+)$/, (m, x) => `Open ${DICT[x] || x}`], [/^(\d+) pasos$/, "$1 steps"], [/^(\d+) sonidos$/, "$1 sounds"], [/^(\d+) de (\d+)$/, "$1 of $2"],

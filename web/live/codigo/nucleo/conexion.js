@@ -18,7 +18,7 @@ async function connectMidi() {
     M.link = link;
     try { await rq(C.INFO, [], { timeout: 600, retries: 3, quiet: true }); }
     catch (e) { link.close(); pr.input.onmidimessage = null; continue; }
-    M.midiOut = pr.output;                           /* (the panic's all notes off: plain MIDI on the same port) */
+    M.midiOut = pr.output; M.access = access; M.fmIn = pr.input;   /* (MIDI learn: the other inputs) */                           /* (the panic's all notes off: plain MIDI on the same port) */
     access.onstatechange = (e) => { if (e.port === pr.input && e.port.state === "disconnected") lost(); };
     $("cname").textContent = pr.input.name.replace(/ MIDI.*$/, "") || "FM-1";
     return load();

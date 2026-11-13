@@ -133,6 +133,19 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 
 ---
 
+## 5b. Para tocar en vivo (ideas del LIVE de SLOOP)
+
+Se añaden desde LIVE > Editar > Añadir > **ESCENAS Y SET**. Todo vive en la tablet: **no ocupa nada en el firmware**.
+
+| Tarjeta | Qué hace |
+|---|---|
+| **Escenas** (2×2) | 8 fotos del sonido (S1–S8). «Guardar» y tocar una ranura guarda el sonido actual (encima de una ocupada, segundo toque en rojo). Tocar una va a ella **de golpe** o **transformándose en 1, 2, 4, 8 o 16 compases** al tempo del sinte; «Parar» corta la transformación. El **crossfader A / B** desliza entre dos escenas (A y B se cambian tocándolas). Guarda los parámetros del sonido, no los del patrón (LEN, DIV, SWG, GATE); los propios del motor (E0–E7) solo vuelven al mismo motor. Sus cambios no llenan «Cambios»: un aviso dice qué escena. |
+| **MIDI learn** (acción) | Modo aprender: tocas un valor, una acción o una escena y mueves una perilla o pulsas una tecla de **otro controlador MIDI**. Un CC mueve el valor por todo su rango; una nota cambia un interruptor, dispara una acción o va a una escena. Los enlaces se ven y se borran en **Estudio > Sistema**. El puerto del FM-1 no se usa para esto. |
+| **Grabar set** (1×1) | Graba el **audio USB del FM-1** (el mismo del osciloscopio) y, al parar, lo baja a tus descargas (`clipper-set-FECHA.webm`). Mientras graba, «● SET» en la barra. |
+| **Reloj del set** (1×1) | La hora y el tiempo del set (▶ / ❚❚ y ↺ a cero); se mantiene si recargas. |
+
+Escenas, enlaces MIDI y reloj se guardan con el resto de ajustes (se exportan e importan en Estudio > Sistema).
+
 ## 6. Decisiones del usuario (no revertir sin preguntar)
 
 | Decisión | Por qué |

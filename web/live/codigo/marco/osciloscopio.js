@@ -19,7 +19,7 @@ async function scopeKeep() {
 }
 setInterval(scopeKeep, 2000);
 
-let an = null, buf = null;
+let an = null, buf = null, usbStream = null;   /* (usbStream: the set's recording, set.js) */
 async function usbAudio() {
   const l = $("src");
   if (!navigator.mediaDevices?.getUserMedia) { l.textContent = "Este navegador no da audio"; return; }
@@ -29,6 +29,7 @@ async function usbAudio() {
     const ins = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "audioinput");
     const fm1 = ins.find((d) => /felucca|clipper|fm-?1|sloop/i.test(d.label)) || ins.find((d) => /usb/i.test(d.label));
     if (fm1 && st.getAudioTracks()[0].getSettings().deviceId !== fm1.deviceId) { st.getTracks().forEach((t) => t.stop()); st = await navigator.mediaDevices.getUserMedia({ audio: { ...raw, deviceId: { exact: fm1.deviceId } } }); }
+    usbStream = st;
     const ctx = new AudioContext(); an = ctx.createAnalyser(); an.fftSize = 2048; buf = new Float32Array(an.fftSize); ctx.createMediaStreamSource(st).connect(an);
     l.textContent = (fm1 ? "" : "No encontré el FM-1: ") + (st.getAudioTracks()[0].label || "entrada");
     document.querySelector(".scope").classList.add("on");

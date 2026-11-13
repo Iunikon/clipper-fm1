@@ -7,6 +7,7 @@ function systemView() {
       ${row("Sonidos de usuario", `${users} de 32`)}${row("Favoritos", `${M.favs.length} de 16`)}${row("Pasos del patrón", i.nstep || "—")}
       ${st ? row("CPU", st.cpu + " %") + row("LATE", st.late) + row("PEAK", st.peak + " %") : ""}${row("Puerto MIDI", $("cname").textContent)}</div>
     <div class="syl"><span>Idioma · Language</span><button class="btn${LANG.cur !== "en" ? " pri" : ""}" data-lang="es">Español</button><button class="btn${LANG.cur === "en" ? " pri" : ""}" data-lang="en">English</button></div>
+    ${mlList()}
     <div class="syl"><span>Ajustes de Live</span><button class="btn" data-cfgio="out"><svg class="i"><use href="#i-dl"/></svg>Exportar</button><button class="btn" data-cfgio="in">Importar</button></div>
     <p class="msh">Las páginas de LIVE, HOME, la Biblioteca, el idioma y el resto de ajustes se guardan en este navegador, en este aparato: no en el FM-1. La página de Vercel y el archivo descargado guardan cada uno los suyos, y se pierden si borras los datos del sitio. Exporta para tener una copia o pasarlos a otro aparato.</p>
     <p class="msh">MIDI, sincronía y afinación se ajustan en GLO.</p></section>`;

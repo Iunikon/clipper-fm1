@@ -28,6 +28,7 @@ One HTML file, no libraries, works offline. It connects to the FM-1 over USB wit
 - **edits with room to spare:** every folder laid out like the synth's pages, envelopes / LFO / effects as graphs you drag, a fine mode (hold your finger still), a double tap to go back to the sound as loaded;
 - **LIVE**, your own pages of controls for playing, with a lock; **HOME** with the 16 favourites;
 - **SEQ** (steps or a MIDI view), **REC** like the synth's, and **Estudio**: an advanced sequencer, the whole **HYBRID** patch, samples, a library with tags (the editor's `felucca-library` format), projects, a full backup, settings;
+- for the stage: **scenes** (8 snapshots of the sound, recalled at once or morphed over 1–16 bars, an A/B crossfader), **MIDI learn** from another controller, the **set recorded** from the FM-1's USB audio, a **set clock**: all in the web app, nothing in the firmware;
 - Spanish interface, English optional.
 
 **Try it without a synth:** open `web/live.html?mock=1` (an example FM-1). Published build: <https://clipper-live-eta.vercel.app>.

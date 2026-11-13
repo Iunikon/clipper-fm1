@@ -10,6 +10,7 @@ if (CFG.lp >= CFG.lpages.length) CFG.lp = 0;
 CFG.live = CFG.lpages[CFG.lp].items;
 function livePage(i) { CFG.lp = Math.max(0, Math.min(CFG.lpages.length - 1, i)); CFG.live = CFG.lpages[CFG.lp].items; store.set("cfg:lp", CFG.lp); }
 const ACT = { play: ["PLAY", "Arranca o para el patrón"], rec: ["REC", "Como el botón REC"], favnext: ["Fav. siguiente", ""], favprev: ["Fav. anterior", ""], discard: ["Descartar", "Lo editado vuelve a como se cargó"] };
+const LXT = {};                                  /* more card types, from other files: {t: {name, w, h, html(it, i)}} (escenas.js, set.js) */
 const GITEM = { filt: ["Filtro", "FILTER", "filt", 0, [50, 127, 127, 127]], fx: ["Efectos", "FX", "meters", 0, [33, 34, 35, 36]], env: ["ENV", "ENV", "env", 0, [1, 2, 3, 4]], lfo: ["LFO", "LFO", "lfo", 0, [9, 10, 11, 12]] };
 function cfgSave(which) { if (which === "live") { CFG.lpages[CFG.lp].items = CFG.live; store.set("cfg:lpages", CFG.lpages); store.set("cfg:lp", CFG.lp); } else store.set("cfg:" + which, CFG[which]); }
 /* ---- a JSON file: given to the viewer (their downloads), or one they pick */
@@ -61,8 +62,9 @@ function itemHtml(it, i, which) {
   if (it.t === "q") { const q = QSPEC.get(it.key); body = q ? tile(q) : ""; }
   else if (it.t === "p") body = desc(it.s, it.id) ? tileP(it.s, it.id, it.k || 0, "", false) : "";
   else if (it.t === "g") { const g = GITEM[it.g]; body = g ? module({ title: g[1], folder: g[1] === "FILTER" || g[1] === "FX" ? "FX" : g[1], s: g[3], ids: g[4] }, g[2], { name: g[0], toggles: it.g === "fx", fxedit: it.g === "fx" }) : ""; }
+  else if (LXT[it.t]) body = LXT[it.t].html(it, i);
   else if (it.t === "a") { const a = ACT[it.a] || ["?", ""], nx = it.a === "favnext" ? M.favs[(M.favCur + 1) % Math.max(1, M.favs.length)] : it.a === "favprev" ? M.favs[(M.favCur - 1 + M.favs.length) % Math.max(1, M.favs.length)] : null;
-    body = `<button class="act" data-act="${it.a}"><b>${a[0]}</b><span class="v num">${it.a === "favnext" ? "›" : it.a === "favprev" ? "‹" : it.a === "play" ? (SQ.playing ? "■" : "▶") : it.a === "rec" ? "●" : "↺"}</span><span class="s">${esc(nx ? nx.name : a[1])}</span></button>`; }
+    body = `<button class="act" data-act="${it.a}"><b>${a[0]}</b><span class="v num">${it.a === "favnext" ? "›" : it.a === "favprev" ? "‹" : it.a === "play" ? (SQ.playing ? "■" : "▶") : it.a === "rec" ? "●" : a[2] || "↺"}</span><span class="s">${esc(nx ? nx.name : a[1])}</span></button>`; }
   const sz = [[1, 1], [2, 1], [1, 2], [2, 2]].map(([a, b]) => `<button data-csz="${i}" data-w="${a}" data-h="${b}" aria-pressed="${a === w && b === h}">${a}×${b}</button>`).join("");
   if (!it.uid) it.uid = Math.random().toString(36).slice(2, 8);
   return `<div class="ci${ed ? " ed" : ""}${CFG.sel === i && ed ? " sel" : ""}" data-uid="${it.uid}" ${at}>${body}${ed ? `<button class="cx" data-cx="${i}" aria-label="Quitar">×</button><span class="cgrip" aria-hidden="true">⋮⋮</span><div class="csz">${sz}</div>` : ""}</div>`;
@@ -77,6 +79,7 @@ function catalog(which) {
   return `<aside class="cat"><h2>Añadir</h2>
     <h3>ACCIONES</h3><div class="chips">${Object.entries(ACT).map(([k, a]) => chip(a[0], `data-cnew='${JSON.stringify({ t: "a", a: k })}'`)).join("")}</div>
     <h3>RÁPIDOS</h3><div class="chips">${[...QSPEC.values()].map((q) => chip(q.name, `data-cnew='${JSON.stringify({ t: "q", key: qkey(q) })}'`)).join("")}</div>
+    <h3>ESCENAS Y SET</h3><div class="chips">${Object.entries(LXT).map(([k, x]) => chip(x.name, `data-cnew='${JSON.stringify({ t: k, w: x.w, h: x.h })}'`)).join("")}</div>
     <h3>GRÁFICAS</h3><div class="chips">${Object.entries(GITEM).map(([k, g]) => chip(g[0], `data-cnew='${JSON.stringify({ t: "g", g: k, w: 2, h: 2 })}'`)).join("")}</div>
     <h3>CUALQUIER PARÁMETRO</h3><div class="chips">${["ENV", "LFO", "FX", "SEL", "EDIT", "ARP", "SEQ", "GLO"].map((f) => `<button class="chip${f === fold ? " sel" : ""}" data-catf="${f}">${f}</button>`).join("")}</div>
     <div class="catp">${pages.map((p) => `<div><small>${esc(p.title)}</small><div class="chips">${pageCells(p).map(({ id, k }) => chip(desc(p.s, id).label, `data-cnew='${JSON.stringify({ t: "p", s: p.s, id, k })}'`)).join("")}</div></div>`).join("")}</div></aside>`;
@@ -105,14 +108,18 @@ document.addEventListener("click", (e) => {
   if (b.dataset.cnew) { CFG[which].push(JSON.parse(b.dataset.cnew)); cfgSave(which); renderWork(); toast(-1, "Añadido"); return; }
   if (b.dataset.catf) { CFG.catF = b.dataset.catf; renderWork(); return; }
   if (b.dataset.fxedit) { S.folder = "FX"; renderNav(); renderWork(); setTimeout(() => document.querySelector(`#edit [data-title="${CSS.escape(b.dataset.fxedit)}"]`)?.scrollIntoView({ block: "start" }), 30); return; }
-  if (b.dataset.act && !CFG.edit) {
-    const a = b.dataset.act, n = M.favs.length;
+  if (b.dataset.act && !CFG.edit) runAct(b.dataset.act);
+});
+function runAct(a) {                             /* an action card, or a MIDI key learnt for it */
+  const n = M.favs.length;
+  {
     if (a === "play") rq(C.TRANSPORT, [SQ.playing ? 0 : 1]).then((r) => { SQ.playing = !!r[0]; renderTransport(); renderWork(); }).catch(() => {});
     else if (a === "rec") document.querySelector("[data-trec]")?.click();
     else if ((a === "favnext" || a === "favprev") && n) favGo(M.favCur < 0 ? (a === "favnext" ? 0 : n - 1) : (M.favCur + (a === "favnext" ? 1 : -1) + n) % n);
     else if (a === "discard") document.querySelector("[data-discard]")?.click();
+    else if (ACT[a] && ACT[a].run) ACT[a].run();
   }
-});
+}
 /* reorder: in edit, a card lifts and follows the finger (a ghost), the others make room as it passes (FLIP: they slide
    from where they were), and on release it settles into its place */
 const zf = () => +getComputedStyle(document.documentElement).getPropertyValue("--z") || 1;   /* (a PC screen: the app zoomed, live.css) */

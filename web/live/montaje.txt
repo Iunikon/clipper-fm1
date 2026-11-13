@@ -22,6 +22,8 @@ estilos/marco/transporte.css
 estilos/vistas/rec.css
 estilos/vistas/live.css
 estilos/vistas/home.css
+estilos/componentes/escenas.css
+estilos/marco/set.css
 estilos/vistas/estudio.css
 estilos/pantallas/celular.css
 estilos/pantallas/pc.css
@@ -66,6 +68,8 @@ codigo/vistas/live.js
 codigo/vistas/home.js
 codigo/componentes/doble-toque.js
 codigo/hojas/opciones.js
+codigo/componentes/escenas.js
+codigo/marco/set.js
 codigo/vistas/estudio/pestanas.js
 codigo/vistas/estudio/copia.js
 codigo/vistas/estudio/sistema.js

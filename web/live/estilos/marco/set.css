@@ -1,0 +1,16 @@
+
+  /* ==== the stage: MIDI learn, the set's recording, the set's clock (marco/set.js) ==== */
+  body.learning [data-fd], body.learning [data-cell], body.learning [data-act], body.learning [data-scn], body.learning .tl[data-tl] { outline: 1px dashed var(--tx-3); outline-offset: -3px; cursor: crosshair; }
+  body.learning .lrn-t { outline: 2px solid var(--tx) !important; outline-offset: -3px; }
+  .lrnbar { position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 40; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px;
+    background: var(--tx); color: var(--page); font-size: 14px; max-width: calc(var(--vw) - 32px); }
+  .lrnbar span { color: var(--page); } .lrnbar .btn { height: 36px; padding: 0 14px; background: var(--page); color: var(--tx); border-color: var(--page); }
+  .mll { display: grid; gap: 6px; margin-top: 12px; }
+  .mlr { display: grid; grid-template-columns: 200px minmax(0, 1fr) 44px; align-items: center; gap: 10px; padding: 6px 10px; background: var(--raised); border: 1px solid var(--line); }
+  .mlr .num { font-size: 13px; color: var(--tx-2); } .mlr b { font-size: 14px; } .mlr .dsc { height: 36px; }
+  .rsb .v { color: #ff3b30; } .rsb.on { background: #ff3b30; border-color: #ff3b30; color: #000; } .rsb.on .v, .rsb.on .s { color: #000; }
+  .clk .v { font-size: 34px; } .clks { display: flex; align-items: center; gap: 6px; width: 100%; } .clks .num { font-size: 16px; margin-right: auto; color: var(--tx-2); }
+  .clks button { width: 36px; height: 32px; background: var(--raised); border: 1px solid var(--line-2); color: var(--tx); font-size: 12px; }
+  body.setrec .bar::after { content: "● SET"; position: absolute; left: 50%; top: 2px; transform: translateX(-50%); font-size: 10px; font-weight: 800; letter-spacing: .08em; color: #ff3b30; }
+  .bar { position: relative; }
+  @media (max-height: 540px) { .lrnbar { bottom: calc(52px + env(safe-area-inset-bottom, 0px)); font-size: 12px; } .mlr { grid-template-columns: 130px minmax(0, 1fr) 40px; } }

@@ -867,6 +867,49 @@
   #favh[aria-pressed="false"] { color: var(--tx-3); } #favh[aria-pressed="true"] { color: var(--tx); }
   .scope.fm1 .src { display: none; }
 
+
+  /* ==== Escenas: 8 pads, the morph's bars, the A / B crossfader (componentes/escenas.js) ==== */
+  .scn { display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto auto; gap: 8px; padding: 12px; background: var(--panel); border: 1px solid var(--line); min-height: 0; }
+  .scn header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .scn h3 { font-size: 13px; font-weight: 800; letter-spacing: .04em; }
+  .sck { height: 32px; padding: 0 12px; font-size: 12px; font-weight: 700; color: var(--tx-2); background: var(--raised); border: 1px solid var(--line-2); }
+  .sck.on { background: var(--fav); border-color: var(--fav); color: #000; }        /* (Guardar: the one orange) */
+  .scps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(44px, 1fr); gap: 6px; min-height: 0; }
+  .scp { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 2px; padding: 6px 8px; min-width: 0; background: var(--raised); border: 1px solid var(--line-2); text-align: left; }
+  .scp b { font-family: var(--num); font-size: 16px; font-weight: 400; -webkit-font-smoothing: none; }
+  .scp span { font-size: 11px; color: var(--tx-2); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .scp.free { background: transparent; border-style: dashed; } .scp.free b, .scp.free span { color: var(--tx-3); }
+  .scn.keep .scp { border-color: var(--fav); } .scn.keep .scp.free span { color: var(--fav); }
+  .scp.cur { background: var(--tx); border-color: var(--tx); } .scp.cur b, .scp.cur span { color: var(--page); }
+  .scp[data-arm="1"] { background: var(--danger); border-color: var(--danger); color: #000; } .scp[data-arm="1"]::before { content: "⚠ "; }
+  .scb { display: flex; align-items: center; gap: 4px; } .scb span { font-size: 11px; color: var(--tx-3); margin-left: 4px; }
+  .scb button { height: 32px; min-width: 36px; padding: 0 8px; font-family: var(--num); font-size: 14px; color: var(--tx-2); background: var(--raised); border: 1px solid var(--line); }
+  .scb button[aria-checked="true"] { background: var(--tx); color: var(--page); border-color: var(--tx); }
+  .scx { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+  .scx button { height: 36px; min-width: 44px; font-size: 14px; color: var(--tx); background: var(--raised); border: 1px solid var(--line-2); }
+  .scf { position: relative; height: 36px; background: var(--page); border: 1px solid var(--line-2); touch-action: none; cursor: ew-resize; }
+  .scf::before { content: ""; position: absolute; left: 50%; top: 6px; bottom: 6px; border-left: 1px dashed var(--line-2); }
+  .scf i { position: absolute; top: 3px; bottom: 3px; width: 14px; left: calc(var(--f) * (100% - 14px)); background: var(--tx); }
+  .scr { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; } .scr[hidden] { display: none; }
+  .scr i { height: 6px; background: var(--raised); position: relative; } .scr i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: calc(var(--f) * 100%); background: var(--tx); }
+  .scr button { height: 32px; padding: 0 12px; font-size: 12px; font-weight: 700; color: var(--tx); background: var(--raised); border: 1px solid var(--line-2); }
+  @media (max-height: 540px) { .scn { padding: 8px; gap: 6px; } .scps { grid-auto-rows: minmax(40px, 1fr); } .scp span { display: none; } }
+
+  /* ==== the stage: MIDI learn, the set's recording, the set's clock (marco/set.js) ==== */
+  body.learning [data-fd], body.learning [data-cell], body.learning [data-act], body.learning [data-scn], body.learning .tl[data-tl] { outline: 1px dashed var(--tx-3); outline-offset: -3px; cursor: crosshair; }
+  body.learning .lrn-t { outline: 2px solid var(--tx) !important; outline-offset: -3px; }
+  .lrnbar { position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 40; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px;
+    background: var(--tx); color: var(--page); font-size: 14px; max-width: calc(var(--vw) - 32px); }
+  .lrnbar span { color: var(--page); } .lrnbar .btn { height: 36px; padding: 0 14px; background: var(--page); color: var(--tx); border-color: var(--page); }
+  .mll { display: grid; gap: 6px; margin-top: 12px; }
+  .mlr { display: grid; grid-template-columns: 200px minmax(0, 1fr) 44px; align-items: center; gap: 10px; padding: 6px 10px; background: var(--raised); border: 1px solid var(--line); }
+  .mlr .num { font-size: 13px; color: var(--tx-2); } .mlr b { font-size: 14px; } .mlr .dsc { height: 36px; }
+  .rsb .v { color: #ff3b30; } .rsb.on { background: #ff3b30; border-color: #ff3b30; color: #000; } .rsb.on .v, .rsb.on .s { color: #000; }
+  .clk .v { font-size: 34px; } .clks { display: flex; align-items: center; gap: 6px; width: 100%; } .clks .num { font-size: 16px; margin-right: auto; color: var(--tx-2); }
+  .clks button { width: 36px; height: 32px; background: var(--raised); border: 1px solid var(--line-2); color: var(--tx); font-size: 12px; }
+  body.setrec .bar::after { content: "● SET"; position: absolute; left: 50%; top: 2px; transform: translateX(-50%); font-size: 10px; font-weight: 800; letter-spacing: .08em; color: #ff3b30; }
+  .bar { position: relative; }
+  @media (max-height: 540px) { .lrnbar { bottom: calc(52px + env(safe-area-inset-bottom, 0px)); font-size: 12px; } .mlr { grid-template-columns: 130px minmax(0, 1fr) 40px; } }
   /* ==== ESTUDIO inside: the editor over the whole work area ==== */
   .stu { display: flex; flex-direction: column; height: 100%; }
   .stub { display: flex; align-items: center; gap: 14px; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--tx-2); }
@@ -1563,7 +1606,7 @@ async function connectMidi() {
     M.link = link;
     try { await rq(C.INFO, [], { timeout: 600, retries: 3, quiet: true }); }
     catch (e) { link.close(); pr.input.onmidimessage = null; continue; }
-    M.midiOut = pr.output;                           /* (the panic's all notes off: plain MIDI on the same port) */
+    M.midiOut = pr.output; M.access = access; M.fmIn = pr.input;   /* (MIDI learn: the other inputs) */                           /* (the panic's all notes off: plain MIDI on the same port) */
     access.onstatechange = (e) => { if (e.port === pr.input && e.port.state === "disconnected") lost(); };
     $("cname").textContent = pr.input.name.replace(/ MIDI.*$/, "") || "FM-1";
     return load();
@@ -2267,7 +2310,7 @@ async function scopeKeep() {
 }
 setInterval(scopeKeep, 2000);
 
-let an = null, buf = null;
+let an = null, buf = null, usbStream = null;   /* (usbStream: the set's recording, set.js) */
 async function usbAudio() {
   const l = $("src");
   if (!navigator.mediaDevices?.getUserMedia) { l.textContent = "Este navegador no da audio"; return; }
@@ -2277,6 +2320,7 @@ async function usbAudio() {
     const ins = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "audioinput");
     const fm1 = ins.find((d) => /felucca|clipper|fm-?1|sloop/i.test(d.label)) || ins.find((d) => /usb/i.test(d.label));
     if (fm1 && st.getAudioTracks()[0].getSettings().deviceId !== fm1.deviceId) { st.getTracks().forEach((t) => t.stop()); st = await navigator.mediaDevices.getUserMedia({ audio: { ...raw, deviceId: { exact: fm1.deviceId } } }); }
+    usbStream = st;
     const ctx = new AudioContext(); an = ctx.createAnalyser(); an.fftSize = 2048; buf = new Float32Array(an.fftSize); ctx.createMediaStreamSource(st).connect(an);
     l.textContent = (fm1 ? "" : "No encontré el FM-1: ") + (st.getAudioTracks()[0].label || "entrada");
     document.querySelector(".scope").classList.add("on");
@@ -4433,6 +4477,7 @@ if (CFG.lp >= CFG.lpages.length) CFG.lp = 0;
 CFG.live = CFG.lpages[CFG.lp].items;
 function livePage(i) { CFG.lp = Math.max(0, Math.min(CFG.lpages.length - 1, i)); CFG.live = CFG.lpages[CFG.lp].items; store.set("cfg:lp", CFG.lp); }
 const ACT = { play: ["PLAY", "Arranca o para el patrón"], rec: ["REC", "Como el botón REC"], favnext: ["Fav. siguiente", ""], favprev: ["Fav. anterior", ""], discard: ["Descartar", "Lo editado vuelve a como se cargó"] };
+const LXT = {};                                  /* more card types, from other files: {t: {name, w, h, html(it, i)}} (escenas.js, set.js) */
 const GITEM = { filt: ["Filtro", "FILTER", "filt", 0, [50, 127, 127, 127]], fx: ["Efectos", "FX", "meters", 0, [33, 34, 35, 36]], env: ["ENV", "ENV", "env", 0, [1, 2, 3, 4]], lfo: ["LFO", "LFO", "lfo", 0, [9, 10, 11, 12]] };
 function cfgSave(which) { if (which === "live") { CFG.lpages[CFG.lp].items = CFG.live; store.set("cfg:lpages", CFG.lpages); store.set("cfg:lp", CFG.lp); } else store.set("cfg:" + which, CFG[which]); }
 /* ---- a JSON file: given to the viewer (their downloads), or one they pick */
@@ -4484,8 +4529,9 @@ function itemHtml(it, i, which) {
   if (it.t === "q") { const q = QSPEC.get(it.key); body = q ? tile(q) : ""; }
   else if (it.t === "p") body = desc(it.s, it.id) ? tileP(it.s, it.id, it.k || 0, "", false) : "";
   else if (it.t === "g") { const g = GITEM[it.g]; body = g ? module({ title: g[1], folder: g[1] === "FILTER" || g[1] === "FX" ? "FX" : g[1], s: g[3], ids: g[4] }, g[2], { name: g[0], toggles: it.g === "fx", fxedit: it.g === "fx" }) : ""; }
+  else if (LXT[it.t]) body = LXT[it.t].html(it, i);
   else if (it.t === "a") { const a = ACT[it.a] || ["?", ""], nx = it.a === "favnext" ? M.favs[(M.favCur + 1) % Math.max(1, M.favs.length)] : it.a === "favprev" ? M.favs[(M.favCur - 1 + M.favs.length) % Math.max(1, M.favs.length)] : null;
-    body = `<button class="act" data-act="${it.a}"><b>${a[0]}</b><span class="v num">${it.a === "favnext" ? "›" : it.a === "favprev" ? "‹" : it.a === "play" ? (SQ.playing ? "■" : "▶") : it.a === "rec" ? "●" : "↺"}</span><span class="s">${esc(nx ? nx.name : a[1])}</span></button>`; }
+    body = `<button class="act" data-act="${it.a}"><b>${a[0]}</b><span class="v num">${it.a === "favnext" ? "›" : it.a === "favprev" ? "‹" : it.a === "play" ? (SQ.playing ? "■" : "▶") : it.a === "rec" ? "●" : a[2] || "↺"}</span><span class="s">${esc(nx ? nx.name : a[1])}</span></button>`; }
   const sz = [[1, 1], [2, 1], [1, 2], [2, 2]].map(([a, b]) => `<button data-csz="${i}" data-w="${a}" data-h="${b}" aria-pressed="${a === w && b === h}">${a}×${b}</button>`).join("");
   if (!it.uid) it.uid = Math.random().toString(36).slice(2, 8);
   return `<div class="ci${ed ? " ed" : ""}${CFG.sel === i && ed ? " sel" : ""}" data-uid="${it.uid}" ${at}>${body}${ed ? `<button class="cx" data-cx="${i}" aria-label="Quitar">×</button><span class="cgrip" aria-hidden="true">⋮⋮</span><div class="csz">${sz}</div>` : ""}</div>`;
@@ -4500,6 +4546,7 @@ function catalog(which) {
   return `<aside class="cat"><h2>Añadir</h2>
     <h3>ACCIONES</h3><div class="chips">${Object.entries(ACT).map(([k, a]) => chip(a[0], `data-cnew='${JSON.stringify({ t: "a", a: k })}'`)).join("")}</div>
     <h3>RÁPIDOS</h3><div class="chips">${[...QSPEC.values()].map((q) => chip(q.name, `data-cnew='${JSON.stringify({ t: "q", key: qkey(q) })}'`)).join("")}</div>
+    <h3>ESCENAS Y SET</h3><div class="chips">${Object.entries(LXT).map(([k, x]) => chip(x.name, `data-cnew='${JSON.stringify({ t: k, w: x.w, h: x.h })}'`)).join("")}</div>
     <h3>GRÁFICAS</h3><div class="chips">${Object.entries(GITEM).map(([k, g]) => chip(g[0], `data-cnew='${JSON.stringify({ t: "g", g: k, w: 2, h: 2 })}'`)).join("")}</div>
     <h3>CUALQUIER PARÁMETRO</h3><div class="chips">${["ENV", "LFO", "FX", "SEL", "EDIT", "ARP", "SEQ", "GLO"].map((f) => `<button class="chip${f === fold ? " sel" : ""}" data-catf="${f}">${f}</button>`).join("")}</div>
     <div class="catp">${pages.map((p) => `<div><small>${esc(p.title)}</small><div class="chips">${pageCells(p).map(({ id, k }) => chip(desc(p.s, id).label, `data-cnew='${JSON.stringify({ t: "p", s: p.s, id, k })}'`)).join("")}</div></div>`).join("")}</div></aside>`;
@@ -4528,14 +4575,18 @@ document.addEventListener("click", (e) => {
   if (b.dataset.cnew) { CFG[which].push(JSON.parse(b.dataset.cnew)); cfgSave(which); renderWork(); toast(-1, "Añadido"); return; }
   if (b.dataset.catf) { CFG.catF = b.dataset.catf; renderWork(); return; }
   if (b.dataset.fxedit) { S.folder = "FX"; renderNav(); renderWork(); setTimeout(() => document.querySelector(`#edit [data-title="${CSS.escape(b.dataset.fxedit)}"]`)?.scrollIntoView({ block: "start" }), 30); return; }
-  if (b.dataset.act && !CFG.edit) {
-    const a = b.dataset.act, n = M.favs.length;
+  if (b.dataset.act && !CFG.edit) runAct(b.dataset.act);
+});
+function runAct(a) {                             /* an action card, or a MIDI key learnt for it */
+  const n = M.favs.length;
+  {
     if (a === "play") rq(C.TRANSPORT, [SQ.playing ? 0 : 1]).then((r) => { SQ.playing = !!r[0]; renderTransport(); renderWork(); }).catch(() => {});
     else if (a === "rec") document.querySelector("[data-trec]")?.click();
     else if ((a === "favnext" || a === "favprev") && n) favGo(M.favCur < 0 ? (a === "favnext" ? 0 : n - 1) : (M.favCur + (a === "favnext" ? 1 : -1) + n) % n);
     else if (a === "discard") document.querySelector("[data-discard]")?.click();
+    else if (ACT[a] && ACT[a].run) ACT[a].run();
   }
-});
+}
 /* reorder: in edit, a card lifts and follows the finger (a ghost), the others make room as it passes (FLIP: they slide
    from where they were), and on release it settles into its place */
 const zf = () => +getComputedStyle(document.documentElement).getPropertyValue("--z") || 1;   /* (a PC screen: the app zoomed, live.css) */
@@ -4631,6 +4682,229 @@ document.addEventListener("click", (e) => {
 }, true);
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && PK.key) closePick(); });
 
+/* ---- scenes (an idea from SLOOP's LIVE pro): 8 snapshots of the sound, kept in the tablet. A tap goes to one, at once
+   or morphing there over 1..16 bars at the synth's tempo; the A / B crossfader slides between two. A scene keeps the
+   sound's parameters (not the pattern's: LEN DIV SWG GATE), the engine's own ones (E0..E7) only for the same engine.
+   Its changes do not fill Cambios (a scene is one deliberate jump: a toast says which) */
+const SCN = Object.assign({ slots: new Array(8).fill(null), bars: 0, a: 0, b: 1, x: 0 }, store.get("scenes") || {});
+SCN.run = null; SCN.keep = false; SCN.cur = -1;
+const SCN_BARS = [0, 1, 2, 4, 8, 16];
+const scnSave = () => store.set("scenes", { slots: SCN.slots, bars: SCN.bars, a: SCN.a, b: SCN.b, x: SCN.x });
+const scnCont = (d) => !!d && !isChoice(d) && d.max - d.min > 4;           /* (glides; a list or a switch changes at once) */
+function scnIds(sc) {
+  const skip = new Set((LAYOUT.find((x) => x.title === "PATTERN") || { ids: [] }).ids);
+  return Object.keys(sc.p).map(Number).filter((id) => !skip.has(id) && desc(0, id) && (id < M.info.pe0 || sc.engine === M.engine));
+}
+function scnSet(id, v) { const u = undoing; undoing = true; setVal(0, id, v); undoing = u; }
+function scnStop() { if (SCN.run) { clearInterval(SCN.run.timer); SCN.run = null; } paintScn(); }
+function scnCapture(n) {
+  const x = M.list[entryNow()], p = {};
+  M.p.forEach((v, id) => { if (id < M.info.pcount && desc(0, id)) p[id] = v; });
+  SCN.slots[n] = { engine: M.engine, sound: x ? x.name : M.info.engines[M.engine] || "", p, at: new Date().toISOString() };
+  scnSave(); renderWork(); toast(-1, `<b>S${n + 1}</b> guardada: ${esc(SCN.slots[n].sound)}`);
+}
+function scnGo(n) {
+  const sc = SCN.slots[n]; if (!sc || !M.link) return;
+  scnStop();
+  const ids = scnIds(sc), from = Object.fromEntries(ids.map((id) => [id, val(0, id)]));
+  const bpm = desc(1, 0) ? val(1, 0) : 120, dur = SCN.bars ? SCN.bars * 4 * 60000 / Math.max(20, bpm) : 0;
+  ids.forEach((id) => { if (!dur || !scnCont(desc(0, id))) scnSet(id, sc.p[id]); });
+  SCN.cur = n;
+  if (dur) {
+    const t0 = performance.now();
+    SCN.run = { n, t0, dur, f: 0, timer: setInterval(() => {
+      const f = Math.min(1, (performance.now() - t0) / dur);
+      ids.forEach((id) => { if (scnCont(desc(0, id))) scnSet(id, from[id] + (sc.p[id] - from[id]) * f); });
+      SCN.run.f = f; paintScn();
+      if (f >= 1) scnStop();
+    }, 60) };
+  }
+  paintScn();
+  toast(-1, `<b>S${n + 1}</b> ${dur ? `en ${SCN.bars} ${SCN.bars === 1 ? "compás" : "compases"}` : ""}: ${esc(sc.sound)}`);
+}
+function scnFade(x) {                              /* the crossfader: A (0) .. B (1) */
+  const A = SCN.slots[SCN.a], B = SCN.slots[SCN.b]; SCN.x = x; if (!A || !B || !M.link) return;
+  scnStop();
+  scnIds(A).filter((id) => B.p[id] != null && (id < M.info.pe0 || B.engine === M.engine)).forEach((id) => {
+    const d = desc(0, id); scnSet(id, scnCont(d) ? A.p[id] + (B.p[id] - A.p[id]) * x : x < .5 ? A.p[id] : B.p[id]);
+  });
+}
+const scnNext = (k) => { const used = SCN.slots.map((s, i) => (s ? i : -1)).filter((i) => i >= 0); if (!used.length) return k; return used[(used.indexOf(k) + 1) % used.length]; };
+function scnHtml() {
+  const run = SCN.run;
+  const pads = SCN.slots.map((s, i) => `<button class="scp${s ? "" : " free"}${SCN.cur === i ? " cur" : ""}" data-scn="${i}" aria-label="Escena ${i + 1}${s ? ": " + esc(s.sound) : ", libre"}">
+      <b class="num">S${i + 1}</b><span>${s ? esc(s.sound) : SCN.keep ? "Guardar aquí" : "Libre"}</span></button>`).join("");
+  return `<section class="scn${SCN.keep ? " keep" : ""}"><header><h3>Escenas</h3>
+      <button class="sck${SCN.keep ? " on" : ""}" data-scnkeep="1" aria-pressed="${SCN.keep}">Guardar</button></header>
+    <div class="scps">${pads}</div>
+    <div class="scb" role="radiogroup" aria-label="Morph">${SCN_BARS.map((b) => `<button role="radio" aria-checked="${SCN.bars === b}" data-scnbars="${b}">${b ? b : "Ya"}</button>`).join("")}<span>${SCN.bars ? "compases" : "de golpe"}</span></div>
+    <div class="scx"><button data-scnab="a" class="num">S${SCN.a + 1}</button>
+      <div class="scf" data-scnx="1" role="slider" tabindex="0" aria-label="Crossfader A / B" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(SCN.x * 100)}" style="--f:${SCN.x}"><i></i></div>
+      <button data-scnab="b" class="num">S${SCN.b + 1}</button></div>
+    <div class="scr" style="--f:${run ? run.f : 0}"${run ? "" : " hidden"}><i></i><button data-scnstop="1">Parar</button></div></section>`;
+}
+function paintScn() {                              /* (in place: the run's bar, the scene playing) */
+  document.querySelectorAll(".scn").forEach((el) => {
+    const r = el.querySelector(".scr"); if (r) { r.hidden = !SCN.run; r.style.setProperty("--f", SCN.run ? SCN.run.f : 0); }
+    el.querySelectorAll("[data-scn]").forEach((b) => b.classList.toggle("cur", +b.dataset.scn === SCN.cur));
+  });
+}
+LXT.sc = { name: "Escenas", w: 2, h: 2, html: scnHtml };
+document.addEventListener("click", (e) => {
+  if (CFG.edit) return;
+  const b = e.target.closest("[data-scn],[data-scnkeep],[data-scnbars],[data-scnab],[data-scnstop]"); if (!b) return;
+  if (b.dataset.scnkeep) { SCN.keep = !SCN.keep; renderWork(); return; }
+  if (b.dataset.scnbars != null) { SCN.bars = +b.dataset.scnbars; scnSave(); renderWork(); return; }
+  if (b.dataset.scnstop) { scnStop(); return; }
+  if (b.dataset.scnab) { const k = b.dataset.scnab; SCN[k] = scnNext(SCN[k]); scnSave(); renderWork(); return; }
+  const n = +b.dataset.scn;
+  if (SCN.keep) {
+    if (SCN.slots[n] && b.dataset.arm !== "1") { arm(b, b.textContent, `S${n + 1}: ¿encima?`); return; }
+    SCN.keep = false; scnCapture(n); return;
+  }
+  if (SCN.slots[n]) scnGo(n);
+});
+/* the crossfader: dragged sideways (the whole bar takes the finger) */
+let scnDrag = null;
+document.addEventListener("pointerdown", (e) => {
+  const f = !CFG.edit && e.target.closest("[data-scnx]"); if (!f) return;
+  scnDrag = f; f.setPointerCapture?.(e.pointerId); scnAt(e); e.preventDefault();
+});
+document.addEventListener("pointermove", (e) => { if (scnDrag) scnAt(e); });
+document.addEventListener("pointerup", () => { if (scnDrag) { scnDrag = null; scnFade(SCN.fx); scnSave(); } });
+function scnAt(e) {
+  const r = scnDrag.getBoundingClientRect(), x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+  scnDrag.style.setProperty("--f", x); scnDrag.setAttribute("aria-valuenow", Math.round(x * 100));
+  SCN.fx = x;
+  if (!SCN.raf) SCN.raf = requestAnimationFrame(() => { SCN.raf = 0; scnFade(SCN.fx); });   /* (once a frame) */
+}
+/* ---- for the stage (ideas from SLOOP's LIVE pro): MIDI learn, the set recorded from the FM-1's USB audio, the set's
+   clock. All in the tablet: nothing of it is in the firmware */
+
+/* MIDI learn: any value, action or scene of Live on a knob or a key of another MIDI controller. Learn: tap a control,
+   then move the controller's knob or press its key. The links are kept in the tablet ("midimap"); a CC sets a value
+   across its range, a note toggles a switch, triggers an action or goes to a scene. The FM-1's own port is left alone */
+const ML = { on: false, target: null, map: store.get("midimap") || {}, ready: false };
+const mlSave = () => store.set("midimap", ML.map);
+const mlName = (t) => (t.s != null ? (desc(t.s, t.id) || {}).label || "?" : t.act ? (ACT[t.act] || [t.act])[0] : t.scn != null ? `S${t.scn + 1}` : "?");
+const mlKeyName = (k) => { const [kind, ch, n] = k.split(":"); return kind === "cc" ? `CC ${n} · canal ${+ch + 1}` : `Nota ${n} · canal ${+ch + 1}`; };
+async function mlAttach() {
+  if (ML.ready || !navigator.requestMIDIAccess) return;
+  let acc = M.access;
+  try { if (!acc) acc = M.access = await navigator.requestMIDIAccess(); } catch (e) { toast(-1, "Sin permiso para MIDI"); return; }
+  const hook = () => acc.inputs.forEach((inp) => { if (inp !== M.fmIn && inp.state !== "disconnected") inp.onmidimessage = mlMsg; });
+  hook(); acc.addEventListener("statechange", hook); ML.ready = true;
+}
+function mlMsg(e) {
+  const [st, a, b] = e.data, kind = st & 0xF0, ch = st & 15;
+  if (kind !== 0xB0 && kind !== 0x90 && kind !== 0x80) return;
+  const k = `${kind === 0xB0 ? "cc" : "nt"}:${ch}:${a}`, on = kind === 0x90 && b > 0;
+  if (ML.on && ML.target) {
+    if (kind === 0x80 || (kind === 0x90 && !b)) return;     /* (the key's release: not a new link) */
+    for (const [kk, t] of Object.entries(ML.map)) if (JSON.stringify(t) === JSON.stringify(ML.target)) delete ML.map[kk];
+    ML.map[k] = ML.target; mlSave();
+    toast(-1, `<b>${esc(mlKeyName(k))}</b> → ${esc(mlName(ML.target))}`);
+    ML.target = null; document.querySelectorAll(".lrn-t").forEach((x) => x.classList.remove("lrn-t")); return;
+  }
+  const t = ML.map[k]; if (!t || !M.link) return;
+  if (t.s != null) {
+    const d = desc(t.s, t.id); if (!d) return;
+    if (kind === 0xB0) setVal(t.s, t.id, d.min + Math.round(b / 127 * (d.max - d.min)));
+    else if (on) setVal(t.s, t.id, isGo(d) ? d.max : val(t.s, t.id) === d.min ? d.max : d.min);
+  } else if (kind === 0xB0 ? b >= 64 && !(ML.hi || {})[k] : on) {
+    if (t.act) runAct(t.act); else if (t.scn != null) scnGo(t.scn);
+  }
+  if (kind === 0xB0) (ML.hi = ML.hi || {})[k] = b >= 64;        /* (a CC as a button: once each time it crosses 64) */
+}
+function mlToggle() {
+  ML.on = !ML.on; ML.target = null; document.body.classList.toggle("learning", ML.on);
+  if (ML.on) { mlAttach(); toast(-1, "<b>MIDI learn</b>: toca un control y mueve tu controlador"); }
+  document.querySelectorAll(".lrn-t").forEach((x) => x.classList.remove("lrn-t")); renderWork();
+}
+/* learning: a tap picks the control instead of using it */
+const ML_SEL = "[data-fd],[data-cell],[data-act],[data-scn],.tl[data-tl]";
+function mlPick(e) {
+  if (!ML.on) return;
+  const el = e.target.closest(ML_SEL); if (!el || e.target.closest("[data-mloff],.lrnbar,[data-act=learn]")) return;
+  e.preventDefault(); e.stopPropagation();
+  if (e.type !== "click") return;
+  let t = null;
+  const key = el.dataset.fd || el.dataset.cell;
+  if (key) { const [s, id] = key.split(":").map(Number); t = { s, id }; }
+  else if (el.dataset.act) t = el.dataset.act === "learn" ? null : { act: el.dataset.act };
+  else if (el.dataset.scn != null) t = { scn: +el.dataset.scn };
+  else if (el.dataset.tl) { const q = QSPEC.get(el.dataset.tl); if (q && q.id >= 0) t = { s: q.s || 0, id: q.id }; }
+  if (!t) return;
+  ML.target = t; document.querySelectorAll(".lrn-t").forEach((x) => x.classList.remove("lrn-t")); el.classList.add("lrn-t");
+  toast(-1, `<b>${esc(mlName(t))}</b>: ahora mueve la perilla o pulsa la tecla`);
+}
+["pointerdown", "click"].forEach((ev) => document.addEventListener(ev, mlPick, true));
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-mloff]")) { mlToggle(); return; }
+  const x = e.target.closest("[data-mldel]"); if (x) { delete ML.map[x.dataset.mldel]; mlSave(); renderWork(); }
+});
+ACT.learn = ["MIDI learn", "Tu controlador mueve Live", "◎"]; ACT.learn.run = mlToggle;
+function mlBar() {                                 /* the strip while learning (on every view) */
+  let el = document.querySelector(".lrnbar");
+  if (!ML.on) { el?.remove(); return; }
+  if (!el) { el = document.createElement("div"); el.className = "lrnbar"; el.setAttribute("role", "status"); document.body.append(el); }
+  el.innerHTML = `<b>MIDI learn</b><span>${ML.target ? `${esc(mlName(ML.target))}: mueve la perilla o pulsa la tecla` : "Toca un control, una acción o una escena"}</span><button class="btn" data-mloff="1">Listo</button>`;
+}
+setInterval(mlBar, 300);
+if (Object.keys(ML.map).length) document.addEventListener("click", () => mlAttach(), { once: true, capture: true });   /* (links kept: listen once Live is touched) */
+function mlList() {                                /* Estudio > Sistema */
+  const rows = Object.entries(ML.map);
+  return `<div class="mll"><div class="syl"><span>MIDI learn</span><button class="btn" data-act="learn">${ML.on ? "Aprendiendo… (Listo)" : "Aprender"}</button></div>
+    ${rows.length ? rows.map(([k, t]) => `<div class="mlr"><span class="num">${esc(mlKeyName(k))}</span><b>${esc(mlName(t))}</b><button class="dsc" data-mldel="${esc(k)}" aria-label="Quitar">×</button></div>`).join("") : `<p class="msh">Sin enlaces. Conecta un controlador MIDI, toca Aprender, luego un control de Live y mueve una perilla.</p>`}</div>`;
+}
+
+/* the set recorded: the FM-1's USB audio (the scope's input) to a file in the downloads, when you stop */
+const RS = { rec: null, chunks: [], t0: 0 };
+async function rsToggle() {
+  if (RS.rec) { RS.rec.stop(); return; }
+  if (!usbStream) await usbAudio();
+  if (!usbStream) { toast(-1, "Sin audio USB del FM-1: no puedo grabar"); return; }
+  if (!window.MediaRecorder) { toast(-1, "Este navegador no puede grabar"); return; }
+  const type = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"].find((t) => MediaRecorder.isTypeSupported?.(t)) || "";
+  try { RS.rec = new MediaRecorder(usbStream, type ? { mimeType: type, audioBitsPerSecond: 192000 } : {}); } catch (e) { toast(-1, "No se pudo empezar a grabar"); return; }
+  RS.chunks = []; RS.t0 = Date.now();
+  RS.rec.ondataavailable = (ev) => { if (ev.data.size) RS.chunks.push(ev.data); };
+  RS.rec.onstop = () => {
+    const ext = /mp4/.test(RS.rec.mimeType) ? "m4a" : "webm", blob = new Blob(RS.chunks, { type: RS.rec.mimeType }), a = document.createElement("a"), url = URL.createObjectURL(blob);
+    const d = new Date(RS.t0), f2 = (x) => String(x).padStart(2, "0");
+    a.href = url; a.download = `clipper-set-${d.getFullYear()}${f2(d.getMonth() + 1)}${f2(d.getDate())}-${f2(d.getHours())}${f2(d.getMinutes())}.${ext}`;
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 8000);
+    toast(-1, `<b>Set grabado</b>: ${clk(Date.now() - RS.t0)}, en tus descargas`);
+    RS.rec = null; document.body.classList.remove("setrec"); paintSet();
+  };
+  RS.rec.start(1000); document.body.classList.add("setrec"); paintSet();
+  toast(-1, "<b>Grabando el set</b> desde el audio USB del FM-1");
+}
+LXT.rs = { name: "Grabar set", w: 1, h: 1, html: () => `<button class="act rsb${RS.rec ? " on" : ""}" data-rs="1"><b>GRABAR SET</b><span class="v num" data-rst="1">${RS.rec ? clk(Date.now() - RS.t0) : "●"}</span><span class="s">${RS.rec ? "Toca para parar y guardar" : "El audio USB del FM-1 a un archivo"}</span></button>` };
+
+/* the set's clock: the time, and how long the set has run (started and paused by hand; kept across a reload) */
+const SC = Object.assign({ acc: 0, t0: 0, run: false }, store.get("setclock") || {});
+const scSave = () => store.set("setclock", { acc: SC.acc, t0: SC.t0, run: SC.run });
+const scNow = () => SC.acc + (SC.run ? Date.now() - SC.t0 : 0);
+function clk(ms) { const s = Math.floor(ms / 1000), f2 = (x) => String(x).padStart(2, "0"); return `${s >= 3600 ? Math.floor(s / 3600) + ":" : ""}${f2(Math.floor(s / 60) % 60)}:${f2(s % 60)}`; }
+const hhmm = () => { const d = new Date(); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
+LXT.clock = { name: "Reloj del set", w: 1, h: 1, html: () => `<div class="act clk"><b>RELOJ</b><span class="v num" data-clkh="1">${hhmm()}</span>
+  <span class="clks"><span class="num" data-clks="1">${clk(scNow())}</span><button data-sc="go" aria-label="${SC.run ? "Pausar el set" : "Empezar el set"}">${SC.run ? "❚❚" : "▶"}</button><button data-sc="zero" aria-label="El set a cero">↺</button></span></div>` };
+document.addEventListener("click", (e) => {
+  if (CFG.edit || ML.on) return;
+  if (e.target.closest("[data-rs]")) { rsToggle(); return; }
+  const b = e.target.closest("[data-sc]"); if (!b) return;
+  if (b.dataset.sc === "go") { if (SC.run) { SC.acc += Date.now() - SC.t0; SC.run = false; } else { SC.t0 = Date.now(); SC.run = true; } }
+  else { SC.acc = 0; SC.t0 = Date.now(); }
+  scSave(); renderWork();
+});
+function paintSet() {                              /* every second: only the numbers that are on screen */
+  document.querySelectorAll("[data-clkh]").forEach((x) => { x.textContent = hhmm(); });
+  document.querySelectorAll("[data-clks]").forEach((x) => { x.textContent = clk(scNow()); });
+  document.querySelectorAll("[data-rst]").forEach((x) => { x.textContent = RS.rec ? clk(Date.now() - RS.t0) : "●"; });
+  document.querySelectorAll(".rsb").forEach((x) => x.classList.toggle("on", !!RS.rec));
+}
+setInterval(() => { if (!document.hidden) paintSet(); }, 1000);
 /* ----------------------------------------------------------------- studio --- */
 /* ESTUDIO, Live's own: what the device's pages do not reach, in tabs. The advanced sequencer (seq.js, its full mode),
    the samples, drum kits, library and projects (bento.js devView), the complete backup (BK_LIST / BK_GET / BK_PUT and
@@ -4761,6 +5035,7 @@ function systemView() {
       ${row("Sonidos de usuario", `${users} de 32`)}${row("Favoritos", `${M.favs.length} de 16`)}${row("Pasos del patrón", i.nstep || "—")}
       ${st ? row("CPU", st.cpu + " %") + row("LATE", st.late) + row("PEAK", st.peak + " %") : ""}${row("Puerto MIDI", $("cname").textContent)}</div>
     <div class="syl"><span>Idioma · Language</span><button class="btn${LANG.cur !== "en" ? " pri" : ""}" data-lang="es">Español</button><button class="btn${LANG.cur === "en" ? " pri" : ""}" data-lang="en">English</button></div>
+    ${mlList()}
     <div class="syl"><span>Ajustes de Live</span><button class="btn" data-cfgio="out"><svg class="i"><use href="#i-dl"/></svg>Exportar</button><button class="btn" data-cfgio="in">Importar</button></div>
     <p class="msh">Las páginas de LIVE, HOME, la Biblioteca, el idioma y el resto de ajustes se guardan en este navegador, en este aparato: no en el FM-1. La página de Vercel y el archivo descargado guardan cada uno los suyos, y se pierden si borras los datos del sitio. Exporta para tener una copia o pasarlos a otro aparato.</p>
     <p class="msh">MIDI, sincronía y afinación se ajustan en GLO.</p></section>`;
@@ -5081,6 +5356,14 @@ document.addEventListener("change", async (e) => {
    with numbers or names in them by RX. The device's own names (ENV, CUT, BASS…) are English already */
 const LANG = { cur: (() => { try { return localStorage.getItem("clipperlive:lang"); } catch (e) { return null; } })() };
 const DICT = {
+  "Escenas": "Scenes", "Guardar aquí": "Save here", "Ya": "Now", "compases": "bars", "de golpe": "at once", "Parar": "Stop",
+  "ESCENAS Y SET": "SCENES AND SET", "Reloj del set": "Set clock", "RELOJ": "CLOCK", "Grabar set": "Record set", "GRABAR SET": "RECORD SET", "Toca para parar y guardar": "Tap to stop and save",
+  "El audio USB del FM-1 a un archivo": "The FM-1's USB audio to a file", "Tu controlador mueve Live": "Your controller moves Live", "Aprender": "Learn", "Aprendiendo… (Listo)": "Learning… (Done)",
+  "Toca un control, una acción o una escena": "Tap a control, an action or a scene", "Listo": "Done", "Pausar el set": "Pause the set", "Empezar el set": "Start the set", "El set a cero": "Set to zero",
+  "Sin audio USB del FM-1: no puedo grabar": "No USB audio from the FM-1: can't record", "Este navegador no puede grabar": "This browser can't record", "No se pudo empezar a grabar": "Couldn't start recording",
+  "Sin permiso para MIDI": "No MIDI permission", "Grabando el set": "Recording the set", "desde el audio USB del FM-1": "from the FM-1's USB audio", "Set grabado": "Set recorded",
+  "Sin enlaces. Conecta un controlador MIDI, toca Aprender, luego un control de Live y mueve una perilla.": "No links. Plug in a MIDI controller, tap Learn, then a Live control, and turn a knob.",
+  ": ahora mueve la perilla o pulsa la tecla": ": now turn the knob or press the key", ": mueve la perilla o pulsa la tecla": ": turn the knob or press the key", ": toca un control y mueve tu controlador": ": tap a control and move your controller",
   "Conecta el FM-1": "Connect the FM-1", "Conectar el FM-1": "Connect the FM-1",
   "Conéctalo por USB y toca Conectar. La primera vez, Chrome pide permiso para usar dispositivos MIDI.": "Plug it in over USB and tap Connect. The first time, Chrome asks to use MIDI devices.",
   "Descargar para usar sin internet": "Download to use offline", "Datos de ejemplo": "Example data", "FM-1 (ejemplo)": "FM-1 (example)", "Sin conectar": "Not connected",
@@ -5160,6 +5443,8 @@ const DICT = {
 
 };
 const RX = [
+  [/^Escena (\d+): (.+)$/, "Scene $1: $2"], [/^Escena (\d+), libre$/, "Scene $1, free"], [/^S(\d+): ¿encima\?$/, "S$1: over it?"], [/^CC (\d+) · canal (\d+)$/, "CC $1 · channel $2"], [/^Nota (\d+) · canal (\d+)$/, "Note $1 · channel $2"],
+  [/^en (\d+) compás$/, "over $1 bar"], [/^en (\d+) compases$/, "over $1 bars"], [/^guardada: (.+)$/, "saved: $1"], [/^: (.+), en tus descargas$/, ": $1, in your downloads"],
   [/^(.+): anterior$/, "$1: previous"], [/^(.+): siguiente$/, "$1: next"], [/^(.+): apagado$/, "$1: off"], [/^(.+): encendido$/, "$1: on"], [/^(.+): menos$/, "$1: less"], [/^(.+): más$/, "$1: more"], [/^(.+): nivel$/, "$1: level"],
   [/^Paso (\d+): vacío$/, "Step $1: empty"], [/^Paso (\d+): ligado$/, "Step $1: tied"], [/^Paso (\d+): (.+)$/, "Step $1: $2"], [/^Deshacer (.+): volver a (.+)$/, "Undo $1: back to $2"],
   [/^Editar (.+)$/, (m, x) => `Edit ${DICT[x] || x}`], [/^Abrir (.+)$/, (m, x) => `Open ${DICT[x] || x}`], [/^(\d+) pasos$/, "$1 steps"], [/^(\d+) sonidos$/, "$1 sounds"], [/^(\d+) de (\d+)$/, "$1 of $2"],
