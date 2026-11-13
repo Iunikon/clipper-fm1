@@ -17,7 +17,7 @@ function makeMock(onFrame) {
   const steps = Array.from({ length: info.nstep }, (_, i) => { const on = [0, 3, 6, 8, 10, 12, 14].includes(i), n = [36, 36, 48, 39, 36, 41, 43][[0, 3, 6, 8, 10, 12, 14].indexOf(i)];
     return { n: on ? 1 : 0, notes: [on ? n : 0, 0, 0, 0], time: on ? 0 : i === 7 ? 1 : 2, flags: i === 6 ? 1 : i === 10 ? 2 : 0, vel: 100, lvl: 0, rat: 0 }; });
   const stepArgs = (i) => { const st = steps[i]; return [i, st.n, ...st.notes, st.time, st.flags, st.vel, st.lvl & 127, ((st.lvl >> 7) & 1) | (((st.rat >> 7) & 1) << 1), st.rat & 127]; };
-  const sq = { playing: 0, pos: 0, t: 0 }, mrec = { rec: 0, mode: 0, start: 0, quant: 0 };
+  const sq = { playing: 0, pos: 0, t: 0, cur: 0 }, mrec = { rec: 0, mode: 0, start: 0, quant: 0 };
   const playArgs = () => [sq.playing, sq.pos & 127, sq.pos >> 7, mrec.rec];
   const relist = () => { D.list = D.list.filter((x) => x[0] < NE).concat(ups.map((u, k) => u && [NE, k, "USER", u.name]).filter(Boolean)); };
   const m = { p: D.dump.p.slice(), g: D.dump.g.slice(), engine: D.dump.engine, preset: D.dump.preset, n: 0, favs: [0, 6, 64, 120, 200, 290],
@@ -27,6 +27,7 @@ function makeMock(onFrame) {
   const pageArgs = () => { const ids = m.page.home ? homeIds() : m.page.ids; return [m.page.home, m.page.fam, m.page.page, ...enc.s(m.page.title), m.page.scope, ...ids, ...homeIds(), m.edited, ...u14(m.n)]; };
   const descOf = (s, id) => (s ? D.gdesc[id] : id >= pe0 && id < pe0 + 8 && D.engineDesc[m.engine] ? D.engineDesc[m.engine][id - pe0] : D.pdesc[id]);
   const push = (cmd, a) => setTimeout(() => onFrame(frame(cmd, a)), 4);
+  let touchedAt = 0; document.addEventListener("pointerdown", () => { touchedAt = Date.now(); }, true);
   const load = (n) => { m.n = n; if (D.list[n][0] === NE) m.engine = ups[D.list[n][1]].engine; else { m.engine = D.list[n][0]; m.preset = D.list[n][1]; } if (m.edited && m.watch) push(C.EDITED, [0]); m.edited = 0;
     (D.engineDesc[m.engine] || []).forEach((d, k) => { m.p[pe0 + k] = d.def; }); if (m.watch) push(C.RELOAD, [m.engine, m.preset, 0]); };
   const FAMS = { ENV: 1, LFO: 2, FX: 3, SEL: 4, EDIT: 5, GLO: 6, ARP: 8 };
@@ -67,6 +68,7 @@ function makeMock(onFrame) {
         steps[i] = { n: Math.min(4, a[1]), notes: a.slice(2, 6), time: Math.min(2, a[6]), flags: a[7] & 3, vel: a[8], lvl: a.length > 9 ? a[9] | (a[10] & 1) << 7 : 0, rat: a.length > 9 ? a[11] | ((a[10] >> 1) & 1) << 7 : 0 };
         return stepArgs(i); }
       case C.PLAY: return playArgs();
+      case C.CURSOR: if (a.length) sq.cur = a[0] % Math.max(1, m.p[29] || 16); return [sq.cur];
       case C.TRANSPORT: sq.playing = a[0] & 1; clearInterval(sq.t);
         if (sq.playing) sq.t = setInterval(() => { sq.pos = (sq.pos + 1) % Math.max(1, m.p[29] || 16); if (m.watch) push(C.PLAY, playArgs()); }, 125);
         else { sq.pos = 0; if (m.watch) push(C.PLAY, playArgs()); }
@@ -115,9 +117,10 @@ function makeMock(onFrame) {
       default: return null;
     }
   }
-  /* the player on the FM-1: a page opened, then a knob of it turned */
+  /* the player on the FM-1: a page opened, then a knob of it turned; the SEQ cursor moved a step */
   setInterval(() => {
     if (!m.watch) return;
+    if (Date.now() - touchedAt > 15000 && Math.random() < .35) { sq.cur = (sq.cur + 1) % Math.max(1, m.p[29] || 16); push(C.CURSOR, [sq.cur]); }   /* (no bajo el dedo de quien prueba) */
     const pages = D.pages.filter((x) => x.scope < 2 && FAMS[x.folder] && x.ids.some((i) => i < 127));
     const pg = pages[Math.floor(Math.random() * pages.length)];
     m.page = { home: 0, fam: FAMS[pg.folder], page: 0, title: pg.title, scope: pg.scope, ids: pg.ids };

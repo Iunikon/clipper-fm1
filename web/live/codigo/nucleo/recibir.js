@@ -13,6 +13,7 @@ function onPush(f) {
       logChange(s, id, old, v, "sinte");
     } else if (f.cmd === C.RELOAD) { SQ.loaded = false; reloadSoon(); xSoon(); }
     else if (f.cmd === C.STEP_CHANGED) sqStepChanged(f.a[0]);
+    else if (f.cmd === C.CURSOR) sqFromDevice(f.a[0]);
     else if (f.cmd === C.PLAY) { sqOnPlay(f.a); if (f.a.length > 3) M.rec = f.a[3]; renderTransport(); if (S.folder === "REC") paintRec(); }
     else if (f.cmd === C.X_CHANGED) xSoon();
     else if (f.cmd === C.FAVS_CHANGED) readFavs().then(renderBar).catch(() => {});

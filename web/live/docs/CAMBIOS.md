@@ -11,7 +11,7 @@ Todo lo hecho en el fork [Iunikon/clipper-fm1](https://github.com/Iunikon/clippe
 | Archivo sin internet | `web/live.html` (y `~/clipper-out/clipper-live.html` en el PC de casa) |
 | Firmware | `sh build.sh` → `build/felucca.fwsc`. Flasheado en el FM-1 el 12 de noviembre: responde «FELUCCA CLIPPER 1.3.1», protocolo 15. |
 | Coste en el sinte | +2.880 B de flash y +32 B de RAM sobre el Clipper 1.3.1; quedan 16.552 B libres de 581.564. |
-| Pruebas | `tests/live_editor_test.c` (46 comprobaciones, pasa). La suite completa pasa salvo `target_budget: drums_mix`, que también falla en el original del creador. |
+| Pruebas | `tests/live_editor_test.c` (51 comprobaciones, pasa). La suite completa pasa salvo `target_budget: drums_mix`, que también falla en el original del creador. |
 
 ---
 
@@ -86,6 +86,12 @@ Todo lo hecho en el fork [Iunikon/clipper-fm1](https://github.com/Iunikon/clippe
 
 **Pequeños.**
 - Sin contorno en los números de los faders; tipo de sonido verde sin recuadro; «APP» en lugar de «TABLET» en Cambios; Estudio más ordenado (HYBRID de cuatro en cuatro). `5ae9ac1` `f0ee732`
+
+## 13 de noviembre: el paso elegido y el celular propio
+
+- **Firmware: CURSOR (comando 114).** El paso que se edita en el sinte (`ui.cursor`) y el elegido en la tablet son el mismo: elegirlo en la app lo mueve en el FM-1 (con su grupo de 16), moverlo en el FM-1 lo marca en la app; fuera del patrón se lleva dentro, como KNOB 1. Hay que compilar y flashear para usarlo; con un firmware anterior la app no lo pide más tras el primer intento. 5 comprobaciones nuevas en `tests/live_editor_test.c`.
+- **Versión propia del celular** (`estilos/pantallas/movil.css`, sin zoom): gráfica a la izquierda y sus 4 valores 2 × 2 a la derecha, valores en Terminus 24, cuatro columnas en las páginas sin gráfica, herramientas del secuenciador en una fila que se desplaza, SAVE de cuatro en cuatro, Glide a 28 px. Entre un 25 y un 38 % menos de scroll por carpeta.
+- Auditoría de Impeccable (16/20) y sus arreglos: marcas de los pasos y «RANGO» a 11 px, el FM-1 de ejemplo ya no mueve el paso bajo el dedo, la pantalla solo sigue al paso del sinte si la rejilla está a la vista.
 
 ---
 

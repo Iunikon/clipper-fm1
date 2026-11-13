@@ -189,7 +189,7 @@ function sqRollTap(i, p) {
     else if (ns.length < 4) { ns.push(p); sqSet(i, { n: ns.length, notes: [...ns, 0, 0, 0, 0].slice(0, 4) }); }
     else sqSet(i, { notes: [p, ...ns.slice(1)] });
   } else sqSet(i, { n: 1, notes: [p, 0, 0, 0], time: ST_NOTE, vel: st.vel || 100 });
-  SQ.last = p; const prev = SQ.sel; SQ.sel = i; SQ.r0 = SQ.r1 = i; sqPaint(prev); sqPaint(i);
+  SQ.last = p; const prev = SQ.sel; SQ.sel = i; SQ.r0 = SQ.r1 = i; sqCursorTo(i); sqPaint(prev); sqPaint(i);
 }
 
 /* ---- los toques del modo completo (fase de captura: van antes que los del básico) ---- */

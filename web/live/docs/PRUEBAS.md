@@ -43,6 +43,8 @@ Abre `clipper-live.html` en Chrome, en horizontal, y toca el botón de pantalla 
 - [ ] Toca un paso vacío: pone una nota y suena en el sinte. Cámbiale la nota, la velocidad, ACC, SLIDE y el ratchet.
 - [ ] Toca el paso seleccionado: se vacía.
 - [ ] Cambia un paso en el sinte (NOTES): la tablet lo muestra.
+- [ ] **Paso elegido (firmware del 13 de noviembre o posterior):** elige el paso 5 en la tablet: el sinte se pone en el paso 5 (y en su grupo de 16). Mueve el paso con KNOB 1 en el sinte: la tablet marca el mismo. Elige un paso gris (fuera del patrón): los dos acaban en el mismo paso dentro del patrón.
+- [ ] Con un firmware anterior (sin CURSOR): los toques en SEQ no se retrasan.
 - [ ] «Completo»: rango y Extender, transponer, copiar y pegar, invertir, el piano roll y los carriles VEL, NUDGE, ROLL y NIVEL.
 - [ ] FILL y LOCKS en un paso; quita el lock después.
 - [ ] Genera un patrón sobre uno vacío y usa Deshacer.

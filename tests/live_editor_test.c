@@ -214,6 +214,22 @@ int main(void)
         check(arg()[0] == 1u && transport_req == 1u, "TRANSPORT 1: the start asked for");
         transport_req = 0;
     }
+    /* CURSOR (114): the SEQ step being edited, moved from the editor and pushed when it moves on the device */
+    {
+        uint8_t q[1];
+        TSEL->p[P_SLEN] = 32;
+        a[0] = 1; ed(ED_WATCH, a, 1);
+        frames_pushing(3, 0, 0);
+        q[0] = 20; ed(ED_CURSOR, q, 1);
+        check(rx_last[4] == ED_CURSOR && arg()[0] == 20u && ui.cursor == 20u && ui.step_page == 1u, "CURSOR 20: the device's cursor there, its 16 shown");
+        check(frames_pushing(3, ED_CURSOR, 0) == 0u, "the editor's own CURSOR: no push");
+        cursor_set(21);
+        check(frames_pushing(3, ED_CURSOR, 0) == 1u && frames_pushing(5, ED_CURSOR, 0) == 0u, "moved on the device: CURSOR pushed once");
+        ed(ED_CURSOR, q, 0);
+        check(arg()[0] == 21u, "CURSOR asked: where it is");
+        q[0] = 40; ed(ED_CURSOR, q, 1);
+        check(arg()[0] == 8u, "CURSOR past the pattern: wrapped inside it, as KNOB 1");
+    }
     /* X_GET / X_SET: the synth pages' values (MIDI's BEND here); X_CHANGED when the device changes one or a MOD SEQ step */
     {
         uint8_t q[3];

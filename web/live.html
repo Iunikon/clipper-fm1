@@ -683,14 +683,14 @@
   .sqk.on { background: var(--tx); color: var(--page); border-color: var(--tx); }
   .sqk[data-arm="1"] { background: var(--fav); border-color: var(--fav); color: #000; }
   .sqsep { width: 1px; height: 28px; background: var(--line-2); margin: 0 4px; }
-  .sqrg { display: flex; flex-direction: column; padding: 0 6px; } .sqrg small { font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--tx-3); }
+  .sqrg { display: flex; flex-direction: column; padding: 0 6px; } .sqrg small { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--tx-3); }
   .sqrg b { font-family: var(--num); font-size: 16px; font-weight: 400; -webkit-font-smoothing: none; }
   .sqpg { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding-bottom: 10px; }
   .sqpg button { height: 40px; padding: 0 12px; background: var(--raised); color: var(--tx-2); font-family: var(--num); font-size: 16px; -webkit-font-smoothing: none; }
   .sqpg button[aria-pressed="true"] { background: var(--tx); color: var(--page); }
   .sqpg .c { margin-left: 8px; font-size: 12px; color: var(--tx-3); }
   .sq.rg { box-shadow: inset 0 -3px 0 var(--tx); }
-  .sq .mk { position: absolute; top: 4px; font-style: normal; font-size: 10px; font-weight: 700; line-height: 12px; padding: 0 3px; }
+  .sq .mk { position: absolute; top: 4px; font-style: normal; font-size: 11px; font-weight: 700; line-height: 12px; padding: 0 3px; }
   .sq .mk.nud { right: 4px; color: var(--k3); } .sq .mk.fil { right: 16px; color: var(--k2); } .sq .mk.lck { right: 28px; color: var(--k4); }
   /* piano roll */
   .sqroll { border: 1px solid var(--line); background: var(--panel); margin-bottom: 12px; }
@@ -1245,6 +1245,69 @@
     #edit:is([data-folder="ENV"], [data-folder="LFO"], [data-folder="FX"], [data-folder="SEL"], [data-folder="ARP"], [data-folder="GLO"], [data-folder="EDIT"]) > .pgs {
       display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 24px; align-items: start; }
   }
+  /* ================================================================ the phone's own layout (13 nov) ===
+     A phone in landscape (under 540 px tall) gets its own layout, not the tablet's scaled down: everything at a
+     phone's size, so a page fits in the height there is.
+     - a page with a graph: the graph on the left, its four values two by two on the right;
+     - the values smaller (a 24 px Terminus value; tiles 64–76 px tall);
+     - a tile with only a choice in it (the arrows of a list, two options, a segment) takes a column, not the width;
+     - what is touched while playing (a list's arrows, two options, a segment) keeps 40 px; only the sequencer's
+       editing tools (one line that scrolls) and its tabs go down to 36 (PRODUCT.md).
+     Last in montaje.txt: it wins over celular.css and the tablet's sizes, and only on the phone */
+  @media (max-height: 540px) {
+    .work { padding: 6px 8px 12px; gap: 6px; }
+    .pgs { gap: 8px; }
+    .pgx { gap: 4px; }
+    .pgh { padding-bottom: 2px; } .pgh h3 { font-size: 12px; }
+
+    /* a page with a graph: two columns */
+    .pgx:has(> .pgr) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 4px 8px; }
+    .pgx:has(> .pgr) > .pgh { grid-column: 1 / -1; }
+    .pgx:has(> .pgr) > .pgr { grid-column: 1; grid-row: 2; height: auto; min-height: 150px; }
+    .pgx:has(> .pgr) > .pgr.tall, .hyb .pgx:has(> .pgr) > .pgr.tall { height: auto; min-height: 170px; }
+    .pgx:has(> .pgr) > .prow { grid-column: 2; grid-row: 2; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(72px, 1fr); align-content: stretch; }
+    .pgx:has(> .pgr) > :not(.pgh):not(.pgr):not(.prow) { grid-column: 1 / -1; }
+
+    /* the values: a phone's size */
+    .prow { gap: 6px; }
+    .prow .tp, .ci .tp { min-height: 64px; padding: 6px 8px; gap: 4px; }
+    .tp .tv, .tv { font-size: 24px; line-height: 26px; }
+    .tp.t-seg .tv, .tp.t-arr .tv { font-size: 24px; line-height: 28px; }
+    .tv small, .rv small { font-size: 16px; }
+    .tp.t-arr .pos { top: 34px; right: 8px; font-size: 12px; }
+    .arw button { height: 40px; }
+    .tp.t-two .opts { gap: 4px; } .tp.t-two .opts button { min-height: 40px; padding: 0 8px; }
+    .tp.t-seg .opts { padding: 2px; gap: 2px; } .tp.t-seg .opts button { height: 40px; }
+    .tp.t-sw .knob { width: 44px; height: 26px; } .tp.t-sw .knob::after { width: 18px; height: 18px; } .tp.t-sw.on .knob::after { transform: translateX(18px); }
+
+    /* a page without a graph: always four columns, so one or two values (a lone choice too) take their column, not the width */
+    .pgx:not(:has(> .pgr)) > .prow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .bb .bx { min-height: 0; }
+    .tz .tp { flex: 1 1 140px; min-height: 64px; }
+    .tz .tp.t-sw, .tz .tp.t-two { flex: 0 1 160px; }
+
+    /* the sequencer: its tools in a line, its steps lower */
+    .sqb .bh { margin-bottom: 4px; padding-bottom: 4px; gap: 6px; } .sqb .bh h2 { font-size: 15px; }
+    .stt { padding-bottom: 4px; }
+    .sqb .seg button, .sqp { height: 36px; }
+    .sqb button.btn, .sqb .sqt2, .sqb [data-sqop], .sqb [data-sqview], .sqb [data-sqlane], .sqb [data-sqpg] { height: 36px; min-height: 36px; padding: 0 8px; font-size: 12px; }
+    .sq { min-height: 52px; }
+    .sqtb { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 4px 0 6px; gap: 4px; }   /* the tools in one line that scrolls */
+    .sqtb > * { flex: none; }
+    .sqk { height: 36px; padding: 0 8px; font-size: 12px; }
+    .sqsep { height: 22px; margin: 0 2px; }
+    .sqpg { padding-bottom: 4px; }
+    .sqlane { height: 72px; }
+    .stt button { height: 36px; }
+
+    /* SAVE: the sounds four across and lower; the one playing in a shorter box */
+    .scs { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+    .sc { min-height: 56px; padding: 8px 10px; gap: 4px; }
+    .svc { padding: 8px 10px; gap: 8px; } .svn b { font-size: 24px; line-height: 26px; }
+
+    /* LIVE: a quick card's level bar keeps its 28 px (the toggle above gives way, not the bar) */
+    .tl > .tg { min-height: 0; flex: 1 1 auto; } .tl > .amt { flex: none; height: 28px; }
+  }
 
 </style>
 </head>
@@ -1407,8 +1470,8 @@ function fmtValue(d, v) {
 const HDR = [0x7D, 0x46, 0x4C];
 const C = { INFO: 1, GET: 2, SET: 3, DUMP: 4, DESC: 5, STEP_GET: 6, STEP_SET: 7, UP_LIST: 16, UP_PUT: 18, UP_STORE: 19, WATCH: 22, CHANGED: 23, RELOAD: 24, PING: 25, STEP_CHANGED: 26, TRACK_CHANGED: 32,
   HY_GET: 77, HY_PUT: 78, PAGE: 97, FAVS: 98, FAV_GO: 99, FAV_SET: 100, FAVS_CHANGED: 101, LIST: 102, LIST_GO: 103, EDITED: 104, TOOL: 105, PLAY: 106, TRANSPORT: 107,
-  SCOPE: 108, X_GET: 109, X_SET: 110, X_CHANGED: 111, STATE: 112, REC: 113 };
-const PUSH = new Set([C.CHANGED, C.RELOAD, C.STEP_CHANGED, C.TRACK_CHANGED, C.FAVS_CHANGED, C.EDITED, C.SCOPE, C.X_CHANGED]);
+  SCOPE: 108, X_GET: 109, X_SET: 110, X_CHANGED: 111, STATE: 112, REC: 113, CURSOR: 114 };
+const PUSH = new Set([C.CHANGED, C.RELOAD, C.STEP_CHANGED, C.TRACK_CHANGED, C.FAVS_CHANGED, C.EDITED, C.SCOPE, C.X_CHANGED, C.CURSOR]);
 const v14 = (v) => { const u = Math.max(-8192, Math.min(8191, Math.round(v))) + 8192; return [u & 127, (u >> 7) & 127]; };
 const u14 = (n) => [n & 127, (n >> 7) & 127];
 const frame = (cmd, args) => [0xF0, ...HDR, cmd & 127, ...args, 0xF7];
@@ -1496,7 +1559,7 @@ function makeMock(onFrame) {
   const steps = Array.from({ length: info.nstep }, (_, i) => { const on = [0, 3, 6, 8, 10, 12, 14].includes(i), n = [36, 36, 48, 39, 36, 41, 43][[0, 3, 6, 8, 10, 12, 14].indexOf(i)];
     return { n: on ? 1 : 0, notes: [on ? n : 0, 0, 0, 0], time: on ? 0 : i === 7 ? 1 : 2, flags: i === 6 ? 1 : i === 10 ? 2 : 0, vel: 100, lvl: 0, rat: 0 }; });
   const stepArgs = (i) => { const st = steps[i]; return [i, st.n, ...st.notes, st.time, st.flags, st.vel, st.lvl & 127, ((st.lvl >> 7) & 1) | (((st.rat >> 7) & 1) << 1), st.rat & 127]; };
-  const sq = { playing: 0, pos: 0, t: 0 }, mrec = { rec: 0, mode: 0, start: 0, quant: 0 };
+  const sq = { playing: 0, pos: 0, t: 0, cur: 0 }, mrec = { rec: 0, mode: 0, start: 0, quant: 0 };
   const playArgs = () => [sq.playing, sq.pos & 127, sq.pos >> 7, mrec.rec];
   const relist = () => { D.list = D.list.filter((x) => x[0] < NE).concat(ups.map((u, k) => u && [NE, k, "USER", u.name]).filter(Boolean)); };
   const m = { p: D.dump.p.slice(), g: D.dump.g.slice(), engine: D.dump.engine, preset: D.dump.preset, n: 0, favs: [0, 6, 64, 120, 200, 290],
@@ -1506,6 +1569,7 @@ function makeMock(onFrame) {
   const pageArgs = () => { const ids = m.page.home ? homeIds() : m.page.ids; return [m.page.home, m.page.fam, m.page.page, ...enc.s(m.page.title), m.page.scope, ...ids, ...homeIds(), m.edited, ...u14(m.n)]; };
   const descOf = (s, id) => (s ? D.gdesc[id] : id >= pe0 && id < pe0 + 8 && D.engineDesc[m.engine] ? D.engineDesc[m.engine][id - pe0] : D.pdesc[id]);
   const push = (cmd, a) => setTimeout(() => onFrame(frame(cmd, a)), 4);
+  let touchedAt = 0; document.addEventListener("pointerdown", () => { touchedAt = Date.now(); }, true);
   const load = (n) => { m.n = n; if (D.list[n][0] === NE) m.engine = ups[D.list[n][1]].engine; else { m.engine = D.list[n][0]; m.preset = D.list[n][1]; } if (m.edited && m.watch) push(C.EDITED, [0]); m.edited = 0;
     (D.engineDesc[m.engine] || []).forEach((d, k) => { m.p[pe0 + k] = d.def; }); if (m.watch) push(C.RELOAD, [m.engine, m.preset, 0]); };
   const FAMS = { ENV: 1, LFO: 2, FX: 3, SEL: 4, EDIT: 5, GLO: 6, ARP: 8 };
@@ -1546,6 +1610,7 @@ function makeMock(onFrame) {
         steps[i] = { n: Math.min(4, a[1]), notes: a.slice(2, 6), time: Math.min(2, a[6]), flags: a[7] & 3, vel: a[8], lvl: a.length > 9 ? a[9] | (a[10] & 1) << 7 : 0, rat: a.length > 9 ? a[11] | ((a[10] >> 1) & 1) << 7 : 0 };
         return stepArgs(i); }
       case C.PLAY: return playArgs();
+      case C.CURSOR: if (a.length) sq.cur = a[0] % Math.max(1, m.p[29] || 16); return [sq.cur];
       case C.TRANSPORT: sq.playing = a[0] & 1; clearInterval(sq.t);
         if (sq.playing) sq.t = setInterval(() => { sq.pos = (sq.pos + 1) % Math.max(1, m.p[29] || 16); if (m.watch) push(C.PLAY, playArgs()); }, 125);
         else { sq.pos = 0; if (m.watch) push(C.PLAY, playArgs()); }
@@ -1594,9 +1659,10 @@ function makeMock(onFrame) {
       default: return null;
     }
   }
-  /* the player on the FM-1: a page opened, then a knob of it turned */
+  /* the player on the FM-1: a page opened, then a knob of it turned; the SEQ cursor moved a step */
   setInterval(() => {
     if (!m.watch) return;
+    if (Date.now() - touchedAt > 15000 && Math.random() < .35) { sq.cur = (sq.cur + 1) % Math.max(1, m.p[29] || 16); push(C.CURSOR, [sq.cur]); }   /* (no bajo el dedo de quien prueba) */
     const pages = D.pages.filter((x) => x.scope < 2 && FAMS[x.folder] && x.ids.some((i) => i < 127));
     const pg = pages[Math.floor(Math.random() * pages.length)];
     m.page = { home: 0, fam: FAMS[pg.folder], page: 0, title: pg.title, scope: pg.scope, ids: pg.ids };
@@ -1754,6 +1820,7 @@ function onPush(f) {
       logChange(s, id, old, v, "sinte");
     } else if (f.cmd === C.RELOAD) { SQ.loaded = false; reloadSoon(); xSoon(); }
     else if (f.cmd === C.STEP_CHANGED) sqStepChanged(f.a[0]);
+    else if (f.cmd === C.CURSOR) sqFromDevice(f.a[0]);
     else if (f.cmd === C.PLAY) { sqOnPlay(f.a); if (f.a.length > 3) M.rec = f.a[3]; renderTransport(); if (S.folder === "REC") paintRec(); }
     else if (f.cmd === C.X_CHANGED) xSoon();
     else if (f.cmd === C.FAVS_CHANGED) readFavs().then(renderBar).catch(() => {});
@@ -3203,6 +3270,8 @@ async function sqLoad() {
       SQ.steps = out; SQ.loaded = true;
       const lastOn = out.slice(0, sqLen()).filter(sqOn).pop(); if (lastOn) SQ.last = lastOn.notes[0];   /* (a new note: the pattern's) */
       const p = await rq(C.PLAY); sqPlayFrom(p);
+      try { const c = await rq(C.CURSOR, [], { quiet: true, retries: 0, timeout: 500 }); SQ.noCursor = false; if (c.length && c[0] < out.length) { SQ.sel = SQ.r0 = SQ.r1 = c[0]; SQ.page = Math.floor(c[0] / 16); } }
+      catch (e) { if (e.message !== "closed") SQ.noCursor = true; }   /* (un firmware sin CURSOR: no se le vuelve a pedir, nada espera por él) */
     } catch (e) { /* the next visit asks again */ }
     SQ.loading = null;
     if (S.folder === "SEQ" || S.folder === "ESTUDIO") renderWork();
@@ -3288,8 +3357,23 @@ function sqPaint(i) {
   if (i === SQ.sel) { const e = document.querySelector(".sqe"); if (e) e.outerHTML = sqEditor(); }
   sqFullPaint();
 }
+/* el paso elegido es el cursor del FM-1 (CURSOR, Live 114): elegir aquí lo mueve allá, y moverlo allá lo elige aquí */
+function sqCursorTo(i) {
+  if (!M.link || SQ.noCursor) return;
+  rq(C.CURSOR, [i & 127], { key: "cursor", quiet: true, retries: 0, timeout: 500 })
+    .then((a) => { if (a.length && a[0] !== SQ.sel) sqFromDevice(a[0]); })          /* (fuera del patrón el FM-1 lo lleva dentro, como KNOB 1: aquí también) */
+    .catch((e) => { if (e.message !== "closed") SQ.noCursor = true; });
+}
+function sqFromDevice(i) {
+  if (!SQ.loaded || i >= SQ.steps.length || i === SQ.sel) return;
+  const prev = SQ.sel; SQ.sel = SQ.r0 = SQ.r1 = i;
+  if (SQ.full && Math.floor(i / 16) !== SQ.page) { SQ.page = Math.floor(i / 16); if (S.folder === "SEQ" || S.folder === "ESTUDIO") renderWork(); return; }
+  sqPaint(prev); sqPaint(i);
+  const el = document.querySelector(`.sq[data-sq="${i}"]`), w = document.querySelector(".work");   /* solo si la rejilla está a la vista: no se lleva la pantalla */
+  if (el && w) { const r = el.getBoundingClientRect(), v = w.getBoundingClientRect(); if (r.bottom > v.top && r.top < v.bottom) el.scrollIntoView({ block: "nearest", inline: "nearest" }); }
+}
 function sqPick(i) {
-  const prev = SQ.sel; SQ.sel = i; SQ.r0 = SQ.r1 = i;
+  const prev = SQ.sel; SQ.sel = i; SQ.r0 = SQ.r1 = i; sqCursorTo(i);
   if (SQ.full) { SQ.page = Math.floor(i / 16); renderWork(); return; }
   sqPaint(prev); sqPaint(i);
 }
@@ -3485,7 +3569,7 @@ function sqRollTap(i, p) {
     else if (ns.length < 4) { ns.push(p); sqSet(i, { n: ns.length, notes: [...ns, 0, 0, 0, 0].slice(0, 4) }); }
     else sqSet(i, { notes: [p, ...ns.slice(1)] });
   } else sqSet(i, { n: 1, notes: [p, 0, 0, 0], time: ST_NOTE, vel: st.vel || 100 });
-  SQ.last = p; const prev = SQ.sel; SQ.sel = i; SQ.r0 = SQ.r1 = i; sqPaint(prev); sqPaint(i);
+  SQ.last = p; const prev = SQ.sel; SQ.sel = i; SQ.r0 = SQ.r1 = i; sqCursorTo(i); sqPaint(prev); sqPaint(i);
 }
 
 /* ---- los toques del modo completo (fase de captura: van antes que los del básico) ---- */

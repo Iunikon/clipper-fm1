@@ -10,7 +10,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** con el f
 
 - **Quién:** un músico tocando o programando sonidos, con el sinte delante, a menudo en penumbra o en escenario.
 - **Pantalla principal:** tablet Android de 11,5" en horizontal, 1400 × 830 y 1600 × 950 CSS. **Solo táctil.**
-- **También:** celular en horizontal (852 × 393), y PC con ratón, con una densidad de escritorio propia (sin zoom: más tarjetas por fila y páginas de dos en dos, no todo más grande). **Sin versión vertical:** en vertical, un aviso para girar el aparato.
+- **También:** celular en horizontal (852 × 393), con **una versión propia** (`estilos/pantallas/movil.css`, no la tablet achicada: gráfica a un lado y sus valores al otro, valores en Terminus 24, una columna para un control suelto), y PC con ratón, con una densidad de escritorio propia (sin zoom: más tarjetas por fila y páginas de dos en dos, no todo más grande). **Sin versión vertical:** en vertical, un aviso para girar el aparato.
 - **Modo de Impeccable:** **Operate**. Lectura rápida, consistencia y respuesta al dedo, por encima de la expresión.
 
 ## Reglas que no se tocan
@@ -23,6 +23,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** con el f
 - **Blanco:** lo seleccionado, lo que suena, lo que el sinte tiene abierto y el candado puesto.
 - Nombres del sinte **en inglés** (ENV, FILTER…); la interfaz, en **español**, con inglés opcional en `codigo/idioma/ingles.js`.
 - **Valores continuos: se arrastran en horizontal, nunca botones − / +.** Dedo quieto mientras arrastras = fino ×¼; doble toque = vuelve a como se cargó. Con ratón: se arrastra igual (Shift = fino, Inicio / Fin); **la rueda solo desplaza la página, nunca cambia un valor** (al desplazar se editaba lo que quedaba bajo el puntero).
+- **Objetivos táctiles de 40–44 px.** Única excepción, en el celular: las herramientas de edición del secuenciador (la fila que se desplaza, sus pestañas y el editor del paso) bajan a 36 px para que quepan los pasos. Lo que se toca tocando (flechas de una lista, dos opciones, segmentos, la barra de Glide de 28 px dentro de su tarjeta) no baja.
 - **Un archivo, sin conexión, sin librerías ni CDN ni fuentes externas.**
 - Nombres, rangos y unidades **salen del firmware**; no se inventan.
 - Las carpetas son **las páginas del sinte, en su orden**. La barra de abajo tiene 14 destinos y se queda así.

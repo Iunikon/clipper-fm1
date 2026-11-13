@@ -36,13 +36,16 @@
  *                        (graph_scope: from a rising zero, scaled to the loudest, never under 1500). on 1: also pushed
  *                        while asked again within 3 s (the tablet asks every 2), at most 20 a second, after everything
  *                        else; 2: stop; 0: this one only
+ *  114 CURSOR [step]  -> step: the SEQ cursor (the step being edited, as KNOB 1 moves it on the STEP page). With a step:
+ *                        moves it there (cursor_set: inside the pattern, the bank and the layer's 16 follow). Also pushed
+ *                        while watched when it moves on the device
  * PAGE's scope 3: a synth page, its 4 ids X_* (X_GET); PLAY ends with STATE's rec byte, and is pushed when it changes
  * Included by editor.c after ui.c (fav_list, preset_go, fav_toggle). */
 enum { ED_PAGE = 97, ED_FAVS, ED_FAV_SET = 100, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO, ED_EDITED, ED_TOOL, ED_PLAY, ED_TRANSPORT,
-       ED_SCOPE = 108, ED_X_GET = 109, ED_X_SET, ED_X_CHANGED, ED_STATE, ED_REC };
+       ED_SCOPE = 108, ED_X_GET = 109, ED_X_SET, ED_X_CHANGED, ED_STATE, ED_REC, ED_CURSOR };
 #define ED_LV_EDITED ((uint8_t)(hist_edited && !hist_cmp_on))
 static struct {
-    uint8_t home, page, edited;
+    uint8_t home, page, edited, cur;
     uint32_t fsig, play, xsig;
 } ed_lv;
 UI_SMALL static uint32_t ed_lv_rec(void) { return (uint32_t)(song.rec != 0u) | (uint32_t)rec_wait << 1 | (uint32_t)ft_on << 2 | (uint32_t)ci_on << 3; }
@@ -114,6 +117,7 @@ UI_SMALL static void ed_lv_shadow(void)                            /* WATCH: in 
     ed_lv.page = ui.page;
     ed_lv.fsig = ed_lv_fsig();
     ed_lv.edited = ED_LV_EDITED;
+    ed_lv.cur = ui.cursor;
     ed_lv.play = ed_lv_pl();
 #if CLIPPER_SYNTH
     ed_lv.xsig = ed_lv_xsig();
@@ -207,6 +211,9 @@ UI_SMALL static int ed_lv_sync(void)                               /* while watc
     } else if (ED_LV_EDITED != ed_lv.edited) {
         ed_lv.edited = ED_LV_EDITED;
         cmd = ED_EDITED;
+    } else if (ui.cursor != ed_lv.cur) {
+        ed_lv.cur = ui.cursor;
+        cmd = ED_CURSOR;
     } else if (pl != ed_lv.play && (song.playing || (ed_lv.play >> 15 & 1u) || (pl >> 16) != (ed_lv.play >> 16))) {
         cmd = ED_PLAY;                               /* (stopped: the step it rests on is no news) */
 #if CLIPPER_SYNTH
@@ -234,6 +241,8 @@ UI_SMALL static int ed_lv_sync(void)                               /* while watc
         ed_b(ed_lv.edited);
     else if (cmd == ED_PLAY)
         ed_lv_play(ed_lv.play);
+    else if (cmd == ED_CURSOR)
+        ed_b(ed_lv.cur);
     else if (cmd == ED_SCOPE)
         ed_lv_scope();
     ed_send();
@@ -272,6 +281,15 @@ UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   
         return 1;
     case ED_PLAY:                                   /* -> playing, step */
         ed_lv_play(ed_lv_pl());
+        return 1;
+    case ED_CURSOR:                                 /* [step] -> step */
+        if (na && a[0] < NSTEP) {
+            cursor_set(a[0]);
+            ui.step_page = (uint8_t)(ui.cursor / 16u);
+            ui.force = 1;
+        }
+        ed_lv.cur = ui.cursor;                       /* (the editor's own move: no push) */
+        ed_b(ui.cursor);
         return 1;
     case ED_TRANSPORT:                              /* on -> playing (what was asked: the start waits for the next block) */
         i = na && (a[0] & 1u);

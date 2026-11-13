@@ -21,6 +21,8 @@ async function sqLoad() {
       SQ.steps = out; SQ.loaded = true;
       const lastOn = out.slice(0, sqLen()).filter(sqOn).pop(); if (lastOn) SQ.last = lastOn.notes[0];   /* (a new note: the pattern's) */
       const p = await rq(C.PLAY); sqPlayFrom(p);
+      try { const c = await rq(C.CURSOR, [], { quiet: true, retries: 0, timeout: 500 }); SQ.noCursor = false; if (c.length && c[0] < out.length) { SQ.sel = SQ.r0 = SQ.r1 = c[0]; SQ.page = Math.floor(c[0] / 16); } }
+      catch (e) { if (e.message !== "closed") SQ.noCursor = true; }   /* (un firmware sin CURSOR: no se le vuelve a pedir, nada espera por él) */
     } catch (e) { /* the next visit asks again */ }
     SQ.loading = null;
     if (S.folder === "SEQ" || S.folder === "ESTUDIO") renderWork();
@@ -106,8 +108,23 @@ function sqPaint(i) {
   if (i === SQ.sel) { const e = document.querySelector(".sqe"); if (e) e.outerHTML = sqEditor(); }
   sqFullPaint();
 }
+/* el paso elegido es el cursor del FM-1 (CURSOR, Live 114): elegir aquí lo mueve allá, y moverlo allá lo elige aquí */
+function sqCursorTo(i) {
+  if (!M.link || SQ.noCursor) return;
+  rq(C.CURSOR, [i & 127], { key: "cursor", quiet: true, retries: 0, timeout: 500 })
+    .then((a) => { if (a.length && a[0] !== SQ.sel) sqFromDevice(a[0]); })          /* (fuera del patrón el FM-1 lo lleva dentro, como KNOB 1: aquí también) */
+    .catch((e) => { if (e.message !== "closed") SQ.noCursor = true; });
+}
+function sqFromDevice(i) {
+  if (!SQ.loaded || i >= SQ.steps.length || i === SQ.sel) return;
+  const prev = SQ.sel; SQ.sel = SQ.r0 = SQ.r1 = i;
+  if (SQ.full && Math.floor(i / 16) !== SQ.page) { SQ.page = Math.floor(i / 16); if (S.folder === "SEQ" || S.folder === "ESTUDIO") renderWork(); return; }
+  sqPaint(prev); sqPaint(i);
+  const el = document.querySelector(`.sq[data-sq="${i}"]`), w = document.querySelector(".work");   /* solo si la rejilla está a la vista: no se lleva la pantalla */
+  if (el && w) { const r = el.getBoundingClientRect(), v = w.getBoundingClientRect(); if (r.bottom > v.top && r.top < v.bottom) el.scrollIntoView({ block: "nearest", inline: "nearest" }); }
+}
 function sqPick(i) {
-  const prev = SQ.sel; SQ.sel = i; SQ.r0 = SQ.r1 = i;
+  const prev = SQ.sel; SQ.sel = i; SQ.r0 = SQ.r1 = i; sqCursorTo(i);
   if (SQ.full) { SQ.page = Math.floor(i / 16); renderWork(); return; }
   sqPaint(prev); sqPaint(i);
 }
