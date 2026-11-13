@@ -5,10 +5,14 @@ const MORE = [["saveb", "Guardar"], ["favh", "Favoritos"], ["mlb", "MIDI learn"]
 function moreOpen(on) {
   const m = $("morem"), b = $("more"); if (!m || !b) return;
   if (on) {
-    m.innerHTML = MORE.filter(([id]) => $(id) && !$(id).hidden).map(([id, t]) => {
+    const x = LOG[0], d = x && desc(x.s, x.id), [sk, stx] = stlState();
+    m.innerHTML = `<p class="mst ${sk}"><i></i>${esc(stx)}</p>`
+      + (d ? `<button role="menuitem" data-moreundo="1" data-k="${x.n}">${esc("Deshacer")}<span class="ms">${esc(d.label)}</span></button>` : "")
+      + MORE.filter(([id]) => $(id) && !$(id).hidden).map(([id, t]) => {
       const el = $(id), st = el.getAttribute("aria-pressed");
       return `<button role="menuitem" data-more="${id}">${esc(trUi(t))}${st != null && id !== "favh" ? `<span class="ms">${st === "true" ? "ON" : "OFF"}</span>` : ""}</button>`;
     }).join("");
+    trNode(m);
   }
   m.hidden = !on; b.setAttribute("aria-expanded", on);
   if (on) m.querySelector("button")?.focus();

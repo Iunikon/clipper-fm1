@@ -79,6 +79,9 @@ function sqEditorBase() {
     : `<div class="sqx"><button class="btn pri" data-sqf="note">Poner ${noteName(SQ.last)}</button>${i > 0 ? tg("tie", "Ligar al anterior", tie) : ""}${tie ? `<button class="sqt2 del" data-sqf="rest">Vaciar</button>` : ""}</div>`}
   </div>`;
 }
+/* an empty pattern says how to start one (after SHRUB's empty lanes) */
+const sqBlank = (len) => !SQ.steps.slice(0, len).some((st) => sqOn(st) || st.time === ST_TIE);
+const sqBlankTxt = () => SQ.full ? "El patrón está vacío: toca un paso y luego «Poner» abajo, o genera uno más abajo." : S.folder === "SEQ" ? "El patrón está vacío: toca un paso y luego «Poner» abajo, o genera uno en Avanzado." : "El patrón está vacío: toca un paso y luego «Poner» abajo.";
 function seqBlock() {
   if (!SQ.loaded) { sqLoad(); return `<section class="blk"><header class="bh"><h2><svg class="i"><use href="#i-seq"/></svg>NOTES</h2></header><p class="sqw">Leyendo el patrón del FM-1…</p></section>`; }
   const len = sqLen(), rows = Math.ceil(Math.min(len, SQ.steps.length) / 16), cells = [];
@@ -86,7 +89,7 @@ function seqBlock() {
   const lv = M.page && !M.page.home && M.page.title === "NOTES";
   return `<section class="blk sqb${lv ? " dev" : ""}" data-title="NOTES"><header class="bh"><h2><svg class="i"><use href="#i-seq"/></svg>NOTES</h2>
       <span class="c num">${len} pasos</span>${S.folder === "SEQ" ? `<div class="seg sqmd" role="group" aria-label="Modo"><button data-sqm="adv" aria-pressed="${SQ.full}">Avanzado</button><button data-sqm="steps" aria-pressed="${!SQ.full}">Pasos</button></div>` : ""}${SQ.full ? "" : `<div class="seg sqvw" role="group" aria-label="Vista"><button data-sqbv="grid" aria-pressed="${SQ.bview !== "midi"}">Pasos</button><button data-sqbv="midi" aria-pressed="${SQ.bview === "midi"}">MIDI</button></div>`}<button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
-    ${SQ.full ? sqFullBody(len, cells.join("")) : SQ.bview === "midi" ? sqMidi(len) : `<div class="sqg" role="group" aria-label="Pasos">${cells.join("")}</div>`}${sqEditor()}${SQ.full ? sqLib() : ""}</section>`;
+    ${(SQ.full || SQ.bview !== "midi") && sqBlank(len) ? `<p class="sqhint">${esc(sqBlankTxt())}</p>` : ""}${SQ.full ? sqFullBody(len, cells.join("")) : SQ.bview === "midi" ? sqMidi(len) : `<div class="sqg" role="group" aria-label="Pasos">${cells.join("")}</div>`}${sqEditor()}${SQ.full ? sqLib() : ""}</section>`;
 }
 /* NOTES' MIDI view: the whole pattern as a piano roll, every note of it in sight (its range and a fifth around); a tap
    puts or takes a note there, as the roll of the advanced sequencer */

@@ -30,6 +30,7 @@ styles/screens/pc.css
 styles/interactions.css
 styles/performance.css
 styles/review.css
+styles/frame/status.css
 styles/screens/desktop.css
 styles/screens/phone.css
 
@@ -78,5 +79,6 @@ code/views/studio/system.js
 code/views/studio/hybrid.js
 code/views/studio/library.js
 code/lang/english.js
+code/frame/info.js
 code/frame/more-menu.js
 code/start.js

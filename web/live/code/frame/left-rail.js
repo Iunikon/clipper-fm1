@@ -13,15 +13,17 @@ function renderDev() {
 
 /* -------------------------------------- the left rail: what changed, undoable --- */
 const LOG = [];
-let undoing = false;
+let undoing = false, logN = 0;   /* (logN: each change its number, so a button undoes the one it showed) */
 const kOf = (s, id) => { const p = LAYOUT.find((x) => x.scope === s && x.ids.includes(id)); return p ? p.ids.indexOf(id) : 0; };
 function logChange(s, id, old, v, src) {
   const now = performance.now(), top = LOG[0];
   if (top && top.s === s && top.id === id && top.src === src && now - top.t < 2500) { top.v = v; top.t = now; if (top.v === top.old) LOG.shift(); }
-  else LOG.unshift({ s, id, old, v, src, t: now });
+  else LOG.unshift({ s, id, old, v, src, t: now, n: ++logN });
   if (LOG.length > 24) LOG.length = 24;
   if (!PV.lraf) PV.lraf = requestAnimationFrame(() => { PV.lraf = 0; renderLog(); });   /* (once a frame) */
 }
+/* one change back: the value it had before, not logged again */
+function undoAt(i) { const x = LOG[i]; if (!x) return; LOG.splice(i, 1); undoing = true; setVal(x.s, x.id, x.old); undoing = false; renderLog(); }
 function renderLog() {
   if (!M.info) return;
   $("chl").innerHTML = LOG.length ? LOG.map((e, i) => { const d = desc(e.s, e.id); if (!d) return ""; const a = fmtValue(d, e.old), b = fmtValue(d, e.v);
@@ -61,6 +63,8 @@ function helpSheet() {
     ${li("Arrastra en horizontal", "sobre una tarjeta para cambiar su valor; en vertical, la página se desplaza.")}
     ${li("Deja el dedo quieto", "un momento mientras arrastras: modo fino ×¼, hasta que lo levantes.")}
     ${li("Doble toque", "en un valor: vuelve a como se cargó el sonido.")}
+    ${li("Mantén el dedo quieto", "en una tarjeta, sin arrastrar: qué hace, su rango y su CC MIDI. Con ratón, clic derecho.")}
+    ${li("Deshacer:", "⌘Z o Ctrl+Z, el botón de la línea de abajo o ⋯ en el celular.")}
     ${li("Lo que borra", "pide un segundo toque, en rojo con ⚠.")}
     ${li("En los pasos de SEQ:", "‹ › nudge (adelanta o retrasa), F fill, L lock, ' acento, ~ slide.")}
     ${li("Con ratón:", "arrastra en horizontal; Shift mientras arrastras = fino ×¼; Inicio / Fin = mínimo / máximo. La rueda solo desplaza la página.")}
@@ -90,7 +94,7 @@ function arm(b, txt, ask) {
 }
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-undo],[data-discard],[data-skind],[data-svfav]"); if (!b) return;
-  if (b.dataset.undo) { const i = +b.dataset.undo, x = LOG[i]; if (!x) return; LOG.splice(i, 1); undoing = true; setVal(x.s, x.id, x.old); undoing = false; renderLog(); }
+  if (b.dataset.undo) { undoAt(+b.dataset.undo); }
   else if (b.dataset.discard) {
     if (b.dataset.arm !== "1") { arm(b, "Descartar", "¿Seguro?"); return; }
     disarm(b, "Descartar"); const n = entryNow(); if (n >= 0) { LOG.length = 0; listGo(n); toast(-1, "Lo editado se descartó"); } }

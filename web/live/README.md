@@ -31,7 +31,8 @@ web/live/
   build-order.txt        the order styles and code are joined in
   styles/
     base.css             tokens (:root), the font, the basics
-    frame/               bar, body and rails, nav (+ toasts and the sound list), connection, transport, set
+    frame/               bar, body and rails, nav (+ toasts and the sound list), connection, transport, set, status (the status
+                         line and a value's sheet)
     components/          LIVE's shortcuts, bento and tiles, blocks, special pages (matrix, layer, mod seq, tuning…), scenes
     views/               SAVE, SEQ (+ advanced), folders as on the synth, REC, LIVE, HOME, Studio
     sheets/              Save
@@ -44,7 +45,8 @@ web/live/
   code/
     core/                base (store, formats), protocol (Link, the C commands), mock (the example FM-1),
                          state (M), connection, receive (what the FM-1 says), send, input (keys and taps)
-    frame/               left rail (On the synth, Changes), toasts, scope, transport (PLAY / REC), set
+    frame/               left rail (On the synth, Changes, undo), toasts, scope, transport (PLAY / REC), set, info (a value's
+                         sheet on a long press, its MIDI CC, undo from anywhere, the status line), more-menu (the phone's «⋯»)
     components/          graphs, cards (tileP), special pages, paint (once a frame), gestures (drag, fine, edges,
                          vibration), page graphs, double tap, scenes
     views/               paint (renderWork and the bar), SAVE, device, folders, REC, LIVE, HOME, quick
