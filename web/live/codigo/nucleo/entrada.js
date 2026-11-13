@@ -1,6 +1,6 @@
 /* ----------------------------------------------------------------- input --- */
 
-async function favGo(i) { try { await rq(C.FAV_GO, [i]); } catch (e) { /* RELOAD brings the rest */ } }
+function favGo(i) { const f = M.favs[i]; if (f) listGo(f.n); }   /* (a favourite is a sound of the list: LIST_GO) */
 async function listGo(n) { try { await rq(C.LIST_GO, u14(n)); } catch (e) { /* RELOAD brings the rest */ } }
 async function favToggle() {
   const was = M.favCur >= 0;

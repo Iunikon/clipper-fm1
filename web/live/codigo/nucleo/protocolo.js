@@ -31,8 +31,8 @@ const P = {
     o.homeIds = r.more ? [r.b(), r.b(), r.b(), r.b()] : null; o.edited = r.more ? r.b() : 0;
     o.cur = r.more ? r.u() : null; if (o.cur === 16383) o.cur = -1; return o; },          /* (cur: the LIST entry playing) */
   entry(r) { return { e: r.b(), k: r.b(), kind: r.s(), name: r.s() }; },
-  favs(a) { const r = new Reader(a), n = r.b(), cur = r.b(), list = []; for (let i = 0; i < n; i++) list.push(P.entry(r)); return { cur: cur === 127 ? -1 : cur, list }; },
-  x(a) { const r = new Reader(a), o = { id: r.b(), v: r.v(), fmt: r.b(), min: r.v(), max: r.v(), names: [] }; const has = r.b();   /* (Live 109) a synth page's value */
+  favs(a) { const r = new Reader(a), n = r.b(), cur = r.b(), at = []; for (let i = 0; i < n; i++) at.push(r.b() | (r.b() << 7)); return { cur: cur === 127 ? -1 : cur, at }; },   /* (each favourite: its place in LIST) */
+  x(a) { if (a.length < 3) return { id: 127 }; const r = new Reader(a), o = { id: r.b(), v: r.v(), fmt: r.b(), min: r.v(), max: r.v(), names: [] }; const has = r.b();   /* (Live 109) a synth page's value */
     o.label = r.s(); o.unit = r.s(); if (has) while (r.more && o.names.length <= o.max - o.min) o.names.push(r.s());
     if (o.names.length) o.fmt = F.ENUM; o.def = o.min; return o; },
   state(a) { return { cpu: a[0], late: a[1] | a[2] << 7, peak: a[3], scale: a[4] | a[5] << 7, rec: a[6], mode: a[7], start: a[8], quant: a[9], empty: a[10], oct: a.length > 11 ? a[11] - 8 : 0 }; },

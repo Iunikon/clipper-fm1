@@ -76,8 +76,7 @@ function makeMock(onFrame) {
       case C.UP_STORE: { const k = a[0], nm = String.fromCharCode(...a.slice(1, a.indexOf(0, 1) < 0 ? a.length : a.indexOf(0, 1))); if (k >= 32 || nm.length > 12) return [k, 1];
         ups[k] = { engine: m.engine, name: nm || `${info.engines[m.engine]} ${String(k + 1).padStart(2, "0")}` }; relist(); return [k, 0]; }
       case C.PAGE: return pageArgs();
-      case C.FAVS: { const cur = m.favs.indexOf(m.n); return [m.favs.length, cur < 0 ? 127 : cur, ...m.favs.flatMap(enc.entry)]; }
-      case C.FAV_GO: { const ok = a[0] < m.favs.length; if (ok) load(m.favs[a[0]]); return [a[0], ok ? 0 : 1]; }
+      case C.FAVS: { const cur = m.favs.indexOf(m.n); return [m.favs.length, cur < 0 ? 127 : cur, ...m.favs.flatMap(u14)]; }
       case C.FAV_SET: { const i = m.favs.indexOf(m.n); if (a[0] & 1) { if (i < 0 && m.favs.length < 16) m.favs.push(m.n); } else if (i >= 0) m.favs.splice(i, 1); return [m.favs.length]; }
       case C.LIST: { const st = Math.min(a[0] | (a[1] << 7), D.list.length), n = Math.min(a[2] || 16, 16, D.list.length - st);
         return [...u14(D.list.length), ...u14(st), n, ...Array.from({ length: n }, (_, i) => enc.entry(st + i)).flat()]; }

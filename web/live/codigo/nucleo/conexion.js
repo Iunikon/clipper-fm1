@@ -96,7 +96,7 @@ async function readList() {
   for (;;) { const r = P.list(await rq(C.LIST, [...u14(list.length), 16])); list.push(...r.items); progress(.8 + .15 * list.length / Math.max(1, r.total)); if (list.length >= r.total || !r.items.length) break; }
   M.list = list;
 }
-async function readFavs() { const r = P.favs(await rq(C.FAVS)); M.favs = r.list; M.favCur = r.cur; }
+async function readFavs() { const r = P.favs(await rq(C.FAVS)); M.favs = r.at.map((n) => ({ ...(M.list[n] || { name: "?", kind: "" }), n })); M.favCur = r.cur; }   /* (the list has the rest) */
 let alive = 0;
 function keepAlive() {
   clearInterval(alive);

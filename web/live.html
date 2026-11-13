@@ -1346,8 +1346,8 @@ const P = {
     o.homeIds = r.more ? [r.b(), r.b(), r.b(), r.b()] : null; o.edited = r.more ? r.b() : 0;
     o.cur = r.more ? r.u() : null; if (o.cur === 16383) o.cur = -1; return o; },          /* (cur: the LIST entry playing) */
   entry(r) { return { e: r.b(), k: r.b(), kind: r.s(), name: r.s() }; },
-  favs(a) { const r = new Reader(a), n = r.b(), cur = r.b(), list = []; for (let i = 0; i < n; i++) list.push(P.entry(r)); return { cur: cur === 127 ? -1 : cur, list }; },
-  x(a) { const r = new Reader(a), o = { id: r.b(), v: r.v(), fmt: r.b(), min: r.v(), max: r.v(), names: [] }; const has = r.b();   /* (Live 109) a synth page's value */
+  favs(a) { const r = new Reader(a), n = r.b(), cur = r.b(), at = []; for (let i = 0; i < n; i++) at.push(r.b() | (r.b() << 7)); return { cur: cur === 127 ? -1 : cur, at }; },   /* (each favourite: its place in LIST) */
+  x(a) { if (a.length < 3) return { id: 127 }; const r = new Reader(a), o = { id: r.b(), v: r.v(), fmt: r.b(), min: r.v(), max: r.v(), names: [] }; const has = r.b();   /* (Live 109) a synth page's value */
     o.label = r.s(); o.unit = r.s(); if (has) while (r.more && o.names.length <= o.max - o.min) o.names.push(r.s());
     if (o.names.length) o.fmt = F.ENUM; o.def = o.min; return o; },
   state(a) { return { cpu: a[0], late: a[1] | a[2] << 7, peak: a[3], scale: a[4] | a[5] << 7, rec: a[6], mode: a[7], start: a[8], quant: a[9], empty: a[10], oct: a.length > 11 ? a[11] - 8 : 0 }; },
@@ -1465,8 +1465,7 @@ function makeMock(onFrame) {
       case C.UP_STORE: { const k = a[0], nm = String.fromCharCode(...a.slice(1, a.indexOf(0, 1) < 0 ? a.length : a.indexOf(0, 1))); if (k >= 32 || nm.length > 12) return [k, 1];
         ups[k] = { engine: m.engine, name: nm || `${info.engines[m.engine]} ${String(k + 1).padStart(2, "0")}` }; relist(); return [k, 0]; }
       case C.PAGE: return pageArgs();
-      case C.FAVS: { const cur = m.favs.indexOf(m.n); return [m.favs.length, cur < 0 ? 127 : cur, ...m.favs.flatMap(enc.entry)]; }
-      case C.FAV_GO: { const ok = a[0] < m.favs.length; if (ok) load(m.favs[a[0]]); return [a[0], ok ? 0 : 1]; }
+      case C.FAVS: { const cur = m.favs.indexOf(m.n); return [m.favs.length, cur < 0 ? 127 : cur, ...m.favs.flatMap(u14)]; }
       case C.FAV_SET: { const i = m.favs.indexOf(m.n); if (a[0] & 1) { if (i < 0 && m.favs.length < 16) m.favs.push(m.n); } else if (i >= 0) m.favs.splice(i, 1); return [m.favs.length]; }
       case C.LIST: { const st = Math.min(a[0] | (a[1] << 7), D.list.length), n = Math.min(a[2] || 16, 16, D.list.length - st);
         return [...u14(D.list.length), ...u14(st), n, ...Array.from({ length: n }, (_, i) => enc.entry(st + i)).flat()]; }
@@ -1642,7 +1641,7 @@ async function readList() {
   for (;;) { const r = P.list(await rq(C.LIST, [...u14(list.length), 16])); list.push(...r.items); progress(.8 + .15 * list.length / Math.max(1, r.total)); if (list.length >= r.total || !r.items.length) break; }
   M.list = list;
 }
-async function readFavs() { const r = P.favs(await rq(C.FAVS)); M.favs = r.list; M.favCur = r.cur; }
+async function readFavs() { const r = P.favs(await rq(C.FAVS)); M.favs = r.at.map((n) => ({ ...(M.list[n] || { name: "?", kind: "" }), n })); M.favCur = r.cur; }   /* (the list has the rest) */
 let alive = 0;
 function keepAlive() {
   clearInterval(alive);
@@ -2182,7 +2181,7 @@ $("scrim").addEventListener("click", () => { if (SVE.open) openSave(false); });
 
 /* ----------------------------------------------------------------- input --- */
 
-async function favGo(i) { try { await rq(C.FAV_GO, [i]); } catch (e) { /* RELOAD brings the rest */ } }
+function favGo(i) { const f = M.favs[i]; if (f) listGo(f.n); }   /* (a favourite is a sound of the list: LIST_GO) */
 async function listGo(n) { try { await rq(C.LIST_GO, u14(n)); } catch (e) { /* RELOAD brings the rest */ } }
 async function favToggle() {
   const was = M.favCur >= 0;

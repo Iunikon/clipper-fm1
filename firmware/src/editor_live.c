@@ -5,9 +5,9 @@
  *                        (0 the sound's p[], 1 song.g[], 2 none the editor can SET) and 4 ids (127: none). On HOME the
  *                        engine's four (home_param). Then HOME's four ids whatever the page (127: none, the drum
  *                        track). Also pushed while watched: the page shown changed
- *   98 FAVS           -> n, the favourite playing (127: none), then n x (engine (NENGINES: a user preset), preset or
- *                        user slot, kind, name)
- *   99 FAV_GO idx     -> idx, rc (0 loaded, 1 no such favourite). Loads it as SAVE > FAVS does
+ *   98 FAVS           -> n, the favourite playing (127: none), then n x its place in LIST (2 x 7 bits): the editor has
+ *                        the list already (engine, kind, name), and loads a favourite with LIST_GO
+ *   99                (FAV_GO, retired: LIST_GO loads any sound, a favourite too)
  *  100 FAV_SET add    -> n. Adds (1) or removes (0) the sound playing, as KNOB 4 on PRESETS
  *  101 FAVS_CHANGED   (push) the favourites changed on the device: read FAVS again
  *  102 LIST start count -> total, start, n, then n x (engine, preset or user slot, kind, name): the list PRESETS walks
@@ -38,15 +38,16 @@
  *                        else; 2: stop; 0: this one only
  * PAGE's scope 3: a synth page, its 4 ids X_* (X_GET); PLAY ends with STATE's rec byte, and is pushed when it changes
  * Included by editor.c after ui.c (fav_list, preset_go, fav_toggle). */
-enum { ED_PAGE = 97, ED_FAVS, ED_FAV_GO, ED_FAV_SET, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO, ED_EDITED, ED_TOOL, ED_PLAY, ED_TRANSPORT,
+enum { ED_PAGE = 97, ED_FAVS, ED_FAV_SET = 100, ED_FAVS_CHANGED, ED_LIST, ED_LIST_GO, ED_EDITED, ED_TOOL, ED_PLAY, ED_TRANSPORT,
        ED_SCOPE = 108, ED_X_GET = 109, ED_X_SET, ED_X_CHANGED, ED_STATE, ED_REC };
 #define ED_LV_EDITED ((uint8_t)(hist_edited && !hist_cmp_on))
 static struct {
     uint8_t home, page, edited;
     uint32_t fsig, play, xsig;
 } ed_lv;
-#define ED_LV_REC ((uint32_t)(song.rec != 0u) | (uint32_t)rec_wait << 1 | (uint32_t)ft_on << 2 | (uint32_t)ci_on << 3)
-#define ED_LV_PLAY (ED_LV_REC << 16 | (uint32_t)song.playing << 15 | (TSEL->seq_idx % trk_len(TSEL)))   /* rec, playing, step */
+UI_SMALL static uint32_t ed_lv_rec(void) { return (uint32_t)(song.rec != 0u) | (uint32_t)rec_wait << 1 | (uint32_t)ft_on << 2 | (uint32_t)ci_on << 3; }
+UI_SMALL static uint32_t ed_lv_pl(void) { return ed_lv_rec() << 16 | (uint32_t)song.playing << 15 | (TSEL->seq_idx % trk_len(TSEL)); }   /* rec, playing, step */
+UI_SMALL static void ed_u14(uint32_t v) { ed_b(v); ed_b(v >> 7); }   /* (ed_b keeps 7 bits) */
 
 #if CLIPPER_SYNTH
 UI_SMALL static uint32_t ed_lv_xsig(void);
@@ -83,22 +84,16 @@ UI_SMALL static void ed_lv_page(void)
     if (ui.home)                                     /* (HOME: the engine's four; the drum track: two of them global) */
         sc = is_drum(TSEL) ? 2u : 0u;
     ed_b(sc);
-    for (k = 0; k < 4u; k++) {
-        if (ui.home && sc == 0u)
-            home_param(k, &vp), ed_b((uint32_t)(vp - TSEL->p));
-        else
+    for (k = 0; k < 8u; k++) {                       /* the page's 4, then HOME's 4 (for a view that always shows them) */
+        if (k < 4u && !(ui.home && sc == 0u))
             ed_b(sc == 2u || pg->id[k] == 0xFFu ? 127u : pg->id[k]);
-    }
-    for (k = 0; k < 4u; k++) {                       /* (HOME's four, for a view that always shows them) */
-        if (is_drum(TSEL))
+        else if (is_drum(TSEL))
             ed_b(127u);
         else
-            home_param(k, &vp), ed_b((uint32_t)(vp - TSEL->p));
+            home_param(k & 3u, &vp), ed_b((uint32_t)(vp - TSEL->p));
     }
     ed_b(ED_LV_EDITED);
-    k = ed_lv_cur();
-    ed_b(k & 127u);
-    ed_b(k >> 7);
+    ed_u14(ed_lv_cur());
 }
 UI_SMALL static void ed_lv_entry(uint32_t n)                   /* base list entry n: engine, preset or slot, kind, name */
 {
@@ -119,7 +114,7 @@ UI_SMALL static void ed_lv_shadow(void)                            /* WATCH: in 
     ed_lv.page = ui.page;
     ed_lv.fsig = ed_lv_fsig();
     ed_lv.edited = ED_LV_EDITED;
-    ed_lv.play = ED_LV_PLAY;
+    ed_lv.play = ed_lv_pl();
 #if CLIPPER_SYNTH
     ed_lv.xsig = ed_lv_xsig();
 #endif
@@ -127,8 +122,7 @@ UI_SMALL static void ed_lv_shadow(void)                            /* WATCH: in 
 UI_SMALL static void ed_lv_play(uint32_t pl)
 {
     ed_b((pl >> 15) & 1u);
-    ed_b(pl & 127u);
-    ed_b((pl >> 7) & 127u);
+    ed_u14(pl);
     ed_b(pl >> 16);                                  /* (STATE's rec byte) */
 }
 #if CLIPPER_SYNTH
@@ -149,10 +143,8 @@ UI_SMALL static void ed_lv_x(uint32_t id)                          /* X_GET's re
     const param_desc_t *d = syn_desc(id, &vp);
     uint32_t i;
     ed_b(id);
-    if (!d || !vp) {
-        ed_v(0); ed_b(0); ed_v(0); ed_v(0); ed_b(0); ed_str("", 1); ed_str("", 1);
+    if (!d || !vp)                                   /* (none: the id alone) */
         return;
-    }
     ed_v(*vp);
     ed_b(d->fmt);
     ed_v(d->min);
@@ -168,27 +160,25 @@ UI_SMALL static void ed_lv_x(uint32_t id)                          /* X_GET's re
 static struct { uint8_t on, seq; uint32_t asked, sent; } ed_sc;
 UI_SMALL static void ed_lv_scope(void)                            /* SCOPE's frame: graph_scope's trace, 0..126 */
 {
-    static int16_t snap[SCOPE_N];
-    uint32_t w = scope_w, i, trig = 0;
-    int32_t peak = 1500;
+    const uint32_t w = scope_w;                      /* (the ring read in place, oldest first: no copy) */
+#define LV_S(i) scope_buf[(w + (i)) & (SCOPE_N - 1u)]
+    uint32_t i, trig = 0;
+    int32_t peak = 1500, v;
     for (i = 0; i < SCOPE_N; i++) {
-        snap[i] = scope_buf[(w + i) & (SCOPE_N - 1u)];
-        if (snap[i] > peak)
-            peak = snap[i];
-        else if (-snap[i] > peak)
-            peak = -snap[i];
+        v = LV_S(i);
+        if (v < 0)
+            v = -v;
+        if (v > peak)
+            peak = v;
     }
-    for (i = 1; i < SCOPE_N - 240u; i++)
-        if (snap[i - 1] < 0 && snap[i] >= 0) {
+    for (i = 1; i < SCOPE_N - 240u && !trig; i++)
+        if (LV_S(i - 1u) < 0 && LV_S(i) >= 0)
             trig = i;
-            break;
-        }
-    ed_b(ed_sc.seq);
-    ed_sc.seq = (uint8_t)((ed_sc.seq + 1u) & 127u);
-    ed_b((uint32_t)peak & 127u);
-    ed_b(((uint32_t)peak >> 7) & 127u);
+    ed_b(ed_sc.seq++);
+    ed_u14((uint32_t)peak);
     for (i = 0; i < 240u; i++)
-        ed_b((uint32_t)clamp(63 - snap[trig + i] * 62 / peak, 0, 126));
+        ed_b((uint32_t)clamp(63 - LV_S(trig + i) * 62 / peak, 0, 126));
+#undef LV_S
     ed_sc.sent = fm1_ms;
 }
 UI_SMALL static void ed_lv_state(void)
@@ -200,7 +190,7 @@ UI_SMALL static void ed_lv_state(void)
     ed_b(clamp((int32_t)diag_peak, 0, 127));
     ed_b(m & 127u);
     ed_b((m >> 7) & 127u);
-    ed_b(ED_LV_REC);
+    ed_b(ed_lv_rec());
     ed_b(rec_tempo);
     ed_b(rec_count);
     ed_b(rec_quant_off);
@@ -209,56 +199,45 @@ UI_SMALL static void ed_lv_state(void)
 }
 UI_SMALL static int ed_lv_sync(void)                               /* while watched: 1 = a push went out */
 {
-    uint32_t h;
+    uint32_t pl = ed_lv_pl(), h, cmd = 0;
     if (ui.home != ed_lv.home || ui.page != ed_lv.page) {
         ed_lv.home = ui.home;
         ed_lv.page = ui.page;
-        ed_begin(ED_PAGE);
-        ed_lv_page();
-        ed_send();
-        return 1;
-    }
-    if (ED_LV_EDITED != ed_lv.edited) {
+        cmd = ED_PAGE;
+    } else if (ED_LV_EDITED != ed_lv.edited) {
         ed_lv.edited = ED_LV_EDITED;
-        ed_begin(ED_EDITED);
-        ed_b(ed_lv.edited);
-        ed_send();
-        return 1;
-    }
-    h = ED_LV_PLAY;
-    if (h != ed_lv.play && (song.playing || (ed_lv.play >> 15 & 1u) || (h >> 16) != (ed_lv.play >> 16))) {   /* (stopped: the step it rests on is no news) */
-        ed_lv.play = h;
-        ed_begin(ED_PLAY);
-        ed_lv_play(h);
-        ed_send();
-        return 1;
-    }
-    ed_lv.play = h;
+        cmd = ED_EDITED;
+    } else if (pl != ed_lv.play && (song.playing || (ed_lv.play >> 15 & 1u) || (pl >> 16) != (ed_lv.play >> 16))) {
+        cmd = ED_PLAY;                               /* (stopped: the step it rests on is no news) */
 #if CLIPPER_SYNTH
-    h = ed_lv_xsig();
-    if (h != ed_lv.xsig) {
+    } else if ((h = ed_lv_xsig()) != ed_lv.xsig) {
         ed_lv.xsig = h;
-        ed_begin(ED_X_CHANGED);
-        ed_send();
-        return 1;
-    }
+        cmd = ED_X_CHANGED;
 #endif
-    h = ed_lv_fsig();
-    if (h != ed_lv.fsig) {
+    } else if ((h = ed_lv_fsig()) != ed_lv.fsig) {
         ed_lv.fsig = h;
-        ed_begin(ED_FAVS_CHANGED);
-        ed_send();
-        return 1;
+        cmd = ED_FAVS_CHANGED;
+    } else {
+        if (ed_sc.on && fm1_ms - ed_sc.asked > 3000u)
+            ed_sc.on = 0;                            /* (nobody asked again: the tablet went) */
+        if (ed_sc.on && fm1_ms - ed_sc.sent >= 50u)  /* the scope: last, at most 20 a second */
+            cmd = ED_SCOPE;
     }
-    if (ed_sc.on && fm1_ms - ed_sc.asked > 3000u)
-        ed_sc.on = 0;                                /* (nobody asked again: the tablet went) */
-    if (ed_sc.on && fm1_ms - ed_sc.sent >= 50u) {   /* the scope: last, at most 20 a second */
-        ed_begin(ED_SCOPE);
+    if (cmd != ED_PAGE && cmd != ED_EDITED)
+        ed_lv.play = pl;                             /* (what the editor knows now) */
+    if (!cmd)
+        return 0;
+    ed_begin(cmd);
+    if (cmd == ED_PAGE)
+        ed_lv_page();
+    else if (cmd == ED_EDITED)
+        ed_b(ed_lv.edited);
+    else if (cmd == ED_PLAY)
+        ed_lv_play(ed_lv.play);
+    else if (cmd == ED_SCOPE)
         ed_lv_scope();
-        ed_send();
-        return 1;
-    }
-    return 0;
+    ed_send();
+    return 1;
 }
 UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   /* 1: a Live command (reply built) */
 {
@@ -275,17 +254,7 @@ UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   
             ;
         ed_b(i < nf && !is_drum(TSEL) ? i : 127u);
         for (i = 0; i < nf; i++)
-            ed_lv_entry(b[i]);
-        return 1;
-    case ED_FAV_GO:
-        i = na ? a[0] : 127u;
-        ed_b(i);
-        if (i < fav_list(b) && !is_drum(TSEL)) {
-            preset_go(i);
-            ed_b(0);
-        } else {
-            ed_b(1);
-        }
+            ed_u14(b[i]);                           /* (its place in LIST) */
         return 1;
     case ED_LIST:                                   /* start (2 x 7), count -> total (2 x 7), start (2 x 7), n, entries */
         base_pos(&total);
@@ -295,16 +264,14 @@ UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   
             i = total;
         if (n > total - i)
             n = total - i;
-        ed_b(total);
-        ed_b(total >> 7);
-        ed_b(i);
-        ed_b(i >> 7);
+        ed_u14(total);
+        ed_u14(i);
         ed_b(n);
         for (k = 0; k < n; k++)
             ed_lv_entry(i + k);
         return 1;
     case ED_PLAY:                                   /* -> playing, step */
-        ed_lv_play(ED_LV_PLAY);
+        ed_lv_play(ed_lv_pl());
         return 1;
     case ED_TRANSPORT:                              /* on -> playing (what was asked: the start waits for the next block) */
         i = na && (a[0] & 1u);
@@ -342,12 +309,10 @@ UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   
         i = na ? a[0] : 0xFFu;
         if (i == 0u)
             rec_toggle();
-        else if (i == 1u && na >= 2u)
-            rec_tempo = (uint8_t)(a[1] & 1u), settings_later = 1;
-        else if (i == 2u && na >= 2u)
-            rec_count = (uint8_t)(a[1] & 1u), settings_later = 1;
-        else if (i == 3u && na >= 2u)
-            rec_quant_off = (uint8_t)(a[1] & 1u), settings_later = 1;
+        else if (i <= 3u && na >= 2u) {
+            *(i == 1u ? &rec_tempo : i == 2u ? &rec_count : &rec_quant_off) = (uint8_t)(a[1] & 1u);
+            settings_later = 1;
+        }
         ed_lv_state();
         return 1;
     case ED_TOOL:                                   /* id -> id, rc */
@@ -358,8 +323,7 @@ UI_SMALL static int ed_lv_handle(uint32_t cmd, const uint8_t *a, uint32_t na)   
     case ED_LIST_GO:                                /* n (2 x 7) -> n, rc */
         base_pos(&total);
         i = na >= 2u ? (uint32_t)(a[0] | a[1] << 7) : 0xFFFFu;
-        ed_b(i);
-        ed_b(i >> 7);
+        ed_u14(i);
         if (i < total && !is_drum(TSEL)) {
             preset_go(fav_list(b) + i);
             ed_b(0);

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 /* Live (protocol v15, firmware/src/editor_live.c) on tests/editor_host.c: INFO says 15; PAGE, and its push while watched
- * when the page shown changes (HOME too); FAVS read empty, FAV_SET adds and removes the sound playing, FAV_GO loads a
- * favourite (and refuses one that is not there), a favourite marked on the device pushes FAVS_CHANGED, the editor's own
+ * when the page shown changes (HOME too); FAVS read empty, FAV_SET adds and removes the sound playing, LIST_GO loads a
+ * favourite by its place in LIST, a favourite marked on the device pushes FAVS_CHANGED, the editor's own
  * FAV_SET does not. Build as tests/editor_fuzz.sh builds editor_fuzz.c (CLIPPER_SYNTH=1). */
 #include "editor_host.c"
 
@@ -108,12 +108,8 @@ int main(void)
     check(frames_pushing(3, ED_FAVS_CHANGED, 0) == 0u, "the editor's own FAV_SET: no push");
     n0 = base_pos(&total);
     ed(ED_FAVS, a, 0);
-    {
-        uint32_t e = arg()[2], kk = arg()[3], ee = base_at(n0, &k);
-        const char *kind = (const char *)arg() + 4, *nm = kind + strlen(kind) + 1;
-        check(arg()[0] == 1u && arg()[1] == 0u && e == ee && kk == k && !strcmp(kind, base_kind(n0)) &&
-              !strcmp(nm, ENGINES[e]->presets[k].name), "FAVS: it, playing, with its engine, preset, kind and name");
-    }
+    check(arg()[0] == 1u && arg()[1] == 0u && (arg()[2] | arg()[3] << 7) == n0,
+          "FAVS: it, playing, with its place in LIST");
 
     preset_go(fav_list(b) + (n0 + 5u) % NBANK); ui_frame();   /* another sound (a factory one: the harness does not
                                                                  * take a user preset's load) */
@@ -122,12 +118,11 @@ int main(void)
     check(n1 != n0 && arg()[1] == 127u, "another sound: none of them playing");
     a[0] = 1; ed(ED_FAV_SET, a, 1);
     check(arg()[0] == 2u, "FAV_SET 1 again: two");
-    a[0] = 0; ed(ED_FAV_GO, a, 1);
-    k = arg()[1];                                          /* (the reply, before the pushes the load brings) */
+    ed(ED_FAVS, a, 0);
+    a[0] = arg()[2]; a[1] = arg()[3]; ed(ED_LIST_GO, a, 2);   /* (a favourite loads by its place in LIST) */
+    k = arg()[2];                                          /* (the reply, before the pushes the load brings) */
     frames_pushing(2, 0, 0);
-    check(k == 0u && base_pos(&total) == n0, "FAV_GO 0: the first favourite loaded");
-    a[0] = 9; ed(ED_FAV_GO, a, 1);
-    check(arg()[0] == 9u && arg()[1] == 1u && base_pos(&total) == n0, "FAV_GO 9: no such favourite, nothing loaded");
+    check(k == 0u && base_pos(&total) == n0, "LIST_GO with the first favourite's place: it loaded");
 
     preset_go(fav_list(b) + (n0 + 9u) % NBANK);
     fav_toggle(1);                                         /* marked on the device (KNOB 4 on PRESETS) */
