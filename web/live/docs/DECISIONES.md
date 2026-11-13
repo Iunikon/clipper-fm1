@@ -66,7 +66,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 | **LIVE** | Una cuadrícula **configurable** de tarjetas (acciones, rápidos, gráficas, cualquier parámetro), en **varias páginas** (LIVE 1, LIVE 2…). Editar: arrastrar para ordenar, × quitar, tamaño. **Candado:** bloqueado no se sale de LIVE; suelto, «Seguir» lleva a la carpeta del sinte. En Editar, **Exportar / Importar** las páginas a un archivo. |
 | **HOME** | Los 16 favoritos como pads, los 4 knobs principales y unos accesos configurables. |
 | **EDIT, ENV, LFO, FX, SEL, ARP, GLO** | **Como las páginas del sinte, en su orden, una fila por página**, tantas columnas como knobs. La gráfica de la página encima de sus tarjetas. En EDIT salen las páginas de FMX (OP, OP 2, OP ENV, ROUTE, FMX, STORE) solo si el sonido usa FMX. |
-| **SEQ** | Dos páginas como el sinte: **NOTES** (pasos o vista MIDI con todo el patrón) y **PATTERN**. «Avanzado en Estudio». |
+| **SEQ** | Dos páginas como el sinte: **NOTES** y **PATTERN**. NOTES abre **el secuenciador avanzado por defecto**; el interruptor **Avanzado / Pasos** lleva al modo sencillo (pasos o vista MIDI con todo el patrón). La elección se recuerda. |
 | **REC** | La pantalla REC del sinte: estado grande, REC/PLAY, MODE, LEN, START, QUANT. |
 | **SAVE** | Carpetas de sonidos a la izquierda; debajo, «Dispositivo»: Biblioteca, Proyectos y **Herramientas** (CLRSQ, INIT, NEW en grande, con segundo toque). |
 | **ESTUDIO** | Nativo, en pestañas: Secuenciador avanzado, **HYBRID** (el patch entero), Samples, Biblioteca (de la tablet, con etiquetas), Proyectos, Copia de seguridad, Sistema (idioma y **Ajustes de Live**: exportar o importar toda la configuración, con la explicación de dónde se guarda). |

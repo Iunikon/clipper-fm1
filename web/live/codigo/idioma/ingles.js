@@ -4,6 +4,7 @@
    with numbers or names in them by RX. The device's own names (ENV, CUT, BASS…) are English already */
 const LANG = { cur: (() => { try { return localStorage.getItem("clipperlive:lang"); } catch (e) { return null; } })() };
 const DICT = {
+  "Avanzado": "Advanced", "Modo": "Mode",
   "Escenas": "Scenes", "Guardar aquí": "Save here", "Ya": "Now", "compases": "bars", "de golpe": "at once", "Parar": "Stop",
   "ESCENAS Y SET": "SCENES AND SET", "Reloj del set": "Set clock", "RELOJ": "CLOCK", "Grabar set": "Record set", "GRABAR SET": "RECORD SET", "Toca para parar y guardar": "Tap to stop and save",
   "El audio USB del FM-1 a un archivo": "The FM-1's USB audio to a file", "Tu controlador mueve Live": "Your controller moves Live", "Aprender": "Learn", "Aprendiendo… (Listo)": "Learning… (Done)",

@@ -22,4 +22,7 @@ function seqView() {
     ${sp === "PATTERN" && pat ? pageRow({ title: pat.title, folder: "SEQ", s: pat.scope, ids: pat.ids }) : seqBlock()}</div>`;
 }
 document.addEventListener("click", (e) => { const b = e.target.closest("[data-seqp]"); if (b) { S.seqPage = b.dataset.seqp; renderWork(); } });
+/* SEQ > NOTES: the advanced sequencer by default, the plain steps as the second (kept in the tablet) */
+S.seqMode = store.get("seqmode") || "adv";
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-sqm]"); if (!b) return; S.seqMode = b.dataset.sqm; store.set("seqmode", S.seqMode); renderWork(); });
 

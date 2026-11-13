@@ -111,7 +111,7 @@ const fade = () => { again($("edit"), "fade"); setTimeout(() => $("edit").classL
 function renderWork() {
   $("edit").dataset.folder = S.folder;   /* (no data-f: la barra de abajo busca [data-f] hacia arriba y se comería todos los toques) */
   const f = S.folder;
-  if (f !== "ESTUDIO") SQ.full = false;                     /* (the advanced sequencer: Estudio's) */
+  SQ.full = f === "ESTUDIO" || (f === "SEQ" && S.seqMode !== "steps");   /* (SEQ: the advanced one first, Pasos the second; Estudio: always) */
   $("edit").innerHTML = f === "ESTUDIO" ? studioView() : f === "SAVE" ? soundsView() : f === "LIVE" ? cfgView("live", "Live") : f === "HOME" ? homeView() : f === "REC" ? recView()
     : f === "SEQ" ? seqView()
     : folderView(f);

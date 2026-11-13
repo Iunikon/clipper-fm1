@@ -1934,7 +1934,7 @@ const fade = () => { again($("edit"), "fade"); setTimeout(() => $("edit").classL
 function renderWork() {
   $("edit").dataset.folder = S.folder;   /* (no data-f: la barra de abajo busca [data-f] hacia arriba y se comería todos los toques) */
   const f = S.folder;
-  if (f !== "ESTUDIO") SQ.full = false;                     /* (the advanced sequencer: Estudio's) */
+  SQ.full = f === "ESTUDIO" || (f === "SEQ" && S.seqMode !== "steps");   /* (SEQ: the advanced one first, Pasos the second; Estudio: always) */
   $("edit").innerHTML = f === "ESTUDIO" ? studioView() : f === "SAVE" ? soundsView() : f === "LIVE" ? cfgView("live", "Live") : f === "HOME" ? homeView() : f === "REC" ? recView()
     : f === "SEQ" ? seqView()
     : folderView(f);
@@ -3251,7 +3251,7 @@ function seqBlock() {
   for (let i = 0; i < rows * 16 && i < SQ.steps.length; i++) cells.push(sqCell(i, len));
   const lv = M.page && !M.page.home && M.page.title === "NOTES";
   return `<section class="blk sqb${lv ? " dev" : ""}" data-title="NOTES"><header class="bh"><h2><svg class="i"><use href="#i-seq"/></svg>NOTES</h2>
-      <span class="c num">${len} pasos</span>${SQ.full ? "" : `<div class="seg sqvw" role="group" aria-label="Vista"><button data-sqbv="grid" aria-pressed="${SQ.bview !== "midi"}">Pasos</button><button data-sqbv="midi" aria-pressed="${SQ.bview === "midi"}">MIDI</button></div><button class="sqst" data-stab="seq" data-stgo="1">Avanzado en Estudio</button>`}<button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
+      <span class="c num">${len} pasos</span>${S.folder === "SEQ" ? `<div class="seg sqmd" role="group" aria-label="Modo"><button data-sqm="adv" aria-pressed="${SQ.full}">Avanzado</button><button data-sqm="steps" aria-pressed="${!SQ.full}">Pasos</button></div>` : ""}${SQ.full ? "" : `<div class="seg sqvw" role="group" aria-label="Vista"><button data-sqbv="grid" aria-pressed="${SQ.bview !== "midi"}">Pasos</button><button data-sqbv="midi" aria-pressed="${SQ.bview === "midi"}">MIDI</button></div>`}<button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
     ${SQ.full ? sqFullBody(len, cells.join("")) : SQ.bview === "midi" ? sqMidi(len) : `<div class="sqg" role="group" aria-label="Pasos">${cells.join("")}</div>`}${sqEditor()}${SQ.full ? sqLib() : ""}</section>`;
 }
 /* NOTES' MIDI view: the whole pattern as a piano roll, every note of it in sight (its range and a fifth around); a tap
@@ -4694,6 +4694,9 @@ function seqView() {
     ${sp === "PATTERN" && pat ? pageRow({ title: pat.title, folder: "SEQ", s: pat.scope, ids: pat.ids }) : seqBlock()}</div>`;
 }
 document.addEventListener("click", (e) => { const b = e.target.closest("[data-seqp]"); if (b) { S.seqPage = b.dataset.seqp; renderWork(); } });
+/* SEQ > NOTES: the advanced sequencer by default, the plain steps as the second (kept in the tablet) */
+S.seqMode = store.get("seqmode") || "adv";
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-sqm]"); if (!b) return; S.seqMode = b.dataset.sqm; store.set("seqmode", S.seqMode); renderWork(); });
 
 /* ---- a list of all a parameter's options, beside its arrows: one tap to any of them (ARP's MODE, SCL, WAVE…) */
 const PK = { key: "" };
@@ -5389,6 +5392,7 @@ document.addEventListener("change", async (e) => {
    with numbers or names in them by RX. The device's own names (ENV, CUT, BASS…) are English already */
 const LANG = { cur: (() => { try { return localStorage.getItem("clipperlive:lang"); } catch (e) { return null; } })() };
 const DICT = {
+  "Avanzado": "Advanced", "Modo": "Mode",
   "Escenas": "Scenes", "Guardar aquí": "Save here", "Ya": "Now", "compases": "bars", "de golpe": "at once", "Parar": "Stop",
   "ESCENAS Y SET": "SCENES AND SET", "Reloj del set": "Set clock", "RELOJ": "CLOCK", "Grabar set": "Record set", "GRABAR SET": "RECORD SET", "Toca para parar y guardar": "Tap to stop and save",
   "El audio USB del FM-1 a un archivo": "The FM-1's USB audio to a file", "Tu controlador mueve Live": "Your controller moves Live", "Aprender": "Learn", "Aprendiendo… (Listo)": "Learning… (Done)",

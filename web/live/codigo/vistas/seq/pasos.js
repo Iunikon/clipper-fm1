@@ -83,7 +83,7 @@ function seqBlock() {
   for (let i = 0; i < rows * 16 && i < SQ.steps.length; i++) cells.push(sqCell(i, len));
   const lv = M.page && !M.page.home && M.page.title === "NOTES";
   return `<section class="blk sqb${lv ? " dev" : ""}" data-title="NOTES"><header class="bh"><h2><svg class="i"><use href="#i-seq"/></svg>NOTES</h2>
-      <span class="c num">${len} pasos</span>${SQ.full ? "" : `<div class="seg sqvw" role="group" aria-label="Vista"><button data-sqbv="grid" aria-pressed="${SQ.bview !== "midi"}">Pasos</button><button data-sqbv="midi" aria-pressed="${SQ.bview === "midi"}">MIDI</button></div><button class="sqst" data-stab="seq" data-stgo="1">Avanzado en Estudio</button>`}<button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
+      <span class="c num">${len} pasos</span>${S.folder === "SEQ" ? `<div class="seg sqmd" role="group" aria-label="Modo"><button data-sqm="adv" aria-pressed="${SQ.full}">Avanzado</button><button data-sqm="steps" aria-pressed="${!SQ.full}">Pasos</button></div>` : ""}${SQ.full ? "" : `<div class="seg sqvw" role="group" aria-label="Vista"><button data-sqbv="grid" aria-pressed="${SQ.bview !== "midi"}">Pasos</button><button data-sqbv="midi" aria-pressed="${SQ.bview === "midi"}">MIDI</button></div>`}<button class="sqp${SQ.playing ? " on" : ""}" data-sqplay="1" aria-pressed="${SQ.playing}">${sqPlayInner()}</button></header>
     ${SQ.full ? sqFullBody(len, cells.join("")) : SQ.bview === "midi" ? sqMidi(len) : `<div class="sqg" role="group" aria-label="Pasos">${cells.join("")}</div>`}${sqEditor()}${SQ.full ? sqLib() : ""}</section>`;
 }
 /* NOTES' MIDI view: the whole pattern as a piano roll, every note of it in sight (its range and a fifth around); a tap
