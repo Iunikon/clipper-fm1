@@ -56,7 +56,7 @@ web/live/
     lang/english.js      English: DICT (phrases) and RX (patterns). The UI is written in Spanish; every new Spanish
                          text needs its entry here
     start.js             last: connect, the demo, ?mock=1, the first paint
-  docs/                  DECISIONS (rules), CHANGELOG (history), PRODUCT (the rules, for reviewers), TESTING (with the FM-1),
+  docs/                  SEGUIR-EN-CASA (where it stands and what is next), DECISIONS (rules), CHANGELOG (history), PRODUCT (the rules, for reviewers), TESTING (with the FM-1),
                          BRIEF (the earlier version) and the Impeccable reports. In Spanish, the owner's language
   proposals/             the mock-ups compared before building
 ```
