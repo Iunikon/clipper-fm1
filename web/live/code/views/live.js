@@ -124,9 +124,11 @@ document.addEventListener("click", (e) => {
   if (b.dataset.csz) { const it = CFG[which][+b.dataset.csz]; it.w = +b.dataset.w; it.h = +b.dataset.h; cfgSave(which); renderWork(); return; }
   if (b.dataset.cnew) { CFG[which].push(JSON.parse(b.dataset.cnew)); cfgSave(which); renderWork(); toast(-1, "Añadido"); return; }
   if (b.dataset.catf) { CFG.catF = b.dataset.catf; renderWork(); return; }
-  if (b.dataset.fxedit) { S.folder = "FX"; renderNav(); renderWork(); setTimeout(() => document.querySelector(`#edit [data-title="${CSS.escape(b.dataset.fxedit)}"]`)?.scrollIntoView({ block: "start" }), 30); return; }
+  if (b.dataset.fxedit) { openFxPage(b.dataset.fxedit); return; }
   if (b.dataset.act && !CFG.edit) runAct(b.dataset.act);
 });
+/* an effect's page in FX (holding an Efectos switch) */
+function openFxPage(t) { S.folder = "FX"; renderNav(); renderWork(); setTimeout(() => document.querySelector(`#edit [data-title="${CSS.escape(t)}"]`)?.scrollIntoView({ block: "start" }), 30); }
 function runAct(a) {                             /* an action card, or a MIDI key learnt for it */
   const n = M.favs.length;
   {

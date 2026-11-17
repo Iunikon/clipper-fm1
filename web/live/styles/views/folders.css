@@ -40,7 +40,8 @@
   .sqst { margin-left: auto; height: 40px; padding: 0 14px; font-size: 12px; font-weight: 700; color: #000; background: var(--k1); }
   .sqst + .sqp { margin-left: 0; }
   /* the FX sends: the name toggles, the pencil opens its page */
-  .mlw { display: flex; gap: 4px; } .mle { width: 34px; display: grid; place-items: center; border: 1px solid var(--line-2); color: var(--tx-2); } .mle svg { width: 16px; height: 16px; }
+  .mt.tg button.ml { width: 100%; justify-content: center; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .mt.tg button.ml .mlf { overflow: hidden; text-overflow: ellipsis; }
 
   /* a page with a curve (ENV, LFO, FILTER, DLY, REVERB, EQ+COMP): the graph at the left, its values at the right in two
      columns, not a graph the whole width with a row under it (tablet note 29, 15 nov; the phone's own layout since 13 nov).
@@ -56,3 +57,6 @@
   .pgtabs button[aria-selected="true"] { background: var(--tx); color: var(--page); }
   .pgtabs button.dev::after { content: ""; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: currentColor; }   /* (the synth is on this one) */
   @media (max-height: 540px) { .pgtabs button { height: 32px; min-width: 64px; font-size: 11px; } }
+  /* a narrow column (a small Efectos card): the switch says DST CHO DLY REV, as on the phone, not «Dist…» */
+  .mt.tg { container-type: inline-size; }
+  @container (max-width: 124px) { .mt.tg .ml[data-short] .mlf { display: none; } .mt.tg .ml[data-short]::after { content: attr(data-short); } .mt.tg button.ml { padding: 8px 4px; } }

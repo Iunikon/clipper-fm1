@@ -70,17 +70,18 @@ const infoOfTile = (t) => { const [s, id] = (t.dataset.cell || t.dataset.mt).spl
 let lp = null, lpEat = 0;
 document.addEventListener("pointerdown", (e) => {
   const t = e.button === 0 && e.target.closest("#edit .tp[data-cell], #edit .mt[data-mt]");
-  if (!t || e.target.closest(".gr,.hd,.mtr,.arc")) return;
+  const fx = t && e.target.closest("[data-fxpage]");          /* (an Efectos switch: inside its graph, but a key, not a fader) */
+  if (!t || (!fx && e.target.closest(".gr,.hd,.mtr,.arc"))) return;
   clearTimeout(lp?.id);
   lp = { x: e.clientX, y: e.clientY, id: setTimeout(() => { lp = null; if (typeof bdrag !== "undefined" && bdrag && (bdrag.kind || bdrag.fine)) return;
-    lpEat = performance.now(); buzz(10); infoOfTile(t); }, 550) };
+    lpEat = performance.now(); buzz(10); fx ? openFxPage(fx.dataset.fxpage) : infoOfTile(t); }, 550) };
 }, true);
 const lpOff = () => { if (lp) { clearTimeout(lp.id); lp = null; } };
 document.addEventListener("pointermove", (e) => { if (lp && Math.hypot(e.clientX - lp.x, e.clientY - lp.y) > 8) lpOff(); }, true);
 ["pointerup", "pointercancel", "scroll"].forEach((ev) => document.addEventListener(ev, lpOff, true));
 /* the tap that ends a long press does nothing else (a switch would flip) */
 document.addEventListener("click", (e) => { if (performance.now() - lpEat < 700 && e.target.closest("#edit")) { e.stopPropagation(); e.preventDefault(); lpEat = 0; } }, true);
-document.addEventListener("contextmenu", (e) => { const t = e.target.closest("#edit .tp[data-cell], #edit .mt[data-mt]"); if (!t) return; e.preventDefault(); if (performance.now() - lpEat > 700) infoOfTile(t); });
+document.addEventListener("contextmenu", (e) => { const t = e.target.closest("#edit .tp[data-cell], #edit .mt[data-mt]"); if (!t) return; e.preventDefault(); if (performance.now() - lpEat > 700) { const fx = e.target.closest("[data-fxpage]"); fx ? openFxPage(fx.dataset.fxpage) : infoOfTile(t); } });
 
 /* undo the last change: ⌘/Ctrl-Z and the «⋯» menu */
 /* the change a button showed, not whatever came after it (the synth can change values meanwhile) */

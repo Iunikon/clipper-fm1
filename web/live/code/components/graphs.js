@@ -66,9 +66,11 @@ const FXPAGE = { 33: "FX", 34: "CHORUS", 35: "DLY", 36: "REVERB" };   /* (a send
 function gMeters(s, ids, toggles) {
   return live(ids).map(({ id, k }) => { const d = desc(s, id); if (!d) return ""; const f = frac(d, val(s, id)), z = zeroOf(d), [t, u] = fmtValue(d, val(s, id));
     const q = toggles && QSPEC.get(keyOf(s, id)), off = q && !qOn(q);
-    return `<div class="mt${off ? " off" : ""}" style="--c:${KC[k]};--lo:${Math.min(f, z)};--hi:${Math.max(f, z)};--f:${f}" data-mt="${keyOf(s, id)}"><span class="mv num">${esc(t)}<small>${esc(u)}</small></span>
+    /* (tablet, 17 nov: the edit key beside the switch ran into the next column; now a tap on the switch turns the
+       effect on or off, and holding it opens its page in FX. The switch takes the column's whole width) */
+    return `<div class="mt${off ? " off" : ""}${q ? " tg" : ""}" style="--c:${KC[k]};--lo:${Math.min(f, z)};--hi:${Math.max(f, z)};--f:${f}" data-mt="${keyOf(s, id)}"><span class="mv num">${esc(t)}<small>${esc(u)}</small></span>
       <div class="mtr${z ? " bi" : ""}" data-drag="v" data-k="${keyOf(s, id)}"><i></i><b></b><s></s></div>
-      ${q ? `<span class="mlw"><button class="ml" data-short="${esc(d.label)}" data-qtog="${keyOf(s, id)}" role="switch" aria-checked="${!off}"><span class="mlf">${esc(q.name)}</span></button><button class="mle" data-fxedit="${FXPAGE[id] || "FX"}" aria-label="Editar ${esc(q.name)}"><svg class="i"><use href="#i-edit"/></svg></button></span>` : `<span class="ml">${esc(d.label)}</span>`}</div>`; }).join("");
+      ${q ? `<button class="ml" data-short="${esc(d.label)}" data-qtog="${keyOf(s, id)}" data-fxpage="${FXPAGE[id] || "FX"}" role="switch" aria-checked="${!off}" aria-description="${esc(trUi("Mantén para editarlo"))}"><span class="mlf">${esc(q.name)}</span></button>` : `<span class="ml">${esc(d.label)}</span>`}</div>`; }).join("");
 }
 function gArcs(s, ids) {
   return live(ids).map(({ id, k }) => { const d = desc(s, id); if (!d) return ""; const v = val(s, id), a = frac(d, v), z = d.min < 0 && d.max > 0 ? -d.min / (d.max - d.min) : 0;

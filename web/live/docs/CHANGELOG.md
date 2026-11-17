@@ -107,6 +107,8 @@ Elegida entre cuatro propuestas (la A). La barra va en cuatro cajas grises, sin 
 
 **El pulido que quedó (P3):** PLAY y REC en reposo son teclas llenas (gris `--press`), no texto suelto; PLAY y REC con la misma letra (los números del paso solo mientras suena); «BPM» a 11 px. En «Cómo se toca», los atajos de teclado que faltaban: ← → (con Shift de uno en uno), RePág / AvPág, Inicio / Fin y Esc. Archivos: `code/frame/transport.js`, `code/frame/left-rail.js`, `code/lang/english.js`, `styles/frame/bar.css`, `styles/screens/phone.css`.
 
+**Efectos, sin amontonarse:** el botón de editar cada efecto se encimaba con la columna de al lado; se quitó. Un toque en el nombre enciende o apaga el efecto y mantenerlo abre su página en FX (con ratón, clic derecho; con teclado, Shift+F10); está dicho en la pista de la tarjeta y en «Cómo se toca». El botón ocupa todo el ancho de su columna y, si es angosta, dice DST, CHO, DLY y REV, como en el celular. Archivos: `code/components/graphs.js`, `code/frame/info.js`, `code/views/live.js`, `code/views/quick.js`, `code/frame/left-rail.js`, `code/lang/english.js`, `styles/views/folders.css`.
+
 ## 17 de noviembre: la tableta, con las notas de la prueba con el FM-1 real
 
 De [`PRUEBAS-TABLETA.md`](PRUEBAS-TABLETA.md), las notas sin firmware y ya decididas:

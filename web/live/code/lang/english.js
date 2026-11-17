@@ -38,7 +38,7 @@ const DICT = {
   "Live": "Live", "Editar": "Edit", "Listo": "Done", "Restablecer": "Reset", "Bloquear": "Lock", "Bloqueado": "Locked", "Accesos": "Shortcuts", "Añadir": "Add", "+ Añadir": "+ Add",
   "ACCIONES": "ACTIONS", "RÁPIDOS": "QUICK", "GRÁFICAS": "GRAPHS", "CUALQUIER PARÁMETRO": "ANY PARAMETER", "Libre": "Free", "Fav. anterior": "Prev. favourite", "Fav. siguiente": "Next favourite",
   "Arrastra por ⋮⋮ para ordenar · × quita · elige el tamaño abajo": "Drag by ⋮⋮ to reorder · × removes · pick the size below",
-  "Filtro": "Filter", "Efectos": "Effects", "Toca el nombre para encender o apagar": "Tap the name to turn it on or off", "Distorsión": "Distortion",
+  "Filtro": "Filter", "Efectos": "Effects", "Toca el nombre para encender o apagar; mantenlo para editarlo": "Tap the name to turn it on or off; hold it to edit it", "Mantén para editarlo": "Hold to edit it", "En Efectos,": "In Effects,", "toca un nombre para encender o apagar el efecto; mantenlo para editarlo.": "tap a name to turn the effect on or off; hold it to edit it.", "Toca el nombre para encender o apagar": "Tap the name to turn it on or off", "Distorsión": "Distortion",
   "Arpegiador": "Arpeggiator", "Velocidad": "Velocity", "Latch": "Latch", "Acordes": "Chords", "Escala": "Scale", "Transponer": "Transpose", "Voces": "Voices", "Tempo": "Tempo", "Pánico": "Panic",
   "Mantiene las notas": "Holds the notes", "Mantiene el arpegio": "Holds the arpeggio", "Octava y semitono": "Octave and semitone", "Toca TAP al pulso": "Tap TAP to the beat", "Corta las notas colgadas": "Cuts stuck notes", "Del arpegio": "Of the arpeggio",
   "Editar más": "Edit more", "Rápido": "Quick",
