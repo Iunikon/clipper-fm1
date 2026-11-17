@@ -6,10 +6,10 @@
   /* ---- a small tablet or a narrow window (up to 1100 wide, taller than a phone): the left rail as a panel */
   @media (max-width: 1100px) and (min-height: 541px) {
     #lrh { display: grid; }
-    .bar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; }
-    .conn, .right .cpu { display: none !important; }
+    .bar { gap: 8px; }
+    .conn > div { display: none; }   /* (17 nov) the synth box keeps its dot and CPU; its name and state go to «⋯» */
     .snd { justify-self: start; } .now { min-width: 0; max-width: 260px; } .now .n > span { overflow: hidden; text-overflow: ellipsis; }
-    .snd { min-width: 0; overflow: hidden; } .now { max-width: 200px; }      /* (the sound never runs under the right side) */
+    .snd { min-width: 0; overflow: clip; overflow-clip-margin: 6px; } .now { max-width: 200px; }      /* (the sound never runs under the right side; the 6 px keep the 44 px touch areas) */
     .right { gap: 6px; } .tmp small { display: none; } .follow { font-size: 0; gap: 0; padding: 0 6px; }   /* (Seguir: its switch alone) */
     .body:has(#edit[data-folder="SAVE"]) { grid-template-columns: 0 minmax(0, 1fr) 0; }
     .rail.l { display: flex !important; position: fixed; top: 64px; bottom: 72px; left: 0; width: 280px; z-index: 12; overflow-y: auto;

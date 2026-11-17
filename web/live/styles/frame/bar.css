@@ -1,12 +1,13 @@
   /* ---- the bar: the FM-1, the sound, where the device is, the mode */
-  .bar { display: grid; grid-template-columns: 240px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 0 16px;
+  .bar { display: flex; align-items: center; gap: 16px; padding: 0 16px;
     background: var(--panel); }
   .conn { display: flex; align-items: center; gap: 10px; min-width: 0; }
   .conn .dot { width: 8px; height: 8px; border-radius: 0; background: var(--ok); box-shadow: 0 0 0 3px rgba(30, 204, 112, .16); flex: none; }
   .conn.off .dot { background: var(--tx-3); box-shadow: none; }
   .conn b { font-weight: 600; }
   .conn span { color: var(--tx-2); font-size: 12px; display: block; }
-  .snd { display: flex; align-items: center; gap: 8px; justify-self: center; min-width: 0; }
+  .snd { display: flex; align-items: center; gap: 8px; margin-inline: auto; min-width: 0; }   /* (17 nov) the bar is a flex row, set only here: the synth, the sound centred in the room left, the right side */
+  .conn, .right { flex: none; }
   .ib { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 0; color: var(--tx-2);
     transition: background .15s var(--ease), color .15s var(--ease); }
   .ib:hover { background: var(--raised); color: var(--tx); }
@@ -50,7 +51,11 @@
   .bgrp .ib { width: 40px; height: 40px; } .bgrp .ib svg { width: 18px; height: 18px; }
   .bar .conn { justify-self: start; gap: 8px; padding: 0 12px; max-width: 240px; }
   .conn > div { min-width: 0; } .conn b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
-  .conn #cstate { display: none; } body.mute .conn #cstate, .conn.off #cstate { display: block; }
+  .conn #cstate { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }   /* (read aloud, role=status) */
+  body.mute .conn #cstate, .conn.off #cstate { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
+  /* 44 px to the finger while the boxes look 40 (audit 17 nov): each control's touch area reaches past it into the gap */
+  .bgrp :is(.ib, .tbt, .svb, .now, .follow) { position: relative; }
+  .bgrp :is(.ib, .tbt, .svb, .now, .follow)::after { content: ""; position: absolute; inset: -5px -2px; }
   .conn .cpu { margin-left: 4px; } .conn .cpu b { display: inline; font-size: 12px; }
   .snd .now { min-width: 170px; padding: 0 10px; } .now .n { font-size: 17px; gap: 4px; } .now .m { font-size: 11px; gap: 6px; } .now .cv { width: 14px; height: 14px; }
   .snd .svb { height: 34px; }

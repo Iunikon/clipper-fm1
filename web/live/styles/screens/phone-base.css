@@ -4,7 +4,7 @@
   .phb { display: none; }
   @media (max-height: 540px) {
     .app { grid-template-rows: 44px minmax(0, 1fr) 46px; }
-    .bar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px; padding: 0 4px; }
+    .bar { gap: 6px; padding: 0 4px; }
     .phb { display: grid; }
     .bar .ib { width: 38px; height: 38px; }
     .conn { display: none; }
