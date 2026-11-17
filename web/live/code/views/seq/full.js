@@ -38,14 +38,18 @@ function sqMarks(i) {
 function sqTools(len) {
   const [a, b] = sqRange(), pages = Math.ceil(len / 16);
   const k = (op, lab, extra = "") => `<button class="sqk" data-sqop="${op}"${extra}>${lab}</button>`;
+  const ki = (op, ic, lab, extra = "") => `<button class="sqk ki" data-sqop="${op}"${extra}><svg class="i"><use href="#i-${ic}"/></svg><span>${lab}</span></button>`;
+  /* families in grey boxes, no separator lines; the rarer ones behind ⋯ (tablet note 26, 14 nov) */
   return `<div class="sqtb">
     <div class="seg"><button data-sqview="grid" aria-pressed="${SQ.view === "grid"}">Rejilla</button><button data-sqview="roll" aria-pressed="${SQ.view === "roll"}">Piano roll</button></div>
-    <span class="sqrg"><small>RANGO</small><b class="num">${a + 1}–${b + 1}</b></span>
-    <button class="sqk${SQ.ext ? " on" : ""}" data-sqop="ext">${SQ.ext ? "Toca el final" : "Extender"}</button>${k("all", "Todo")}
-    <span class="sqsep"></span>${k("copy", "Copiar")}${k("paste", "Pegar", SQ.clip ? "" : " disabled")}${k("clear", "Borrar")}
-    <span class="sqsep"></span>${[-12, -1, 1, 12].map((d) => `<button class="sqk num" data-sqop="tr" data-d="${d}">${d > 0 ? "+" : "−"}${Math.abs(d)}</button>`).join("")}
-    <span class="sqsep"></span><button class="sqk ico" data-sqop="shift" data-d="-1" aria-label="Mover el rango a la izquierda"><svg class="i"><use href="#i-prev"/></svg></button><button class="sqk ico" data-sqop="shift" data-d="1" aria-label="Mover el rango a la derecha"><svg class="i"><use href="#i-next"/></svg></button>
-    ${k("rev", "Invertir")}${k("dbl", "Duplicar")}${k("acc", "ACC")}${k("slide", "SLIDE")}
+    <div class="sqgp" role="group" aria-label="Rango"><span class="sqrg"><small>RANGO</small><b class="num">${a + 1}–${b + 1}</b></span>
+      <button class="sqk${SQ.ext ? " on" : ""}" data-sqop="ext">${SQ.ext ? "Toca el final" : "Extender"}</button>${k("all", "Todo")}</div>
+    <div class="sqgp" role="group" aria-label="Edición">${ki("copy", "copy", "Copiar")}${ki("paste", "paste", "Pegar", SQ.clip ? "" : " disabled")}${k("clear", "Borrar")}</div>
+    <div class="sqgp" role="group" aria-label="Altura"><small class="gl">TONO</small><button class="sqk num" data-sqop="tr" data-d="-1" aria-label="Bajar un semitono">−1</button><button class="sqk num" data-sqop="tr" data-d="1" aria-label="Subir un semitono">+1</button>
+      <small class="gl">8VA</small><button class="sqk num" data-sqop="tr" data-d="-12" aria-label="Bajar una octava">−12</button><button class="sqk num" data-sqop="tr" data-d="12" aria-label="Subir una octava">+12</button></div>
+    <div class="sqgp" role="group" aria-label="Paso">${k("acc", "ACC")}${k("slide", "SLIDE")}</div>
+    <button class="sqk ico${SQ.more ? " on" : ""}" data-sqop="more" aria-expanded="${!!SQ.more}" aria-label="Más herramientas">⋯</button>
+    ${SQ.more ? `<div class="sqgp" role="group" aria-label="Más"><button class="sqk ico" data-sqop="shift" data-d="-1" aria-label="Mover el rango a la izquierda"><svg class="i"><use href="#i-prev"/></svg></button><button class="sqk ico" data-sqop="shift" data-d="1" aria-label="Mover el rango a la derecha"><svg class="i"><use href="#i-next"/></svg></button>${k("rev", "Invertir")}${k("dbl", "Duplicar")}</div>` : ""}
   </div>${pages > 1 ? `<div class="sqpg" role="group" aria-label="Página de 16 pasos">${Array.from({ length: pages }, (_, p) =>
     `<button data-sqpg="${p}" aria-pressed="${p === SQ.page}">${p * 16 + 1}–${Math.min(len, p * 16 + 16)}</button>`).join("")}<span class="c">El piano roll y los carriles muestran esta página</span></div>` : ""}`;
 }
@@ -61,7 +65,7 @@ function sqRoll(len) {
       const i = p0 + j, st = SQ.steps[i], on = sqOn(st) && st.notes.slice(0, st.n).includes(p);
       return `<button class="prc${on ? " on" : ""}${i === SQ.sel ? " sel" : ""}${j % 4 === 0 ? " beat" : ""}${inRange(i) ? " rg" : ""}" data-pr="${i}" data-p="${p}" aria-label="${noteName(p)}, paso ${i + 1}${on ? ", suena" : ""}"></button>`; }).join("")}</div>`);
   }
-  return `<div class="sqroll"><div class="pro"><button class="sqk" data-sqop="oct" data-d="-12">Octava −</button><span class="num">${noteName(SQ.oct)} – ${noteName(SQ.oct + 11)}</span><button class="sqk" data-sqop="oct" data-d="12">Octava +</button></div>
+  return `<div class="sqroll"><div class="pro"><button class="sqk" data-sqop="oct" data-d="-12" aria-label="Octava abajo">▼ 8va</button><span class="num">${noteName(SQ.oct)} – ${noteName(SQ.oct + 11)}</span><button class="sqk" data-sqop="oct" data-d="12" aria-label="Octava arriba">8va ▲</button></div>
     <div class="prg" style="--cols:${cols}">${rows.join("")}</div></div>`;
 }
 
@@ -140,6 +144,7 @@ function sqOp(op, d, el) {
   const len = sqLen(), [a, b] = sqRange(), arr = SQ.steps.slice(a, b + 1).map(cpStep), on = (s) => sqOn(s);
   switch (op) {
     case "ext": SQ.ext = !SQ.ext; break;
+    case "more": SQ.more = !SQ.more; break;
     case "all": SQ.r0 = 0; SQ.r1 = len - 1; SQ.ext = false; break;
     case "copy": SQ.clip = arr; toast(-1, `Copiados <b class="num">${arr.length}</b> pasos`); break;
     case "paste": if (SQ.clip) sqApply(a, SQ.clip.slice(0, len - a).map(cpStep)); break;

@@ -2,7 +2,7 @@
    reads the other's. A sound goes back to the FM-1 into a USER slot (UP_PUT: slot, engine, name, every parameter,
    the 16-step pattern) */
 const LIBX = { FORMAT: "felucca-library", VERSION: 1, PAT: 16 };
-const LIBV = { tag: "", q: "", slotFor: -1, busy: false };
+const LIBV = { tag: "", q: "", slotFor: -1, moreFor: -1, order: false, busy: false };   /* (order: «Reordenar» on: arrows, no filter; tablet note 24) */
 const libAll = () => store.get("lib") || [];
 const libKeep = (a) => store.set("lib", a);
 function libKeys() {                             /* each parameter's key (editor.html paramKeys): a label, #2 when repeated, E0..E7 */
@@ -43,24 +43,29 @@ async function libToSlot(p, slot) {              /* UP_PUT; unknown values: the 
 }
 function libView() {
   const all = libAll(), tags = [...new Set(all.flatMap((p) => p.tags))].sort(), q = LIBV.q.trim().toLowerCase();
-  const list = all.map((p, i) => ({ p, i })).filter(({ p }) => (!LIBV.tag || p.tags.includes(LIBV.tag)) && (!q || p.name.toLowerCase().includes(q) || p.engineName.toLowerCase().includes(q)));
+  const list = all.map((p, i) => ({ p, i })).filter(({ p }) => LIBV.order || ((!LIBV.tag || p.tags.includes(LIBV.tag)) && (!q || p.name.toLowerCase().includes(q) || p.engineName.toLowerCase().includes(q))));
   const slots = LIBV.slotFor >= 0 ? US.slots : null;
   if (LIBV.slotFor >= 0 && !US.slots && !US.busy) { US.busy = true; readSlots().then((v) => { US.slots = v; }, () => { US.slots = []; }).finally(() => { US.busy = false; renderWork(); }); }
   const pickSlots = (i) => `<div class="lsl"><span class="c">¿En qué ranura USER?</span>${!slots ? `<span class="c">Leyendo las ranuras…</span>` : slots.map((u, k) =>
     `<button class="btn${u.used ? " used" : ""}" data-lib="put" data-n="${i}" data-k="${k}"><span class="num">${upLabel(k)}</span><small>${u.used ? esc(u.name) : "Libre"}</small></button>`).join("")}
     <button class="btn" data-lib="nosl">Cancelar</button></div>`;
+  /* «Reordenar»: only then can a sound move, with ▲ ▼, so a finger sliding down the list always scrolls (after SHRUB, whose
+     drag fights the scroll; tablet note 24). The order is the tablet's: nothing goes to the FM-1 */
+  const orow = ({ p, i }) => `<div class="lrow lord"><span class="num lon">${i + 1}</span><b>${esc(p.name)}</b><span class="e">${esc(p.engineName)}</span>
+      <span class="dva"><button class="btn ico" data-lib="up" data-n="${i}" aria-label="Subir en la lista: ${esc(p.name)}"${i ? "" : " disabled"}>▲</button><button class="btn ico" data-lib="down" data-n="${i}" aria-label="Bajar en la lista: ${esc(p.name)}"${i < all.length - 1 ? "" : " disabled"}>▼</button></span></div>`;
   const row = ({ p, i }) => `<div class="lrow"><b>${esc(p.name)}</b><span class="e">${esc(p.engineName)}</span>
       <span class="ltg">${p.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</span><small class="num">${esc((p.modified || "").slice(0, 10))}</small>
-      <span class="dva"><button class="btn" data-lib="slot" data-n="${i}" aria-expanded="${LIBV.slotFor === i}">A USER…</button><button class="btn" data-lib="tags" data-n="${i}">Etiquetas</button>
-        <button class="btn" data-lib="ren" data-n="${i}">Renombrar</button><button class="dsc" data-lib="del" data-n="${i}">Borrar</button></span>
+      <span class="dva"><button class="btn" data-lib="slot" data-n="${i}" aria-expanded="${LIBV.slotFor === i}">A USER…</button><button class="btn lmb" data-lib="more" data-n="${i}" aria-expanded="${LIBV.moreFor === i}" aria-label="Más: ${esc(p.name)}">⋯</button></span>
+      ${LIBV.moreFor === i ? `<span class="lmore"><button class="btn" data-lib="tags" data-n="${i}">Etiquetas</button><button class="btn" data-lib="ren" data-n="${i}">Renombrar</button><button class="dsc" data-lib="del" data-n="${i}">Borrar</button></span>` : ""}
       ${LIBV.slotFor === i ? pickSlots(i) : ""}</div>`;
   return `<section class="blk tlib"><header class="bh"><h2><svg class="i"><use href="#i-save"/></svg>BIBLIOTECA</h2><span class="c">${all.length} ${all.length === 1 ? "sonido" : "sonidos"} en esta tablet</span>
       <span class="hyt"><button class="btn pri" data-lib="add"${M.link ? "" : " disabled"}><svg class="i"><use href="#i-disk"/></svg>Guardar el sonido actual</button>
         <button class="btn" data-lib="export"${all.length ? "" : " disabled"}><svg class="i"><use href="#i-dl"/></svg>Exportar</button>
-        <label class="btn">Importar<input type="file" accept=".json,application/json" id="libf" hidden></label></span></header>
+        <label class="btn">Importar<input type="file" accept=".json,application/json" id="libf" hidden></label>
+        <button class="btn${LIBV.order ? " pri" : ""}" data-lib="order"${all.length > 1 ? "" : " disabled"}>${LIBV.order ? "Listo" : "Reordenar"}</button></span></header>
     <div class="lflt"><input class="lq" id="libq" type="search" placeholder="Buscar por nombre o motor" value="${esc(LIBV.q)}" autocomplete="off" spellcheck="false">
       <button class="tg2${LIBV.tag ? "" : " on"}" data-libtag="">Todas</button>${tags.map((t) => `<button class="tg2${LIBV.tag === t ? " on" : ""}" data-libtag="${esc(t)}">${esc(t)}</button>`).join("")}</div>
-    ${list.length ? `<div class="lrows">${list.map(row).join("")}</div>` : `<p class="msh">${all.length ? "Ningún sonido con eso." : "Aún no hay nada. Guarda el sonido que suena o importa una biblioteca del editor."}</p>`}
+    ${list.length ? `<div class="lrows">${list.map(LIBV.order ? orow : row).join("")}</div>` : `<p class="msh">${all.length ? "Ningún sonido con eso." : "Aún no hay nada. Guarda el sonido que suena o importa una biblioteca del editor."}</p>`}
     <p class="msh">Se guarda en esta tablet, no en el FM-1. «A USER…» lo escribe en una ranura de usuario del sinte; desde ahí lo cargas en SAVE.</p></section>`;
 }
 document.addEventListener("click", async (e) => {
@@ -72,11 +77,18 @@ document.addEventListener("click", async (e) => {
     const blob = new Blob([JSON.stringify(libFile(all), null, 1)], { type: "application/json" }), aa = document.createElement("a"), url = URL.createObjectURL(blob);
     aa.href = url; aa.download = `felucca-library-${new Date().toISOString().slice(0, 10)}.json`; document.body.append(aa); aa.click(); aa.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
   } else if (w === "nosl") { LIBV.slotFor = -1; renderWork(); }
+  else if (w === "order") { LIBV.order = !LIBV.order; LIBV.slotFor = LIBV.moreFor = -1; renderWork(); }
+  else if ((w === "up" || w === "down") && p) {
+    const to = n + (w === "up" ? -1 : 1); if (to < 0 || to >= all.length) return;
+    [all[n], all[to]] = [all[to], all[n]]; libKeep(all); renderWork();
+    document.querySelector(`[data-lib="${w}"][data-n="${to}"]`)?.focus({ preventScroll: true });   /* (the finger stays on the one it moves) */
+  }
   else if (!p) return;
+  else if (w === "more") { LIBV.moreFor = LIBV.moreFor === n ? -1 : n; renderWork(); }
   else if (w === "slot") { LIBV.slotFor = LIBV.slotFor === n ? -1 : n; US.slots = null; renderWork(); }
   else if (w === "tags") { ask({ title: "Etiquetas, separadas por comas", input: p.tags.join(", "), ok: "Guardar" }).then((t) => { if (t == null) return; p.tags = libTags(t); p.modified = new Date().toISOString(); libKeep(all); renderWork(); }); }
   else if (w === "ren") { ask({ title: "Nombre (hasta 12 letras)", input: p.name, ok: "Guardar" }).then((t) => { if (t == null) return; p.name = cleanName(t).slice(0, 12) || p.name; p.modified = new Date().toISOString(); libKeep(all); renderWork(); }); }
-  else if (w === "del") { if (b.dataset.arm !== "1") { arm(b, "Borrar", "¿Seguro?"); return; } all.splice(n, 1); libKeep(all); LIBV.slotFor = -1; renderWork(); toast(-1, `<b>${esc(p.name)}</b> fuera de la biblioteca`); }
+  else if (w === "del") { if (b.dataset.arm !== "1") { arm(b, "Borrar", "¿Seguro?"); return; } all.splice(n, 1); libKeep(all); LIBV.slotFor = LIBV.moreFor = -1; renderWork(); toast(-1, `<b>${esc(p.name)}</b> fuera de la biblioteca`); }
   else if (w === "put") {
     const k = +b.dataset.k, u = US.slots && US.slots[k];
     if (u && u.used && b.dataset.arm !== "1") { arm(b, `${upLabel(k)} ${u.name}`, `${upLabel(k)} ¿encima?`); return; }

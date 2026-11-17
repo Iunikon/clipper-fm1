@@ -52,14 +52,16 @@
   /* SAVE > Dispositivo */
   .svg2 { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--tx-3); text-transform: uppercase; margin: 4px 0 -8px; }
   .svk[aria-label="Dispositivo"] .kf:nth-child(2), .kts .kf:nth-child(2) { margin-bottom: 0; }
-  .dvc { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
-  .dvs { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto auto; gap: 4px 10px; padding: 12px; background: var(--panel); border: 1px solid var(--line); }
-  .dvs > .num { grid-row: span 2; font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }
+  /* Proyectos, Samples (and Drum kits): one line a slot, its buttons at the right (tablet note 18, 14 nov) */
+  .dvc { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .dvs { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto auto; align-items: center; gap: 4px 12px; min-height: 56px; padding: 8px 12px; background: var(--panel); }
+  .dvs > .num { font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }
   .dvs b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .dvs small { font-size: 12px; color: var(--tx-3); }
-  .dvs .btn, .dvs .dsc { grid-column: 1 / -1; justify-self: start; }
+  .dvs small { font-size: 12px; color: var(--tx-2); white-space: nowrap; }
+  .dvs .dva { grid-column: auto; flex-wrap: nowrap; justify-content: flex-end; }
   .dvs .btn { height: 40px; padding: 0 14px; }
-  .dvs.free { background: var(--page); border-style: dashed; } .dvs.free b { color: var(--tx-3); font-weight: 400; }
+  .dvs .upb { grid-column: 1 / -1; }
+  .dvs.free { background: var(--page); outline: 1px dashed var(--line); outline-offset: -1px; } .dvs.free b { color: var(--tx-3); font-weight: 400; }
   .kts { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
   .kts .kf { height: 44px; }
   .pads { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; max-width: 560px; }

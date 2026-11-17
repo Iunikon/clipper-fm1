@@ -63,7 +63,7 @@ function helpSheet() {
     ${li("Arrastra en horizontal", "sobre una tarjeta para cambiar su valor; en vertical, la página se desplaza.")}
     ${li("Deja el dedo quieto", "un momento mientras arrastras: modo fino ×¼, hasta que lo levantes.")}
     ${li("Doble toque", "en un valor: vuelve a como se cargó el sonido.")}
-    ${li("Mantén el dedo quieto", "en una tarjeta, sin arrastrar: qué hace, su rango y su CC MIDI. Con ratón, clic derecho.")}
+    ${li("Mantén el dedo quieto", "en una tarjeta, sin arrastrar: qué hace, su rango y su CC MIDI. Con ratón, clic derecho; con teclado, Shift+F10.")}
     ${li("Deshacer:", "⌘Z o Ctrl+Z, o ⋯ > Deshacer arriba a la derecha.")}
     ${li("Lo que borra", "pide un segundo toque, en rojo con ⚠.")}
     ${li("En los pasos de SEQ:", "‹ › nudge (adelanta o retrasa), F fill, L lock, ' acento, ~ slide.")}

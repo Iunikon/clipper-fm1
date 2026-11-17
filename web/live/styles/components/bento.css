@@ -131,3 +131,10 @@
   .cpu3 b { font-family: var(--num); font-size: 32px; line-height: 36px; font-weight: 400; color: var(--tx); -webkit-font-smoothing: none; }
   .cpu3 small { font-size: 16px; color: var(--tx-2); }
   .cpu3 .hot b, .cpu3 .hot small { color: var(--danger); } .cpu3 .warn b { color: var(--k3); }
+  /* a waveform choice drawn (tablet note 21): the shapes in grey, the chosen one lit in its knob's colour */
+  .tp.t-wave .wvn { font: 400 16px/1 var(--num); color: var(--tx-2); -webkit-font-smoothing: none; }
+  .tp.t-wave .opts { margin-top: auto; gap: 4px; }
+  .tp.t-wave .opts button { flex: 1; min-width: 0; height: 44px; display: grid; place-items: center; background: var(--raised); padding: 0 4px; }
+  .tp.t-wave svg { width: 100%; max-width: 40px; height: 20px; fill: none; stroke: var(--tx-3); stroke-width: 2; stroke-linejoin: miter; overflow: visible; }
+  .tp.t-wave .opts button[aria-checked="true"] { background: var(--page); box-shadow: inset 0 0 0 2px var(--c); }
+  .tp.t-wave .opts button[aria-checked="true"] svg { stroke: var(--c); }

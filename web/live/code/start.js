@@ -1,8 +1,10 @@
 /* ------------------------------------------------------------------ start --- */
-$("connect").onclick = () => connectMidi();
+/* hold landscape from the first tap where the browser lets a page do it (installed, or in full screen): tablet note 33 */
+const landLock = () => { try { screen.orientation?.lock?.("landscape")?.catch?.(() => {}); } catch (e) { /* (not allowed here) */ } };
+$("connect").onclick = () => { landLock(); connectMidi(); };
 /* (13 nov) the demo: the whole app on the example FM-1, to see it without the synth; it does not turn pages on its own
    (Seguir off) until you switch Seguir on. Reloading the page leaves it */
-$("demo").onclick = () => { if (M.link) return; QS.set("follow", "0"); connectMock(); };
+$("demo").onclick = () => { if (M.link) return; landLock(); QS.set("follow", "0"); connectMock(); };
 if (/^https?:$/.test(location.protocol)) $("dl").hidden = false;
 /* full screen: the tablet's whole 3:2 screen, without Chrome's bars */
 if (document.fullscreenEnabled) $("fs").hidden = false;

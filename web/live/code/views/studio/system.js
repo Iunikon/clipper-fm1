@@ -6,6 +6,7 @@ function systemView() {
     <div class="sys">${row("Firmware", i.version || "—")}${row("Protocolo", i.proto || "—")}${row("Motores", i.nengines || "—")}${row("Sonidos de fábrica", M.list.length - users)}
       ${row("Sonidos de usuario", `${users} de 32`)}${row("Favoritos", `${M.favs.length} de 16`)}${row("Pasos del patrón", i.nstep || "—")}
       ${st ? row("CPU", st.cpu + " %") + row("LATE", st.late) + row("PEAK", st.peak + " %") : ""}${row("Puerto MIDI", $("cname").textContent)}</div>
+    <div class="syl"><span>Pantalla encendida sin uso</span><button class="btn sylang" data-pick="awake" aria-haspopup="listbox">${esc(awakeName())}<svg class="i"><use href="#i-down"/></svg></button></div>
     <div class="syl"><span>Idioma · Language</span><button class="btn sylang" data-pick="lang" aria-haspopup="listbox">${esc((LANGS.find(([v]) => v === (LANG.cur || "es")) || LANGS[0])[1])}<svg class="i"><use href="#i-down"/></svg></button></div>
     ${mlList()}
     <div class="syl"><span>Ajustes de Live</span><button class="btn" data-cfgio="out"><svg class="i"><use href="#i-dl"/></svg>Exportar</button><button class="btn" data-cfgio="in">Importar</button></div>

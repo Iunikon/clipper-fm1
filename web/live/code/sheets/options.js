@@ -20,7 +20,8 @@ function closePick() { $("pick").classList.remove("on"); if (!B.open && !SVE.ope
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-pick],[data-pkv],#pkx"); if (!b) { if (PK.key && e.target.id === "scrim") closePick(); return; }
   e.stopPropagation();
-  if (b.dataset.pick === "lang") openPickList("Idioma · Language", LANGS, LANG.cur || "es", (l) => { if (l !== LANG.cur) setLang(l); renderWork(); });
+  if (b.dataset.pick === "awake") openPickList("Pantalla encendida sin uso", AW_OPTS.map(([m, n]) => [String(m), n]), String(AW.mins), (m) => { awakeSet(m); renderWork(); });
+  else if (b.dataset.pick === "lang") openPickList("Idioma · Language", LANGS, LANG.cur || "es", (l) => { if (l !== LANG.cur) setLang(l); renderWork(); });
   else if (b.dataset.pick) openPick(b.dataset.pick);
   else if (b.id === "pkx") closePick();
   else if (PK.key === "list") { const cb = PK.cb; closePick(); PK.cb = null; cb && cb(b.dataset.pkv); }

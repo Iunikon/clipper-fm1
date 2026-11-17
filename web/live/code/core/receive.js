@@ -2,6 +2,7 @@
 let reloadT = 0;
 function reloadSoon() { clearTimeout(reloadT); reloadT = setTimeout(async () => { try { await readSound(false); await readFavs(); renderAll(); } catch (e) { /* the next push tries again */ } }, 60); }
 function onPush(f) {
+  if (f.cmd !== C.SCOPE) awakeBump();   /* (the FM-1 moving counts as use; its scope trace does not) */
   try {
     if (f.cmd === C.CHANGED) {
       const r = new Reader(f.a), s = r.b(), id = r.b(), v = r.v(), arr = s ? M.g : M.p;
@@ -36,7 +37,8 @@ function followPage() {
   if (folder === "SAVE") { const k = pg.title === "FAVS" ? "FAVS" : pg.title === "USER" ? "USER" : pg.title === "TOOLS" ? "TOOLS" : null; if (k) SV.kind = k; if (S.folder !== "SAVE") { S.folder = "SAVE"; renderAll(); } else renderWork(); return; }
   if (!folder || folder === "HOME") return;
   if (folder === "SEQ" && (pg.title === "NOTES" || pg.title === "PATTERN") && S.seqPage !== pg.title) { S.seqPage = pg.title; if (S.folder === "SEQ") renderWork(); }   /* (the device's page) */
-  if (S.folder !== folder) { S.folder = folder; renderAll(); } else renderNav();
+  const tabCh = tabSync(folder, pg.title);   /* (ENV 2 on the synth: the ENV 2 tab here) */
+  if (S.folder !== folder) { S.folder = folder; renderAll(); } else { renderNav(); if (tabCh) renderWork(); }
   flashRow(pg.title);
 }
 function flashRow(title) {

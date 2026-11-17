@@ -710,10 +710,10 @@ function sqGen() {
     : g.type === "pre" ? ar("preset", `Preset ${g.preset + 1}/${PAT.PRESETS.length}`, `${esc(pr[1])} <small>${esc(pr[0])}</small>`) + ar("scale", "Escala", g.scale) + ar("root", "Raíz", NOTE_N[g.root])
     : ar("hvel", "Velocidad ±", g.hvel) + ar("hnud", "Nudge ±", g.hnud) + `<button class="sqk" data-gen="seed">Otra tirada</button>`;
   return `<div class="sqgen"><div class="sqlh"><b>Generar</b><div class="seg">${GEN_T.map(([k, t]) => `<button data-gentype="${k}" aria-pressed="${g.type === k}">${t}</button>`).join("")}</div></div>
-    <div class="gnr">${body}</div>
-    <div class="gnr"><button class="btn pri" data-gen="go">${g.type === "hum" ? "Humanizar" : "Generar"} en ${A + 1}–${B}</button>${SQ.undo ? `<button class="sqk" data-gen="undo">Deshacer</button>` : ""}
-      <span class="sqsep"></span><b class="gnm">MIDI</b><button class="sqk" data-gen="midiout">Exportar .mid</button>
-      <label class="sqk">Importar .mid<input type="file" accept=".mid,.midi,audio/midi" data-midiin="1" hidden></label></div></div>`;
+    <div class="gnb"><div class="gnv">${body}</div>
+      <div class="gna"><button class="btn pri" data-gen="go">${g.type === "hum" ? "Humanizar" : "Generar"} en ${A + 1}–${B}</button>${SQ.undo ? `<button class="sqk" data-gen="undo">Deshacer</button>` : ""}</div></div>
+    <div class="gnr"><b class="gnm">MIDI</b><button class="sqk" data-gen="midiout">Exportar .mid</button>
+      <label class="sqk">Importar .mid<input type="file" accept=".mid,.midi,audio/midi" data-midiin="1" hidden></label></div></div>`;   /* (values in an even grid, the action fixed at the right: tablet note 27) */
 }
 function midiExport() {
   const len = sqLen(), notes = SMF.fromSteps(SQ.steps, len, sqDiv());

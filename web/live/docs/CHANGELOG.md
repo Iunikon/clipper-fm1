@@ -117,6 +117,20 @@ De [`PRUEBAS-TABLETA.md`](PRUEBAS-TABLETA.md), las notas sin firmware y ya decid
 - **SEQ en la octava del sinte (1):** las notas nuevas y el piano roll empiezan en la octava de OCT − / + (llega en STATE) y la siguen cuando cambia.
 - **SEQ sigue el paso del sinte al grabar (2):** el firmware ya mandaba CURSOR; por si el aviso se pierde, cada nota escrita en el sinte hace que la web pregunte en qué paso quedó el cursor. Falta probarlo con el FM-1.
 
+**Segunda tanda, lo que se puede hacer sin el sinte:**
+- **Pantalla encendida mientras haya uso (9):** wake lock que se suelta tras unos minutos sin tocar, sin mandar ni recibir valores y sin SEQ sonando; los minutos (o apagado) en Estudio > Sistema.
+- **Un renglón por sonido o ranura (17, 18):** Biblioteca (A USER… y «⋯» con Etiquetas, Renombrar, Borrar), Proyectos y Samples.
+- **Favicon nuevo (23):** cuatro faders con los colores de los knobs, sin la rejilla de 2 × 2.
+- **FX 1 y MACROS solo con las barras (28):** sin tarjetas repetidas; las barras abren la ficha (clic derecho o mantener) y aprenden MIDI.
+- **El valor suelto en la rejilla de su hermana (30):** INSERT · INSERT 2, VOICE 2 · VOICE 3, ENV 2 · ENV 2 LOOP, DLY · DLY 2…; el marco del sinte sigue en las tarjetas de su página.
+- **Gráfica a la izquierda y valores a la derecha en la tableta (29)** para las curvas (ENV, LFO, FILTER, DLY, REVERB, EQ+COMP).
+- **ENV y LFO con pestañas (20):** ENV 1 · 2 y LFO 1 · 2 · 3 sobre el mismo lugar; con «Seguir», la del sinte; se recuerda la última.
+- **SEQ > Completo en grupos (26):** Rango, Edición (con íconos), Tono y 8va, ACC / SLIDE, y lo poco usado detrás de «⋯»; **Generar (27)** en una rejilla pareja con Generar y Deshacer fijos a la derecha.
+- **Formas de onda con dibujos (21)** donde todas las opciones son formas conocidas (la WAVE de los LFO).
+- **Reordenar en la Biblioteca (24):** con ▲ ▼ solo en ese modo, para no chocar con el scroll.
+- **Horizontal (33):** Live pide horizontal al primer toque; el aviso en vertical ofrece «Ver en horizontal» (pantalla completa y gira).
+- **De la auditoría:** el foco vuelve a la tarjeta al cerrar su ficha, la ayuda de SPACE completa, «MIDI» de la barra a 11 px, Shift+F10 en «Cómo se toca».
+
 ---
 
 ## Lo siguiente

@@ -36,7 +36,7 @@ const HELP = {
   50: "Filtro de la pista: abajo de la mitad quita agudos, arriba quita graves; en medio, apagado.",
   87: "Cuánto varían las notas del arpegiador y del secuenciador.", 88: "Qué variación usa SPICE.", 89: "Cada voz un poco distinta, como un sinte viejo.",
   91: "Reparte las voces de izquierda a derecha.",
-  96: "Macro: más brillo o menos.", 97: "Macro: el timbre, a un lado o al otro.", 98: "Macro: cuánto se mueve el sonido.", 99: "Macro: cuánto espacio (reverb y delay).",
+  96: "Macro: más brillo o menos.", 97: "Macro: el timbre, a un lado o al otro.", 98: "Macro: cuánto se mueve el sonido.", 99: "Macro: cuánto espacio: más reverb, más delay y las voces más abiertas en estéreo.",
 };
 const HELP_LABEL = { CUT: "El corte del filtro del motor: más abierto, más brillante.", RES: "La resonancia del filtro: realza el corte.", Q: "La resonancia del filtro: realza el corte." };
 const helpOf = (s, id, d) => (s === 0 && HELP[id]) || HELP_LABEL[d.label] || "";
@@ -46,6 +46,7 @@ function learnedOf(s, id) { for (const [k, t] of Object.entries(ML.map || {})) i
 
 function infoSheet(s, id, page) {
   const d = desc(s, id); if (!d || document.querySelector(".askw.inf")) return;
+  const back = document.activeElement && document.activeElement !== document.body ? document.activeElement : document.querySelector(`#edit .tp[data-cell="${s}:${id}"]`);   /* (focus goes back there on close) */
   const fv = (v) => { const a = fmtValue(d, v); return esc(a[0] + a[1]); };
   const cc = ccOf(s, id), lr = learnedOf(s, id), h = helpOf(s, id, d);
   const row = (a, b) => `<div class="ir"><dt>${esc(trUi(a))}</dt><dd class="num">${b}</dd></div>`;
@@ -57,18 +58,18 @@ function infoSheet(s, id, page) {
     <p class="ih">${esc(trUi(cc != null ? "El CC llega por el canal del sonido. Doble toque en la tarjeta: vuelve a como se cargó." : "Doble toque en la tarjeta: vuelve a como se cargó."))}</p>
     <div class="askf"><button class="btn pri" data-askok="1">${esc(trUi("Entendido"))}</button></div></div>`;
   document.body.appendChild(w);
-  const close = () => { w.remove(); document.removeEventListener("keydown", key, true); };
+  const close = () => { w.remove(); document.removeEventListener("keydown", key, true); if (back && back.isConnected) back.focus({ preventScroll: true }); };
   const key = (e) => { if (e.key === "Escape") close(); };
   document.addEventListener("keydown", key, true);
   w.addEventListener("click", (e) => { if (e.target === w || e.target.closest("[data-askok]")) close(); });
   setTimeout(() => w.querySelector("[data-askok]").focus(), 30);
 }
-const infoOfTile = (t) => { const [s, id] = t.dataset.cell.split(":").map(Number); infoSheet(s, id, t.dataset.title || ""); };
+const infoOfTile = (t) => { const [s, id] = (t.dataset.cell || t.dataset.mt).split(":").map(Number); infoSheet(s, id, t.dataset.title || t.closest("[data-title]")?.dataset.title || ""); };
 
 /* the long press: still (under 8 px), 0.55 s, not on what takes the finger outright (graphs, meters, dials) */
 let lp = null, lpEat = 0;
 document.addEventListener("pointerdown", (e) => {
-  const t = e.button === 0 && e.target.closest("#edit .tp[data-cell]");
+  const t = e.button === 0 && e.target.closest("#edit .tp[data-cell], #edit .mt[data-mt]");
   if (!t || e.target.closest(".gr,.hd,.mtr,.arc")) return;
   clearTimeout(lp?.id);
   lp = { x: e.clientX, y: e.clientY, id: setTimeout(() => { lp = null; if (typeof bdrag !== "undefined" && bdrag && (bdrag.kind || bdrag.fine)) return;
@@ -79,7 +80,7 @@ document.addEventListener("pointermove", (e) => { if (lp && Math.hypot(e.clientX
 ["pointerup", "pointercancel", "scroll"].forEach((ev) => document.addEventListener(ev, lpOff, true));
 /* the tap that ends a long press does nothing else (a switch would flip) */
 document.addEventListener("click", (e) => { if (performance.now() - lpEat < 700 && e.target.closest("#edit")) { e.stopPropagation(); e.preventDefault(); lpEat = 0; } }, true);
-document.addEventListener("contextmenu", (e) => { const t = e.target.closest("#edit .tp[data-cell]"); if (!t) return; e.preventDefault(); if (performance.now() - lpEat > 700) infoOfTile(t); });
+document.addEventListener("contextmenu", (e) => { const t = e.target.closest("#edit .tp[data-cell], #edit .mt[data-mt]"); if (!t) return; e.preventDefault(); if (performance.now() - lpEat > 700) infoOfTile(t); });
 
 /* undo the last change: ⌘/Ctrl-Z and the «⋯» menu */
 /* the change a button showed, not whatever came after it (the synth can change values meanwhile) */

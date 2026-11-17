@@ -84,10 +84,16 @@ $("edit").addEventListener("keydown", (e) => {   /* ← → (Shift: one by one),
   if (e.key === "Home" || e.key === "End") { e.preventDefault(); setVal(s, id, e.key === "Home" ? d.min : d.max); return; }
   if (!st) return; e.preventDefault(); setVal(s, id, val(s, id) + st);
 });
-/* landscape only: where the browser can't lock the rotation, a notice when upright */
+/* landscape only (tablet note 33, 14 nov): Live asks the browser to hold landscape at the first tap (start.js landLock);
+   Chrome on Android only allows it in full screen or installed, so upright the notice offers one tap that does both, and
+   Live turns. Where even that is refused (Safari on an iPad), the notice stays: turning the app by CSS would turn every
+   drag sideways, and needs the device to test */
 (() => { const d = document.createElement("div"); d.className = "rot"; d.setAttribute("role", "alert");
-  d.innerHTML = `<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20"/><path d="M3 12a9 9 0 0 1 9-9M21 12a9 9 0 0 1-9 9"/></svg><b>Gira el aparato</b><span>Clipper Live se usa en horizontal.</span>`;
-  document.body.appendChild(d); })();
+  d.innerHTML = `<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20"/><path d="M3 12a9 9 0 0 1 9-9M21 12a9 9 0 0 1-9 9"/></svg><b>Gira el aparato</b><span>Clipper Live se usa en horizontal.</span>
+    ${document.fullscreenEnabled ? `<button class="btn pri" data-landfs="1">Ver en horizontal</button>` : ""}`;
+  document.body.appendChild(d);
+  d.addEventListener("click", (e) => { if (!e.target.closest("[data-landfs]")) return;
+    document.documentElement.requestFullscreen().then(() => screen.orientation?.lock?.("landscape")).catch(() => toast(-1, "Este navegador no deja girar la pantalla: gira el aparato")); }); })();
 /* (no wheel: scrolling the page with it edited whatever card was under the pointer; with a mouse, drag) */
 
 

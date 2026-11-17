@@ -21,11 +21,18 @@ function cpu3Html() {
   const st = M.state, c = (l, v, u, cls = "") => `<div class="${cls}"><span class="l">${l}</span><b class="num">${v}${u && st ? `<small>${u}</small>` : ""}</b></div>`;
   return c("CPU", st ? st.cpu : "—", "%", st && st.cpu >= 90 ? "hot" : "") + c("LATE", st ? st.late : "—", "", st && st.late > 0 ? "warn" : "") + c("PEAK", st ? st.peak : "—", "%", st && st.peak >= 90 ? "hot" : "");
 }
+/* a choice of waveforms is drawn, not spelt (after SHRUB; tablet note 21, 14 nov): one drawing a shape in the LFO graph's
+   stroke, the chosen one lit; only when every name is a shape it knows */
+const WAVE_D = { SIN: "M2 10C8-2 14-2 20 10S32 22 38 10", SINE: "M2 10C8-2 14-2 20 10S32 22 38 10", TRI: "M2 10L11 2L29 18L38 10",
+  SAW: "M2 18L20 2V18L38 2", "RAMP+": "M2 18L20 2V18L38 2", "RAMP-": "M2 2L20 18V2L38 18", SQR: "M2 18V2H20V18H38V2", SQUARE: "M2 18V2H20V18H38V2",
+  PULSE: "M2 18V2H10V18H38", "S&H": "M2 12H9V4H16V15H23V7H30V17H38", RND: "M2 12H9V4H16V15H23V7H30V17H38", NOISE: "M2 10L5 4L8 15L11 7L14 17L17 3L20 12L23 6L26 16L29 5L32 13L35 8L38 11" };
+const isWave = (d) => isEnum(d) && d.names.length >= 3 && d.names.length <= 6 && d.names.every((n) => WAVE_D[n]);
 function tileP(s, id, k, pt, tag = pt) {
   const d = desc(s, id); if (!d) return "";
   const v = val(s, id), key = keyOf(s, id), lv = devLive(S.folder, pt) ? " dev" : "", at = `style="--c:${KC[k]}${isChoice(d) ? "" : ";" + fillVars(d, v)}" data-cell="${key}" data-kk="${k}" data-title="${esc(pt)}" data-tag="${tag ? 1 : 0}"`;
   const top = `<span class="tt"><span class="tlb"><i></i>${esc(d.label)}</span>${tag ? `<span class="pg">${esc(pt)}</span>` : ""}</span>`;
   if (typeof isGo === "function" && isGo(d)) return `<button class="tp t-go${lv}" ${at} data-set="${key}" data-v="${d.max}"><span class="tt"><span class="tlb"><i></i>${esc(d.label)}</span></span><span class="tv">GO</span></button>`;   /* (RAND, BACK, SET A, SWAP…: an action) */
+  if (isWave(d)) return `<div class="tp t-wave${lv}" ${at}>${top}<span class="wvn">${esc(d.names[v - d.min] || "")}</span><div class="opts" role="radiogroup" aria-label="${esc(d.label)}">${d.names.map((n, i) => `<button role="radio" aria-checked="${i + d.min === v}" aria-label="${esc(n)}" data-set="${key}" data-v="${i + d.min}"><svg viewBox="0 0 40 20" aria-hidden="true"><path d="${WAVE_D[n]}"/></svg></button>`).join("")}</div></div>`;
   if (isOnOff(d)) { const on = v !== d.min;
     return `<button class="tp t-sw${on ? " on" : ""}${lv}" ${at} role="switch" aria-checked="${on}" data-set="${key}" data-v="${on ? d.min : d.max}" aria-label="${esc(d.label)}">${top}<span class="tv num">${valHtml(d, v)}</span><span class="knob" aria-hidden="true"></span></button>`; }
   const opts = () => d.names.map((n, i) => `<button role="radio" aria-checked="${i + d.min === v}" data-set="${key}" data-v="${i + d.min}">${esc(n)}</button>`).join("");

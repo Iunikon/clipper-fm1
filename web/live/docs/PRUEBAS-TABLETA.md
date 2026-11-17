@@ -4,7 +4,11 @@ Notas de Jorge al usar Clipper Live en la tableta con el FM-1 real, para corregi
 
 **Plan:** dejar estable la versión de tableta con estas notas y, después, revisar el celular.
 
-**Hechas el 17 de noviembre** (en la demo; falta probarlas en la tableta con el FM-1): 1, 3, 4, 5, 6, 8, 10, 11, 13, 14, 15, 16, 22, 25, 31 y 32. La 2 tiene un arreglo en la web que hay que probar con el sinte. Qué se hizo en cada una está en [`CHANGELOG.md`](CHANGELOG.md).
+**Hechas el 17 de noviembre** (en la demo; falta probarlas en la tableta con el FM-1): 1, 3, 4, 5, 6, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 20, 21, 22, 25, 26, 27, 28, 29, 30, 31 y 32. La 2 tiene un arreglo en la web que hay que probar con el sinte.
+
+**En parte:** 23 (el favicon de Live; los PNG de `web/` son del editor clásico del creador, no de Live), 24 (Reordenar en la Biblioteca; en Favoritos y USER el orden vive en el sinte) y 33 (Live pide horizontal al primer toque y el aviso ofrece «Ver en horizontal», que entra en pantalla completa y gira; el giro por CSS, sin pantalla completa, se dejó porque tuerce todos los arrastres y hay que probarlo en el aparato).
+
+**Necesitan firmware:** 7, 12, 19 y la parte de 24 en el sinte. Qué se hizo en cada una está en [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Resumen
 
@@ -18,7 +22,7 @@ Notas de Jorge al usar Clipper Live en la tableta con el FM-1 real, para corregi
 | 6 | Tableta | Las ayudas de la línea de estado, en un solo lugar | No | Hecha (17 nov) |
 | 7 | MIDI learn | No escucha un controlador conectado al FM-1 | Sí | |
 | 8 | Inglés | Textos que siguen en español | No | Hecha (17 nov) |
-| 9 | General | Pantalla encendida mientras haya actividad | No | |
+| 9 | General | Pantalla encendida mientras haya actividad | No | Hecha (17 nov) |
 | 10 | Carpetas | Quitar las líneas blancas bajo los títulos, en toda la app | No | Hecha (17 nov) |
 | 11 | Carpetas | Tarjetas de valor menos altas | No | Hecha (17 nov) |
 | 12 | EDIT > UNDO | Decir qué cambió en cada paso, y mostrar los de rehacer | Sí | |
@@ -26,23 +30,23 @@ Notas de Jorge al usar Clipper Live en la tableta con el FM-1 real, para corregi
 | 14 | Estudio > Sistema | El idioma en un selector, no en pestañas | No | Hecha (17 nov) |
 | 15 | GLO > SYSTEM | Más peso para LATE y PEAK junto a CPU | No | Hecha (17 nov) |
 | 16 | Estudio | Quitar el secuenciador avanzado repetido | No | Hecha (17 nov) |
-| 17 | Estudio > Biblioteca | Cada sonido en un solo renglón | No | |
-| 18 | Estudio > Proyectos | Cada ranura en un solo renglón | No | |
+| 17 | Estudio > Biblioteca | Cada sonido en un solo renglón | No | Hecha (17 nov) |
+| 18 | Estudio > Proyectos | Cada ranura en un solo renglón | No | Hecha (17 nov) |
 | 19 | Estudio | Los ajustes del sinte (HOME largo) desde la web | Sí | |
-| 20 | ENV, LFO | Una sola gráfica con pestañas ENV 1 · 2 · 3 y LFO 1 · 2 · 3 · 4 (idea de SHRUB) | No | |
-| 21 | Formas de onda | Elegir la forma de onda con dibujos, no con texto (idea de SHRUB) | No | |
+| 20 | ENV, LFO | Una sola gráfica con pestañas ENV 1 · 2 · 3 y LFO 1 · 2 · 3 · 4 (idea de SHRUB) | No | Hecha (17 nov) |
+| 21 | Formas de onda | Elegir la forma de onda con dibujos, no con texto (idea de SHRUB) | No | Hecha (17 nov) |
 | 22 | General | Aclarar los grises: con luz de día no se distinguen del negro | No | Hecha (17 nov) |
-| 23 | General | Cambiar el favicon: se parece mucho al logo de Microsoft | No | |
-| 24 | SAVE, Biblioteca, Favoritos | Reordenar los sonidos con un botón «Reordenar», sin chocar con el scroll (idea de SHRUB) | Para USER, sí | |
+| 23 | General | Cambiar el favicon: se parece mucho al logo de Microsoft | No | Hecha (17 nov): solo el favicon de Live |
+| 24 | SAVE, Biblioteca, Favoritos | Reordenar los sonidos con un botón «Reordenar», sin chocar con el scroll (idea de SHRUB) | Para USER, sí | Biblioteca hecha (17 nov); Favoritos y USER necesitan firmware |
 | 25 | SAVE | Juntar las dos filas de cada sonido para hacer menos scroll | No | Hecha (17 nov) |
-| 26 | SEQ > Completo | Menos botones y más visuales en la barra de herramientas y el piano roll | No | |
-| 27 | SEQ > Generar | Ordenar lo que hay dentro de cada pestaña y aprovechar el espacio | No | |
-| 28 | FX (página 1), EDIT (MACROS) | Los valores salen dos veces: dejar solo las barras verticales | No | |
-| 29 | Todas las páginas con gráfica | La gráfica a la izquierda y los valores a la derecha, en vez de una gráfica a todo lo ancho | No | |
-| 30 | FX > INSERT, EDIT | El valor suelto de la última página queda solo a todo lo ancho: juntarlo con los demás | No | |
+| 26 | SEQ > Completo | Menos botones y más visuales en la barra de herramientas y el piano roll | No | Hecha (17 nov) |
+| 27 | SEQ > Generar | Ordenar lo que hay dentro de cada pestaña y aprovechar el espacio | No | Hecha (17 nov) |
+| 28 | FX (página 1), EDIT (MACROS) | Los valores salen dos veces: dejar solo las barras verticales | No | Hecha (17 nov) |
+| 29 | Todas las páginas con gráfica | La gráfica a la izquierda y los valores a la derecha, en vez de una gráfica a todo lo ancho | No | Hecha (17 nov) |
+| 30 | FX > INSERT, EDIT | El valor suelto de la última página queda solo a todo lo ancho: juntarlo con los demás | No | Hecha (17 nov) |
 | 31 | FX > REVERB | Las 4 opciones del tiempo de reverb se cortan («…»): usar el selector con flechas y lista | No | Hecha (17 nov) |
 | 32 | SAVE | Sin la barra izquierda: SAVE solo para manejar sonidos | No | Hecha (17 nov) |
-| 33 | General | En vertical, mostrar la app en horizontal en vez del aviso «Gira el aparato» | No | |
+| 33 | General | En vertical, mostrar la app en horizontal en vez del aviso «Gira el aparato» | No | En parte (17 nov): falta el giro sin pantalla completa |
 
 ---
 

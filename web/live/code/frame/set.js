@@ -43,14 +43,14 @@ function mlToggle() {
   document.querySelectorAll(".lrn-t").forEach((x) => x.classList.remove("lrn-t")); renderWork();
 }
 /* learning: a tap picks the control instead of using it */
-const ML_SEL = "[data-fd],[data-cell],[data-act],[data-scn],.tl[data-tl]";
+const ML_SEL = "[data-fd],[data-cell],.mt[data-mt],[data-act],[data-scn],.tl[data-tl]";   /* (.mt: a bar of FX 1 / MACROS, its only control since 14 nov) */
 function mlPick(e) {
   if (!ML.on) return;
   const el = e.target.closest(ML_SEL); if (!el || e.target.closest("[data-mloff],.lrnbar,[data-act=learn],#mlb")) return;
   e.preventDefault(); e.stopPropagation();
   if (e.type !== "click") return;
   let t = null;
-  const key = el.dataset.fd || el.dataset.cell;
+  const key = el.dataset.fd || el.dataset.cell || el.dataset.mt;
   if (key) { const [s, id] = key.split(":").map(Number); t = { s, id }; }
   else if (el.dataset.act) t = el.dataset.act === "learn" ? null : { act: el.dataset.act };
   else if (el.dataset.scn != null) t = { scn: +el.dataset.scn };

@@ -15,6 +15,6 @@
   .bar { position: relative; }
   @media (max-height: 540px) { .lrnbar { bottom: calc(52px + env(safe-area-inset-bottom, 0px)); font-size: 12px; } .mlr { grid-template-columns: 130px minmax(0, 1fr) 40px; } }
   /* the bar's MIDI button: MIDI learn from anywhere; white while learning (and with links kept, its text brighter) */
-  .mlb b { font: 800 10px var(--sans); letter-spacing: .06em; }
+  .mlb b { font: 800 11px var(--sans); letter-spacing: .04em; }
   .bar .mlb[aria-pressed="true"], .bar .mlb[aria-pressed="true"]:hover { background: var(--tx); color: var(--page); }
   .mlb.has { color: var(--tx); }

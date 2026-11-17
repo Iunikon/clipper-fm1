@@ -88,3 +88,18 @@
   .gnc b small { font-family: var(--sans); font-size: 11px; color: var(--tx-3); letter-spacing: .04em; }
   .gnr .btn.pri { height: 44px; padding: 0 18px; }
   label.sqk { display: inline-flex; align-items: center; cursor: pointer; }
+  /* the advanced toolbar: families in grey boxes, no lines; icons beside the words (tablet note 26, 14 nov) */
+  .sqgp { display: flex; align-items: center; gap: 4px; padding: 4px; background: var(--panel); }
+  .sqgp .sqk { border: 0; }
+  .sqgp .gl { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--tx-3); padding: 0 4px 0 6px; }
+  .sqk.ki { display: inline-flex; align-items: center; gap: 6px; } .sqk.ki svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+  .sqk.ico { font-size: 20px; line-height: 1; }
+  /* Generar: its values in an even grid of cards, Generar / Deshacer fixed at the right (tablet note 27) */
+  .gnb { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; margin-top: 10px; align-items: stretch; }
+  .gnv { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .gnv > .gnc, .gnv > .sqk { background: var(--panel); padding: 8px 10px; justify-content: space-between; min-width: 0; }
+  .gnv > .sqk { height: auto; min-height: 44px; border: 0; }
+  .gnc .arw { justify-content: space-between; } .gnc b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .gna { display: flex; flex-direction: column; gap: 6px; justify-content: center; min-width: 180px; } .gna .btn.pri { height: 52px; }
+  @media (max-width: 900px) { .gnv { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-height: 540px) { .gnb { grid-template-columns: minmax(0, 1fr); } .gna { flex-direction: row; min-width: 0; } .gnv { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -2,6 +2,7 @@
 const sets = new Map();          /* key -> performance.now() of the last user change: the device's echo is not taken */
 const touched = (k) => performance.now() - (sets.get(k) || 0) < 600;
 function setVal(s, id, v) {
+  awakeBump();
   const d = desc(s, id); if (!d || !M.link) return;
   v = Math.max(d.min, Math.min(d.max, Math.round(v)));
   if (val(s, id) === v && !(s === 3 && isGo(d))) return;

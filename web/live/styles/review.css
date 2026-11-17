@@ -1,7 +1,7 @@
   .rot { display: none; }
   @media (orientation: portrait) and (max-width: 1100px) {
     .rot { display: grid; place-items: center; align-content: center; gap: 16px; position: fixed; inset: 0; z-index: 99; background: var(--page); color: var(--tx); text-align: center; padding: 24px; font-size: 15px; }
-    .rot svg { width: 64px; height: 64px; stroke: var(--tx); fill: none; stroke-width: 1.5; }
+    .rot svg { width: 64px; height: 64px; stroke: var(--tx); fill: none; stroke-width: 1.5; } .rot .btn { height: 52px; padding: 0 22px; margin-top: 8px; }
   }
   .lpx { width: auto !important; padding: 0 5px; background: var(--danger) !important; color: #000 !important; font-weight: 800; margin-left: 6px; }   /* removing the page: red with ⚠ */
   .pcs button { height: 44px; font-size: 13px; }   /* SEQ's note keys, finger-sized */
