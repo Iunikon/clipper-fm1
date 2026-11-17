@@ -1,6 +1,6 @@
   /* ---- the bar: the FM-1, the sound, where the device is, the mode */
   .bar { display: grid; grid-template-columns: 240px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 0 16px;
-    background: var(--panel); border-bottom: 1px solid var(--line); }
+    background: var(--panel); }
   .conn { display: flex; align-items: center; gap: 10px; min-width: 0; }
   .conn .dot { width: 8px; height: 8px; border-radius: 0; background: var(--ok); box-shadow: 0 0 0 3px rgba(30, 204, 112, .16); flex: none; }
   .conn.off .dot { background: var(--tx-3); box-shadow: none; }
@@ -31,8 +31,11 @@
   .seg button[aria-pressed="true"] { background: var(--tx); color: var(--page); }
 
 
-  /* the phone's «⋯» and its menu (screens/phone.css shows them) */
-  .bar .more, .morem[hidden] { display: none; }
-  .morem { position: fixed; top: 42px; right: 6px; z-index: 30; min-width: 200px; display: flex; flex-direction: column; padding: 4px; background: var(--panel); border: 1px solid var(--line-2); }
+  /* «⋯» and its menu: on the phone (13 nov) and the tablet (tablet note 4, 14 nov) MIDI learn, help and full screen
+     live there, so the bar does not crowd once the sound shows EDIT and Guardar; the desktop keeps them in the bar too */
+  .morem[hidden] { display: none; }
+  .bar .more { display: grid; place-items: center; font-size: 20px; line-height: 1; color: var(--tx); }
+  .bar #mlb, .bar #helpb, .bar #fs { display: none; }
+  .morem { position: fixed; top: 62px; right: 6px; z-index: 30; min-width: 200px; display: flex; flex-direction: column; padding: 4px; background: var(--panel); border: 1px solid var(--line-2); }
   .morem button { height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px; font-size: 13px; font-weight: 700; color: var(--tx); text-align: left; }
   .morem button:active { background: var(--press); } .morem .ms { font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }

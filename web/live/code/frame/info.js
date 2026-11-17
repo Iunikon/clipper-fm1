@@ -1,5 +1,5 @@
 /* ---- after SHRUB's editor (13 nov): every value can say what it does, its range and the MIDI CC that moves it; the
-   last change can be undone from anywhere; a status line says what state Live is in and what this folder takes.
+   last change can be undone from anywhere (⌘/Ctrl-Z, the «⋯» menu).
    Long press (the finger still on a card, 0.55 s) or a right click opens a value's sheet. */
 
 /* the CCs the FM-1 itself listens to on the sound's channel (firmware seq.c MIDI_CC_MAP and part_ctl_cc), by the
@@ -81,7 +81,7 @@ document.addEventListener("pointermove", (e) => { if (lp && Math.hypot(e.clientX
 document.addEventListener("click", (e) => { if (performance.now() - lpEat < 700 && e.target.closest("#edit")) { e.stopPropagation(); e.preventDefault(); lpEat = 0; } }, true);
 document.addEventListener("contextmenu", (e) => { const t = e.target.closest("#edit .tp[data-cell]"); if (!t) return; e.preventDefault(); if (performance.now() - lpEat > 700) infoOfTile(t); });
 
-/* undo the last change: ⌘/Ctrl-Z, the status line's button and the phone's «⋯» */
+/* undo the last change: ⌘/Ctrl-Z and the «⋯» menu */
 /* the change a button showed, not whatever came after it (the synth can change values meanwhile) */
 function undoLast(x = LOG[0]) {
   const i = LOG.indexOf(x), d = x && desc(x.s, x.id); if (i < 0) return;
@@ -95,27 +95,14 @@ document.addEventListener("keydown", (e) => {
   e.preventDefault(); undoLast();
 });
 
-/* the status line (tablet and desktop; on the phone the «⋯» menu says it): the state, what this folder takes, undo */
-const STL_HINT = {
-  LIVE: "Arrastra de lado sobre una tarjeta. Mantén el dedo en una: qué hace y su CC.",
-  SEQ: "Toca un paso para editarlo abajo. ‹ › nudge, F fill, L lock.",
-  REC: "PLAY y REC mandan el transporte del FM-1.",
-  SAVE: "Toca un sonido para escucharlo. Guardar lo escribe en una ranura USER.",
-  ESTUDIO: "Cada acción dice si escribe en el FM-1 o se queda en este navegador.",
-};
-const stlHint = () => STL_HINT[S.folder] || "Arrastra de lado para cambiar un valor. Doble toque: como se cargó. Mantén el dedo: qué hace y su CC.";
+/* the connection state, for the «⋯» menu where the bar does not show it (the phone, a narrow tablet). The status line
+   of 13 Nov is gone (tablet notes 3, 5, 6, 14 Nov): it said «Conectado» twice and the help twice */
 function stlState() {
   if (!M.link) return ["off", "Sin conectar"];
   if (document.body.classList.contains("mute")) return ["mute", "No contesta: revisa el cable"];
   return M.mock ? ["demo", "Demo: un FM-1 de ejemplo, no suena"] : ["on", "Conectado"];
 }
-function stlHtml() {
-  const [k, t] = stlState(), x = LOG[0], d = x && desc(x.s, x.id);
-  return `<span class="st0 ${k}"><i></i><b>${esc(t)}</b></span><span class="st1">${esc(stlHint())}</span>`
-    + (d ? `<button class="stu" data-stundo="1" data-k="${x.n}"><svg class="i"><use href="#i-undo"/></svg>${esc("Deshacer")} <b>${esc(d.label)}</b></button>` : "");
-}
-setInterval(() => { const el = $("stl"); if (!el || el.offsetParent === null) return; const h = stlHtml(); if (el._h !== h) { el._h = h; el.innerHTML = h; trNode(el); } }, 400);
 const undoOfKey = (k) => LOG.find((x) => String(x.n) === k);
-document.addEventListener("click", (e) => { const b = e.target.closest("[data-stundo],[data-moreundo]"); if (!b) return;
+document.addEventListener("click", (e) => { const b = e.target.closest("[data-moreundo]"); if (!b) return;
   const x = undoOfKey(b.dataset.k); if (x) undoLast(x); else toast(-1, esc(trUi("Ese cambio ya no está")));
   if (typeof moreOpen === "function") moreOpen(false); });

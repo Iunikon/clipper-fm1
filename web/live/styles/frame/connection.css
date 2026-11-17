@@ -32,3 +32,4 @@
   .favs:empty::after { content: "Sin favoritos todavía. Marca el sonido con la estrella."; display: block; padding: 12px 8px; color: var(--tx-3); font-size: 13px; line-height: 1.4; }
   .conn button { color: var(--tx-2); font-size: 12px; text-decoration: underline; text-underline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { .bx.flash, .tp.flash, .tp.hot, .tl.hot, .ro.hot, .work.fade > *, .tap.pulse, .ib.pop svg, .live2 { animation: none !important; } }
+  :lang(en) .favs:empty::after { content: "No favourites yet. Mark the sound with the star."; }   /* (CSS text the translator does not reach) */

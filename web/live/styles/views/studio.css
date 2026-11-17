@@ -1,6 +1,6 @@
   /* ==== ESTUDIO inside: the editor over the whole work area ==== */
   .stu { display: flex; flex-direction: column; height: 100%; }
-  .stub { display: flex; align-items: center; gap: 14px; padding: 8px 16px; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--tx-2); }
+  .stub { display: flex; align-items: center; gap: 14px; padding: 8px 16px; background: var(--panel); font-size: 13px; color: var(--tx-2); }
   .stub > b { font-size: 16px; color: var(--tx); } .stub .more { margin-left: auto; }
   #stuf { flex: 1; width: 100%; border: 0; background: #fff; }
   .chs { display: flex; align-items: center; gap: 6px; padding: 0 16px 8px; flex-wrap: wrap; } .chs:empty { display: none; }
@@ -21,7 +21,7 @@
 
   /* ==== ESTUDIO, Live's own: tabs, then the tab ==== */
   .stv { display: flex; flex-direction: column; gap: 14px; }
-  .stt { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, auto); gap: 4px; border-bottom: 2px solid var(--line-2); padding-bottom: 8px; }
+  .stt { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, auto); gap: 4px; padding-bottom: 4px; }
   .stt button { height: 44px; padding: 0 10px; white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--tx-2); background: var(--panel); border: 1px solid var(--line); }
   .stt button svg { width: 16px; height: 16px; } .stt button[aria-current="true"] { background: var(--k1); color: #000; border-color: var(--k1); }
   .stt[aria-label="SEQ"] button[aria-current="true"] { background: var(--tx); color: var(--page); border-color: var(--tx); }
@@ -38,7 +38,7 @@
   .sqmidi { display: grid; gap: 1px; max-height: 420px; overflow-y: auto; background: var(--page); border: 1px solid var(--line); padding: 4px; }
   .mr, .mhd { display: grid; grid-template-columns: 40px repeat(var(--cols), minmax(0, 1fr)); gap: 1px; }
   .mhd { position: sticky; top: 0; background: var(--page); z-index: 1; } .mhd span { font-size: 11px; color: var(--tx-3); }
-  .mr.bk .mc { background: #111114; } .mr.c { border-bottom: 1px solid var(--line-2); }
+  .mr.bk .mc { background: var(--panel); } .mr.c { border-bottom: 1px solid var(--line-2); }
   .mn { font-size: 13px; color: var(--tx-3); align-self: center; text-align: right; padding-right: 6px; }
   .mc { height: 16px; background: var(--raised); border: 0; padding: 0; min-width: 0; }
   .mc.beat { box-shadow: inset 2px 0 0 var(--line-2); } .mc.on { background: var(--k1); } .mc.tie { background: rgba(40, 124, 255, .45); }
@@ -57,7 +57,7 @@
   .ci.ed { animation: none; } .ci.ed > :first-child { outline: 2px dashed var(--k1); }
   .lockb svg { width: 16px; height: 16px; } .lockb.on { background: var(--k3); color: #000; border-color: var(--k3); }
   body.locked .nav .nb:not([aria-current="page"]) { opacity: .3; }
-  .langq { display: flex; flex-direction: column; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--line-2); } .langq b { font-size: 14px; color: var(--tx-2); }
+  .langq { display: flex; flex-direction: column; gap: 10px; padding-bottom: 6px; } .langq b { font-size: 14px; color: var(--tx-2); }
   .langq div, .syl { display: flex; gap: 8px; align-items: center; } .langq .btn, .syl .btn { flex: 1; height: 48px; } .syl { margin-top: 12px; } .syl span { font-size: 13px; color: var(--tx-2); width: 160px; }
   .syl .btn.pri { background: var(--tx); color: var(--page); }
 
@@ -73,7 +73,7 @@
   /* the header's tools: one strip at the right of the title */
   .qtools { margin-left: auto; display: flex; border: 1px solid var(--line-2); }
   .qtools button { height: 40px; padding: 0 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--tx-2); background: var(--panel); }
-  .qtools button + button { border-left: 1px solid var(--line-2); } .qtools button svg { width: 16px; height: 16px; }
+  .qtools { gap: 2px; } .qtools button svg { width: 16px; height: 16px; }
   .qtools button.on { background: var(--k3); color: #000; } .qtools [data-lock].on { background: var(--tx); color: var(--page); }
   body:has(.qtools [data-lock].on) .follow { opacity: .4; }   /* with the lock on, the lock wins */ .qtools button.pri { background: var(--tx); color: var(--page); }
   .qtools button:active { background: var(--press); }
@@ -123,7 +123,7 @@
   .ltg span { padding: 2px 8px; border: 1px solid var(--line-2); color: var(--tx-2); font-size: 12px; }
   .lrow .dva { display: flex; gap: 6px; }
   .lrow .dva .btn, .lrow .dva .dsc { padding: 0 12px; cursor: pointer; }
-  .lsl { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .lsl { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; padding-top: 4px; }
   .lsl > .c { grid-column: 1 / -1; color: var(--tx-3); font-size: 13px; }
   .lsl .btn { height: 52px; flex-direction: column; gap: 2px; cursor: pointer; }
   .lsl .btn small { font-size: 11px; color: var(--tx-3); font-weight: 500; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -139,3 +139,4 @@
   .svm .tool b { font-size: 28px; }
   .svm .tool span { font-size: 15px; }
 
+  .syl .btn.sylang { flex: 0 1 260px; justify-content: space-between; padding: 0 14px; } .sylang svg { width: 16px; height: 16px; }   /* (the language: a list, tablet note 14) */

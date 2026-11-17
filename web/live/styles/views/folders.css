@@ -2,14 +2,14 @@
   .pgs { display: flex; flex-direction: column; gap: 18px; }
   .pgx { display: flex; flex-direction: column; gap: 8px; }
   .pgx.dev .pgh h3 { color: var(--tx); }
-  .pgh { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line-2); padding-bottom: 6px; }
+  .pgh { display: flex; align-items: center; gap: 10px; padding-bottom: 4px; }
   .pgh h3 { font-size: 16px; font-weight: 800; letter-spacing: .04em; color: var(--tx-2); }
   .pgr { height: 220px; display: flex; min-height: 0; }
   .pgr.tall { height: 300px; }
   .pgr > .gr { flex: 1; margin: 0; }
   .pgr.g-meters, .pgr.g-meters > .gr { background: var(--panel); }
   .prow { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 8px; }
-  .prow .tp, .ci .tp { grid-column: auto; grid-row: auto; min-height: 128px; height: 100%; }
+  .prow .tp, .ci .tp { grid-column: auto; grid-row: auto; min-height: 100px; height: 100%; }   /* (lower: tablet note 11) */
   .tp.t-go { cursor: pointer; justify-content: space-between; } .tp.t-go .tv { font-size: 32px; line-height: 32px; color: var(--tx-2); }
   .tp.t-go:active { background: var(--tx); } .tp.t-go:active .tv, .tp.t-go:active .tlb { color: #000; }
   /* the device's other graphs: text and bars, in Terminus */

@@ -4,9 +4,9 @@
      FM-1; white is what is selected or being touched; orange marks a favourite, as on the device. */
   @font-face { font-family: "Terminus"; src: url(__FONT__) format("truetype"); }
   :root {
-    --page: #000; --panel: #0d0d0f; --raised: #17171a; --press: #202024;
-    --line: #232327; --line-2: #66666e;
-    --tx: #f2f2f3; --tx-2: #a4a4ad; --tx-3: #8a8a95;
+    --page: #000; --panel: #1a1a1e; --raised: #26262b; --press: #303036;   /* (lighter steps, 14 nov: in daylight the old */
+    --line: #3a3a40; --line-2: #6e6e76;                                   /*  #0d0d0f / #17171a read as black; always */
+    --tx: #f2f2f3; --tx-2: #b0b0b8; --tx-3: #9a9aa4;                     /*  these, no «day mode»: tablet note 22) */
     --k1: #287cff; --k2: #1ecc70; --k3: #ffc618; --k4: #ff621a; --fav: #ff621a; --kind: #1ecc70; --eng: #6ea8ff; --kind-d: #0a6b36; --eng-d: #1a4fc4; --ok: #1ecc70; --studio: #287cff; --danger: #ff2c34; --fav-d: #b04008; --tx-ink: #55555c; --studio-hi: #4a92ff;
     --sans: system-ui, Roboto, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     --num: "Terminus", ui-monospace, monospace;

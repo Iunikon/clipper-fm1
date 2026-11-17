@@ -57,6 +57,8 @@ npx vercel@latest deploy --prod --yes
 
 ## Pendientes, en orden
 
+> **Lo siguiente:** las 33 notas de la prueba en la tableta con el FM-1 real, en [`PRUEBAS-TABLETA.md`](PRUEBAS-TABLETA.md). El plan es dejar estable la tableta con ellas y después revisar el celular.
+
 1. **Flashear el firmware con CURSOR** en el FM-1 (`sh build.sh` -> `build/felucca.fwsc`) y probar la sincronía de pasos en los dos sentidos: tocar un paso en Live lo selecciona en el sinte, y moverlo en el sinte lo marca en Live. La lista está en [`TESTING.md`](TESTING.md).
 2. **Probar con el FM-1 real lo de hoy:**
    - que el CC de cada ficha mueva de verdad ese valor (CUT 74, RES 71, GLD 5, LVL 7, macros 16–19…);

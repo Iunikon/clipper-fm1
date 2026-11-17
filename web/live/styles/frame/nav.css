@@ -1,5 +1,5 @@
   /* ---- the families: the device's buttons */
-  .nav { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)) minmax(0, 1.3fr); background: var(--panel); border-top: 1px solid var(--line); padding: 6px 8px; gap: 4px; }
+  .nav { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)) minmax(0, 1.3fr); background: var(--panel); padding: 6px 8px; gap: 4px; }
   .nb { border-radius: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--tx-3);
     font-size: 11px; font-weight: 600; letter-spacing: .04em; position: relative; transition: background .15s var(--ease), color .15s var(--ease); }
   .nb:hover { color: var(--tx-2); background: var(--raised); }
@@ -26,12 +26,12 @@
     background: var(--panel); border: 1px solid var(--line-2); border-radius: 0; z-index: 8; display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
     box-shadow: 0 24px 64px rgba(0, 0, 0, .7), 0 4px 12px rgba(0, 0, 0, .5); opacity: 0; pointer-events: none; transition: opacity .2s var(--ease), transform .2s var(--ease); }
   .br.on { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
-  .brh { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 20px; border-bottom: 1px solid var(--line); }
+  .brh { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 20px; }
   .brh h2 { font-size: 16px; font-weight: 600; }
   .brh .c { color: var(--tx-3); font-size: 13px; }
   .brh .ib { margin-left: auto; }
   .brb { display: grid; grid-template-columns: 200px minmax(0, 1fr); min-height: 0; }
-  .kinds { border-right: 1px solid var(--line); padding: 8px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+  .kinds { padding: 8px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
   .kd { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 44px; padding: 0 12px; border-radius: 0;
     color: var(--tx-2); font-weight: 600; font-size: 13px; letter-spacing: .02em; transition: background .15s var(--ease), color .15s var(--ease); }
   .kd:hover { background: var(--raised); color: var(--tx); }
@@ -52,7 +52,7 @@
   .sd[aria-current="true"] { background: var(--tx); color: var(--page); }
   .sd[aria-current="true"] .m, .sd[aria-current="true"] .x { color: var(--tx-ink); }
   .sd[aria-current="true"] .m .k { color: var(--kind-d); } .sd[aria-current="true"] .m .e { color: var(--eng-d); }
-  .brf { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; border-top: 1px solid var(--line); color: var(--tx-3); font-size: 12px; }
+  .brf { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; color: var(--tx-3); font-size: 12px; }
   .brf .alg { display: flex; gap: 6px; }
   .brf .btn { height: 44px; padding: 0 14px; }
   @media (max-width: 1100px) { .body { grid-template-columns: 0 minmax(0, 1fr) 220px; } .rail.l { display: none; } .bar { grid-template-columns: auto minmax(0, 1fr) auto; } .where { display: none; } }

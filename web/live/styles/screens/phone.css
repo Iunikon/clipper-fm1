@@ -136,7 +136,7 @@
     .bar { display: flex !important; align-items: center; gap: 4px; padding: 0 8px; }
     .bar .snd { flex: 0 1 auto; min-width: 0; } .bar .right { margin-left: auto; gap: 4px; }
     .bar #saveb, .bar #tmp, .bar .cpu, .bar #mlb, .bar #favh, .bar #helpb, .bar #fs, .bar .where, .bar .follow, .bar #lrh, .bar .conn { display: none !important; }
-    .bar .more { display: grid; place-items: center; font-size: 20px; line-height: 1; color: var(--tx); }
+    .morem { top: 42px; }
     .trn button { height: 32px; padding: 0 10px; }
 
     /* the start: Conectar, the demo */

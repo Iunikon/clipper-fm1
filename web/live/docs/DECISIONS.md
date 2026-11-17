@@ -77,14 +77,18 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 
 ## 4. Sistema visual
 
+**Sin líneas divisorias (15 de noviembre).** Ni horizontales ni verticales: ni bajo los títulos de página o de bloque, ni entre grupos de botones, ni entre la barra, los rieles y el trabajo. Lo que va junto se agrupa en un cuadro gris (`--panel` o `--raised`). Se quedan las líneas que se leen como dato: el cero de un valor bipolar, el tiempo fuerte cada 4 pasos y la fila del Do en el piano roll.
+
+**Opciones en fila solo si caben.** Un valor de hasta 4 opciones va en fila (`t-seg`) solo si todos sus nombres tienen 5 letras o menos; si no, selector con ◀ ▶ y lista (`t-arr`), para que nada se corte con «…» (nota 31).
+
 **Tokens** (`styles/base.css`, `:root`):
 
 | Token | Valor | Uso |
 |---|---|---|
 | `--page` | `#000` | Fondo. Negro puro: escenario, penumbra. |
-| `--panel` / `--raised` / `--press` | `#0d0d0f` / `#17171a` / `#202024` | Paneles, controles, pulsado. |
-| `--line` / `--line-2` | `#232327` / `#34343a` | Bordes. |
-| `--tx` / `--tx-2` / `--tx-3` | `#f2f2f3` / `#a4a4ad` / `#8a8a95` | Texto. `--tx-3` ≥ 4.5:1 sobre `--panel`. |
+| `--panel` / `--raised` / `--press` | `#1a1a1e` / `#26262b` / `#303036` | Paneles, controles, pulsado. Más claros desde el 14 de noviembre: con luz de día los de antes (`#0d0d0f`…) se veían negros. **Siempre así, sin modo «Día».** |
+| `--line` / `--line-2` | `#3a3a40` / `#6e6e76` | Bordes de cuadro (no líneas divisorias). |
+| `--tx` / `--tx-2` / `--tx-3` | `#f2f2f3` / `#b0b0b8` / `#9a9aa4` | Texto. `--tx-3` ≥ 4.5:1 sobre `--panel`. |
 | `--k1`…`--k4` | `#287cff` `#1ecc70` `#ffc618` `#ff621a` | Los 4 knobs del FM-1. |
 | `--fav` | `#ff621a` | Favorito, editado, Guardar con cambios. |
 | `--kind` / `--eng` | `#1ecc70` / `#6ea8ff` | Tipo de sonido (verde) y motor (azul). |

@@ -1,14 +1,15 @@
-/* ---- the phone's «⋯» (13 nov): its bar keeps the sound, the favourite and PLAY / REC; the rest of the bar (Save, the
-   favourites panel, MIDI learn, help, full screen, Seguir) is in this menu. Each item taps the bar's own button, hidden
-   on the phone, so the behaviour stays in one place */
+/* ---- «⋯» (the phone, 13 nov; the tablet too, 14 nov): undo the last change, then whatever of the bar is hidden on
+   this screen (the phone: Save, the favourites panel, MIDI learn, help, full screen, Seguir; the tablet: MIDI learn,
+   help, full screen). Each item taps the bar's own button, so the behaviour stays in one place. The connection state
+   heads it where the bar does not show it */
 const MORE = [["saveb", "Guardar"], ["favh", "Favoritos"], ["mlb", "MIDI learn"], ["helpb", "Cómo se toca"], ["fs", "Pantalla completa"], ["follow", "Seguir al sinte"]];
 function moreOpen(on) {
   const m = $("morem"), b = $("more"); if (!m || !b) return;
   if (on) {
-    const x = LOG[0], d = x && desc(x.s, x.id), [sk, stx] = stlState();
-    m.innerHTML = `<p class="mst ${sk}"><i></i>${esc(stx)}</p>`
+    const x = LOG[0], d = x && desc(x.s, x.id), [sk, stx] = stlState(), connShown = $("conn") && $("conn").offsetParent && getComputedStyle($("conn").querySelector("div")).display !== "none";
+    m.innerHTML = (connShown ? "" : `<p class="mst ${sk}"><i></i>${esc(stx)}</p>`)
       + (d ? `<button role="menuitem" data-moreundo="1" data-k="${x.n}">${esc("Deshacer")}<span class="ms">${esc(d.label)}</span></button>` : "")
-      + MORE.filter(([id]) => $(id) && !$(id).hidden).map(([id, t]) => {
+      + MORE.filter(([id]) => $(id) && !$(id).hidden && getComputedStyle($(id)).display === "none").map(([id, t]) => {
       const el = $(id), st = el.getAttribute("aria-pressed");
       return `<button role="menuitem" data-more="${id}">${esc(trUi(t))}${st != null && id !== "favh" ? `<span class="ms">${st === "true" ? "ON" : "OFF"}</span>` : ""}</button>`;
     }).join("");

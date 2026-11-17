@@ -7,7 +7,7 @@
   .sqk:active { background: var(--press); } .sqk:disabled { opacity: .4; }
   .sqk.on { background: var(--tx); color: var(--page); border-color: var(--tx); }
   .sqk[data-arm="1"] { background: var(--fav); border-color: var(--fav); color: #000; }
-  .sqsep { width: 1px; height: 28px; background: var(--line-2); margin: 0 4px; }
+  .sqsep { width: 0; height: 28px; margin: 0 6px; }   /* (a gap between groups, no line: tablet note 10) */
   .sqrg { display: flex; flex-direction: column; padding: 0 6px; } .sqrg small { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--tx-3); }
   .sqrg b { font-family: var(--num); font-size: 16px; font-weight: 400; -webkit-font-smoothing: none; }
   .sqpg { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding-bottom: 10px; }
@@ -19,7 +19,7 @@
   .sq .mk.nud { right: 4px; color: var(--k3); } .sq .mk.fil { right: 16px; color: var(--k2); } .sq .mk.lck { right: 28px; color: var(--k4); }
   /* piano roll */
   .sqroll { border: 1px solid var(--line); background: var(--panel); margin-bottom: 12px; }
-  .pro { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid var(--line); }
+  .pro { display: flex; align-items: center; gap: 10px; padding: 8px; }
   .pro .num { font-family: var(--num); font-size: 16px; color: var(--tx-2); -webkit-font-smoothing: none; }
   .prg { display: grid; }
   .prr { display: grid; grid-template-columns: 48px repeat(var(--cols), minmax(0, 1fr)); gap: 2px; padding: 1px 8px 1px 0; }
@@ -27,7 +27,7 @@
   .prn { align-self: center; text-align: right; padding-right: 8px; font-family: var(--num); font-size: 16px; color: var(--tx-3); -webkit-font-smoothing: none; }
   .prc { height: 34px; background: var(--raised); border: 0; }
   .prc.beat { box-shadow: inset 2px 0 0 var(--line-2); }
-  .prc.rg { background: #232329; }
+  .prc.rg { background: var(--press); }
   .prc.sel { outline: 1px solid var(--tx-3); outline-offset: -1px; }
   .prc.on { background: var(--k1); }
   /* carriles */
@@ -46,7 +46,7 @@
   /* the step: nudge, fill, locks */
   .sqk.ico { width: 44px; padding: 0; display: grid; place-items: center; } .sqk.ico svg { width: 20px; height: 20px; }
   .sqe .sqd { grid-column: 1 / -1; }   /* the step editor is a 3-column grid: this row spans it */
-  .sqd { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 16px; align-items: start; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .sqd { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 16px; align-items: start; margin-top: 12px; padding-top: 4px; }
   .sqdi, .sqdl { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
   .sqd small { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--tx-3); }
   .sqdi b { font-family: var(--num); font-size: 32px; line-height: 32px; font-weight: 400; -webkit-font-smoothing: none; } .sqdi b small { font-size: 16px; margin-left: 2px; }
@@ -57,7 +57,7 @@
   .lk.arm { background: var(--fav); color: #000; } .lk.arm .x { color: #000; }
   .lks .c { font-size: 12px; color: var(--tx-3); }
   /* patterns on the tablet */
-  .sqlib { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .sqlib { margin-top: 16px; padding: 12px; background: var(--raised); }   /* (a grey box, no line: tablet notes 10, 27) */
   .sqlib .sqlh b { font-size: 13px; }
   .lib { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; }
   .lbi { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-rows: auto auto; gap: 2px 6px; align-items: center; padding: 8px 10px; background: var(--panel); border: 1px solid var(--line); }
@@ -78,7 +78,7 @@
   .upb { grid-column: 1 / -1; height: 6px; background: var(--page); position: relative; } .upb i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--k1); }
   .dvs.busy { border-color: var(--k1); }
   label.btn { cursor: pointer; }
-  .sqgen { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .sqgen { margin-top: 16px; padding: 12px; background: var(--raised); }
   .sqgen .sqlh b, .gnm { font-size: 13px; }
   .gnr { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-top: 10px; }
   .gnc { display: flex; flex-direction: column; gap: 4px; }

@@ -30,7 +30,7 @@ styles/screens/pc.css
 styles/interactions.css
 styles/performance.css
 styles/review.css
-styles/frame/status.css
+styles/frame/info.css
 styles/screens/desktop.css
 styles/screens/phone.css
 

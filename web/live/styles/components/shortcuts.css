@@ -9,7 +9,7 @@
   .tl { background: var(--panel); border: 1px solid var(--line); border-radius: 0; padding: 12px; display: flex; flex-direction: column; gap: 10px;
     min-height: 124px; position: relative; overflow: hidden; transition: border-color .15s var(--ease), background .15s var(--ease); min-width: 0; }
   .tl::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--c); opacity: 0; transition: opacity .15s var(--ease); }
-  .tl.on { background: #121216; border-color: var(--line-2); }
+  .tl.on { background: var(--raised); border-color: var(--line-2); }
   .tl.on::before { opacity: 1; }
   .tl.hot { border-color: var(--c); animation: flash 1.2s var(--ease); }
   .tl { padding: 0; gap: 0; }

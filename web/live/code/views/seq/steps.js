@@ -19,7 +19,8 @@ async function sqLoad() {
       const n = M.info.nstep, out = [];
       for (let i = 0; i < n; i++) out.push(P.step(await rq(C.STEP_GET, [i])));
       SQ.steps = out; SQ.loaded = true;
-      const lastOn = out.slice(0, sqLen()).filter(sqOn).pop(); if (lastOn) SQ.last = lastOn.notes[0];   /* (a new note: the pattern's) */
+      const lastOn = out.slice(0, sqLen()).filter(sqOn).pop();   /* (a new note: the pattern's, in the synth's octave) */
+      SQ.oct = sqSynthC(); SQ.last = Math.min(127, SQ.oct + (lastOn ? lastOn.notes[0] : SQ.last) % 12);
       const p = await rq(C.PLAY); sqPlayFrom(p);
       try { const c = await rq(C.CURSOR, [], { quiet: true, retries: 0, timeout: 500 }); SQ.noCursor = false; if (c.length && c[0] < out.length) { SQ.sel = SQ.r0 = SQ.r1 = c[0]; SQ.page = Math.floor(c[0] / 16); } }
       catch (e) { if (e.message !== "closed") SQ.noCursor = true; }   /* (a firmware without CURSOR: never asked again, nothing waits for it) */
@@ -41,6 +42,22 @@ function sqPlayBtn(b) { b.classList.toggle("on", SQ.playing); b.setAttribute("ar
 async function sqStepChanged(i) {
   if (!SQ.loaded || i >= SQ.steps.length) return;
   try { SQ.steps[i] = P.step(await rq(C.STEP_GET, [i])); sqPaint(i); } catch (e) { /* (a RELOAD reads them all) */ }
+  sqAskCursor();
+}
+/* a step written on the synth (step entry: the cursor moves on as the keys are let go) asks where the cursor is now, so
+   the tablet marks the synth's step even if the CURSOR push went missing (tablet note 2, 14 nov) */
+function sqAskCursor() {
+  if (!M.link || SQ.noCursor) return;
+  clearTimeout(SQ.askT);
+  SQ.askT = setTimeout(() => rq(C.CURSOR, [], { key: "cursor?", quiet: true, retries: 0, timeout: 500 })
+    .then((a) => { if (a.length) sqFromDevice(a[0]); }).catch(() => {}), 120);
+}
+/* the synth's keys: OCT − / + (STATE's oct, -3..3) puts the lowest key's C at 48 + 12 x oct. New notes and the piano
+   roll start there, and follow it when OCT changes (tablet note 1, 14 nov) */
+const sqSynthC = () => Math.max(0, Math.min(115, 48 + 12 * ((M.state && M.state.oct) | 0)));
+function sqSynthOct() {
+  const c = sqSynthC(); SQ.oct = c; SQ.last = Math.min(127, c + (SQ.last % 12));
+  if (SQ.loaded && (S.folder === "SEQ" || S.folder === "ESTUDIO")) renderWork();
 }
 
 /* a step to the device: the whole of it, the reply is what it keeps */

@@ -34,8 +34,8 @@ function setX(id, v) {
 /* the device's state, every 1.5 s: CPU, LATE, PEAK, the scale's notes, REC */
 async function pollState() {
   if (!M.link || !M.info || document.hidden) return;
-  try { const st = P.state(await rq(C.STATE, [], { key: "state", quiet: true, retries: 0, timeout: 500 })); const scaleCh = !M.state || M.state.scale !== st.scale;
-    M.state = st; M.rec = st.rec; renderTransport(); if (scaleCh && (S.folder === "SEL")) renderWork(); if (S.folder === "REC") paintRec(); } catch (e) { /* (an older firmware: no STATE) */ }
+  try { const st = P.state(await rq(C.STATE, [], { key: "state", quiet: true, retries: 0, timeout: 500 })); const scaleCh = !M.state || M.state.scale !== st.scale, octCh = M.state && M.state.oct !== st.oct;
+    M.state = st; M.rec = st.rec; renderTransport(); if (octCh) sqSynthOct(); if (scaleCh && (S.folder === "SEL")) renderWork(); if (S.folder === "REC") paintRec(); } catch (e) { /* (an older firmware: no STATE) */ }
 }
 setInterval(pollState, 1500);
 

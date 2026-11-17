@@ -1,15 +1,14 @@
 /* ----------------------------------------------------------------- studio --- */
-/* ESTUDIO, Live's own: what the device's pages do not reach, in tabs. The advanced sequencer (seq.js, its full mode),
-   the samples, drum kits, library and projects (bento.js devView), the complete backup (BK_LIST / BK_GET / BK_PUT and
+/* ESTUDIO, Live's own: what the device's pages do not reach, in tabs (the advanced sequencer lives in SEQ > Avanzado
+   only, since 14 nov: tablet note 16). The samples, drum kits, library and projects (bento.js devView), the complete backup (BK_LIST / BK_GET / BK_PUT and
    the sample slots, as editor.html backupCapture / backupRestore: the same file, either way), the system */
-const STU = { tab: "seq", busy: false, prog: 0, msg: "" };
-const STABS = [["seq", "Secuenciador avanzado", "seq"], ["hy", "HYBRID", "edit"], ["SMP", "Samples", "save"], ["LIB", "Biblioteca", "save"],
+const STU = { tab: "hy", busy: false, prog: 0, msg: "" };
+const STABS = [["hy", "HYBRID", "edit"], ["SMP", "Samples", "save"], ["LIB", "Biblioteca", "save"],
   ["PRJ", "Proyectos", "save"], ["bak", "Copia de seguridad", "save"], ["sys", "Sistema", "glo"]];
 function studioView() {
   const t = STU.tab;
   let body;
-  if (t === "seq") { SQ.full = true; body = seqBlock(); }
-  else if (t === "hy") body = hyView();
+  if (t === "hy") body = hyView();
   else if (t === "bak") body = backupView();
   else if (t === "sys") body = systemView();
   else body = devView(t);

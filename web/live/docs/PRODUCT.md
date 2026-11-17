@@ -15,7 +15,7 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** con el f
 
 ## Reglas que no se tocan
 
-- Fondo **negro**, todo **cuadrado** (`--r: 0`).
+- Fondo **negro**, todo **cuadrado** (`--r: 0`). Los grises de paneles y textos, lo bastante claros para leerse con luz de día (14 nov), siempre. **Sin líneas divisorias:** lo que va junto, en un cuadro gris.
 - **Terminus** (la bitmap del FM-1, embebida) para números y valores, a tamaños de su retícula.
 - **El color de un parámetro es el del knob que lo gira en el FM-1:** K1 azul `#287cff`, K2 verde `#1ecc70`, K3 amarillo `#ffc618`, K4 naranja `#ff621a`.
 - **Los colores con significado comparten tono con los knobs y se separan con forma, no con otro tono:** favorito ★, editado con la etiqueta **EDIT**, tipo de sonido en mayúsculas y en verde (sin recuadro: no casaba con nada más), Estudio con su icono, peligro con ⚠, candado 🔒.

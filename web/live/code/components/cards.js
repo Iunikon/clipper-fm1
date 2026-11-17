@@ -15,6 +15,12 @@ function readout(s, id, k) {
 }
 
 /* a parameter's tile, by what it is */
+/* GLO > SYSTEM's CPU card: CPU, LATE and PEAK at the same weight (tablet note 15), red from 90 %; transport.js repaints it
+   with each STATE */
+function cpu3Html() {
+  const st = M.state, c = (l, v, u, cls = "") => `<div class="${cls}"><span class="l">${l}</span><b class="num">${v}${u && st ? `<small>${u}</small>` : ""}</b></div>`;
+  return c("CPU", st ? st.cpu : "—", "%", st && st.cpu >= 90 ? "hot" : "") + c("LATE", st ? st.late : "—", "", st && st.late > 0 ? "warn" : "") + c("PEAK", st ? st.peak : "—", "%", st && st.peak >= 90 ? "hot" : "");
+}
 function tileP(s, id, k, pt, tag = pt) {
   const d = desc(s, id); if (!d) return "";
   const v = val(s, id), key = keyOf(s, id), lv = devLive(S.folder, pt) ? " dev" : "", at = `style="--c:${KC[k]}${isChoice(d) ? "" : ";" + fillVars(d, v)}" data-cell="${key}" data-kk="${k}" data-title="${esc(pt)}" data-tag="${tag ? 1 : 0}"`;
@@ -24,10 +30,10 @@ function tileP(s, id, k, pt, tag = pt) {
     return `<button class="tp t-sw${on ? " on" : ""}${lv}" ${at} role="switch" aria-checked="${on}" data-set="${key}" data-v="${on ? d.min : d.max}" aria-label="${esc(d.label)}">${top}<span class="tv num">${valHtml(d, v)}</span><span class="knob" aria-hidden="true"></span></button>`; }
   const opts = () => d.names.map((n, i) => `<button role="radio" aria-checked="${i + d.min === v}" data-set="${key}" data-v="${i + d.min}">${esc(n)}</button>`).join("");
   if (isEnum(d) && d.names.length <= 2) return `<div class="tp t-two${lv}" ${at}>${top}<div class="opts" role="radiogroup" aria-label="${esc(d.label)}">${opts()}</div></div>`;
-  if (isEnum(d) && d.names.length <= 4) return `<div class="tp t-seg${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span><div class="opts" role="radiogroup" aria-label="${esc(d.label)}">${opts()}</div></div>`;
+  if (isEnum(d) && d.names.length <= 4 && d.names.every((n) => n.length <= 5)) return `<div class="tp t-seg${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span><div class="opts" role="radiogroup" aria-label="${esc(d.label)}">${opts()}</div></div>`;
   if (isEnum(d)) return `<div class="tp t-arr${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span><span class="pos num">${v - d.min + 1}/${d.max - d.min + 1}</span>
     <div class="arw"><button data-set="${key}" data-v="${v <= d.min ? d.max : v - 1}" aria-label="${esc(d.label)}: anterior"><svg class="i"><use href="#i-prev"/></svg></button><button class="pkb" data-pick="${key}" aria-label="${esc(d.label)}: lista"><svg class="i"><use href="#i-list"/></svg></button><button data-set="${key}" data-v="${nextOf(d, v)}" aria-label="${esc(d.label)}: siguiente"><svg class="i"><use href="#i-next"/></svg></button></div></div>`;
-  if (d.max <= d.min && d.label === "CPU" && M.state) return `<div class="tp${lv}" ${at}>${top}<span class="tv num">${M.state.cpu}<small>%</small></span><span class="pos2 num">LATE ${M.state.late}  PEAK ${M.state.peak}%</span></div>`;   /* (SYSTEM's reading: STATE) */
+  if (d.max <= d.min && d.label === "CPU") return `<div class="tp t-cpu${lv}" ${at}><div class="cpu3">${cpu3Html()}</div></div>`;   /* (SYSTEM's reading: STATE) */
   if (d.max <= d.min) return `<div class="tp${lv}" ${at}>${top}<span class="tv num">${valHtml(d, v)}</span></div>`;   /* (a reading) */
   return `<div class="tp t-fd${zeroOf(d) ? " t-bi" : ""}${lv}" ${at} data-fd="${key}" role="slider" tabindex="0" aria-label="${esc(d.label)}" aria-valuenow="${v}" aria-valuemin="${d.min}" aria-valuemax="${d.max}">${top}<span class="tv num">${valHtml(d, v)}</span><span class="fl" aria-hidden="true"></span></div>`;
 }

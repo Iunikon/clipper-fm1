@@ -6,7 +6,6 @@
   .fpad small { font-size: 11px; white-space: nowrap; overflow: hidden; max-width: 100%; } .fpad .k { color: var(--kind); } .fpad .e { color: var(--eng); }
   .fpad.on { background: var(--tx); color: var(--page); } .fpad.on .i { color: var(--fav-d); } .fpad.on .k { color: var(--kind-d); } .fpad.on .e { color: var(--eng-d); }
   .fpad.free { border-style: dashed; border-color: var(--line-2); background: none; } .fpad.free small { white-space: normal; color: var(--tx-3); }
-  .pos2 { font-size: 13px; color: var(--tx-3); margin-top: auto; }
 
   /* the favourites rail can go: the left one grows (more room to edit) */
   body.nofav .body { grid-template-columns: 320px minmax(0, 1fr) 0; } body.nofav .rail.r { display: none; }

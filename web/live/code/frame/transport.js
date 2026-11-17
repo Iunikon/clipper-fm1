@@ -7,6 +7,7 @@ function renderTransport() {
   const sel2 = LAYOUT.find((x) => x.title === "SEL 2"), trn = sel2 && desc(0, sel2.ids[0]) ? val(0, sel2.ids[0]) | 0 : 0, oct = M.state ? M.state.oct | 0 : 0, bpm = desc(1, 0) ? val(1, 0) : null;
   setHtml($("tmp"), `${bpm != null ? `<b class="num">${bpm}</b><small>BPM</small>` : ""}${oct ? `<span class="tag2 num">OCT ${oct > 0 ? "+" : ""}${oct}</span>` : ""}${trn ? `<span class="tag2 trn num">TRN ${trn > 0 ? "+" : ""}${trn}</span>` : ""}`);
   const c = $("cpu"); if (c && M.state) { setHtml(c, `CPU <b class="num">${M.state.cpu}%</b>${M.state.late ? ` LATE <b class="num">${M.state.late}</b>` : ""}`); c.classList.toggle("hot", M.state.cpu > 85 || M.state.late > 0); }
+  if (M.state) document.querySelectorAll(".t-cpu .cpu3").forEach((el) => setHtml(el, cpu3Html()));
 }
 document.addEventListener("click", (e) => {
   const b = e.target.closest("[data-tplay],[data-trec]"); if (!b || !M.link) return;

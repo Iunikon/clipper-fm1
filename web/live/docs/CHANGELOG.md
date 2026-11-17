@@ -100,6 +100,23 @@ Todo lo hecho en el fork [Iunikon/clipper-fm1](https://github.com/Iunikon/clippe
 - **Ideas del editor SHRUB (de Xfer, para el mismo FM-1), solo de uso e información:** mantener el dedo quieto en una tarjeta (o clic derecho) abre su ficha: qué hace, su valor, su rango, el CC MIDI con que el FM-1 la mueve (el mapa de `seq.c`) y la tecla de tu controlador si la aprendiste; deshacer el último cambio desde ⌘Z / Ctrl+Z, la línea de estado y el menú «⋯» del celular (deshace justo el que muestra, aunque el sinte cambie otro mientras); una línea de estado bajo el trabajo en tableta y escritorio (conectado, demo o «No contesta», y qué se hace en esa carpeta); el patrón vacío de SEQ dice cómo empezar uno.
 - Auditoría de Impeccable (16/20) y sus arreglos: marcas de los pasos y «RANGO» a 11 px, el FM-1 de ejemplo ya no mueve el paso bajo el dedo, la pantalla solo sigue al paso del sinte si la rejilla está a la vista.
 
+
+## 17 de noviembre: la tableta, con las notas de la prueba con el FM-1 real
+
+De [`PRUEBAS-TABLETA.md`](PRUEBAS-TABLETA.md), las notas sin firmware y ya decididas:
+
+- **Barra y línea de estado (3, 4, 5, 6):** fuera la línea de estado de abajo (repetía «Conectado» y las ayudas, y su botón se encimaba abajo a la derecha). El menú «⋯» sale también en la tableta, con Deshacer, MIDI learn, Cómo se toca y Pantalla completa; la barra ya no se amontona. Con ratón, en escritorio, esos botones siguen también en la barra.
+- **SAVE sin la barra izquierda (32):** usa todo el ancho; la barra vuelve en las demás carpetas.
+- **Sin líneas divisorias (10, 13)** en toda la app; Generar y la biblioteca de patrones de SEQ, en un cuadro gris.
+- **Grises más claros (22):** `--panel` `#1a1a1e`, `--raised` `#26262b`, `--line` `#3a3a40`, `--tx-3` `#9a9aa4`; los grises escritos a mano pasan a tokens.
+- **Tarjetas más bajas (11)** y **los sonidos de SAVE con sus dos filas juntas (25)**.
+- **CPU, LATE y PEAK al mismo peso (15)** en GLO > SYSTEM, en rojo desde el 90 %, y se repinta con cada estado del FM-1.
+- **Opciones que no caben, con flechas y lista (31):** p. ej. el tiempo de la reverb.
+- **Estudio (14, 16):** sin el secuenciador avanzado repetido (queda en SEQ > Avanzado; Estudio abre en HYBRID); el idioma, en una lista.
+- **Inglés (8):** «Conectado  USB MIDI», unos 20 avisos y dos textos que vivían en el CSS.
+- **SEQ en la octava del sinte (1):** las notas nuevas y el piano roll empiezan en la octava de OCT − / + (llega en STATE) y la siguen cuando cambia.
+- **SEQ sigue el paso del sinte al grabar (2):** el firmware ya mandaba CURSOR; por si el aviso se pierde, cada nota escrita en el sinte hace que la web pregunte en qué paso quedó el cursor. Falta probarlo con el FM-1.
+
 ---
 
 ## Lo siguiente
