@@ -1,17 +1,24 @@
 # Seguir en casa
 
-Notas del 13 de noviembre de 2026 para retomar Clipper Live en otra computadora. Todo está en `main` de [Iunikon/clipper-fm1](https://github.com/Iunikon/clipper-fm1); el último commit con código es `c3867e7`.
+Notas para retomar Clipper Live en otra computadora, al día el 17 de noviembre de 2026. Todo está en `main` de [Iunikon/clipper-fm1](https://github.com/Iunikon/clipper-fm1); el último commit con código es `cb6f5a9`.
 
 ## Dónde quedó
 
 | Qué | Estado |
 |---|---|
 | Código | `main` de Iunikon/clipper-fm1, al día. Nada sin subir. |
-| App publicada | https://clipper-live-eta.vercel.app, con todo lo de `c3867e7`. |
+| App publicada | https://clipper-live-eta.vercel.app, con todo lo de `cb6f5a9`. |
 | Firmware | El código de CURSOR (comando Live 114) está en `firmware/src/editor_live.c` desde `c9f7368`, pero **todavía no está flasheado** en el FM-1. |
 | Pruebas | `tests/live_editor_test.c`: 51 comprobaciones, pasan. |
 
-## Lo que se hizo hoy
+## Lo que se hizo el 17 de noviembre
+
+1. **Las notas de la prueba en la tableta** que no necesitan firmware, en dos tandas (el detalle, nota por nota, en [`PRUEBAS-TABLETA.md`](PRUEBAS-TABLETA.md)).
+2. **La barra de arriba, rediseñada** (propuesta A de cuatro): cuatro cajas grises (el sinte · el sonido · el transporte · Seguir y «⋯»), 56 px de alto, con menos que leer. Después, la auditoría de Impeccable (16/20) y sus arreglos: 44 px de toque en cada botón, el estado del sinte anunciado a un lector de pantalla, la barra definida solo en `bar.css`, la CPU visible también entre 1024 y 1100 de ancho. Y el pulido: PLAY y REC son teclas llenas con la misma letra, «BPM» a 11 px.
+3. **«Cómo se toca»** con los atajos de teclado que faltaban (← →, RePág / AvPág, Inicio / Fin, Esc) y cómo se edita un efecto.
+4. **Efectos sin el botón de editar**, que se encimaba con la columna de al lado: un toque en el nombre enciende o apaga el efecto y mantenerlo abre su página en FX (clic derecho o Shift+F10 con ratón o teclado). En columnas angostas dice DST, CHO, DLY y REV.
+
+## Lo que se hizo el 13 de noviembre
 
 1. **Celular con su propio diseño**, elegido entre 3 variantes en cada pantalla (Impeccable `generate`) a 852×393:
    - las carpetas con gráfica: la gráfica a la izquierda y los valores 2 × 2;
@@ -57,7 +64,9 @@ npx vercel@latest deploy --prod --yes
 
 ## Pendientes, en orden
 
-> **Lo siguiente:** las 33 notas de la prueba en la tableta con el FM-1 real, en [`PRUEBAS-TABLETA.md`](PRUEBAS-TABLETA.md). El plan es dejar estable la tableta con ellas y después revisar el celular.
+> **Lo siguiente:** probar en la tableta, con el dedo y con el FM-1, todo lo del 17 de noviembre: la barra nueva, mantener el nombre de un efecto para editarlo y las notas hechas de [`PRUEBAS-TABLETA.md`](PRUEBAS-TABLETA.md). La lista para ir marcando está en el artefacto «Clipper Live checklist». Con eso queda estable la tableta y sigue revisar el celular.
+>
+> **Por decidir:** un doble toque en el nombre de un efecto lo regresa a como se cargó el sonido (sale «DLY como se cargó»). Ya pasaba antes; ver en la tableta si estorba.
 
 1. **Flashear el firmware con CURSOR** en el FM-1 (`sh build.sh` -> `build/felucca.fwsc`) y probar la sincronía de pasos en los dos sentidos: tocar un paso en Live lo selecciona en el sinte, y moverlo en el sinte lo marca en Live. La lista está en [`TESTING.md`](TESTING.md).
 2. **Probar con el FM-1 real lo de hoy:**
@@ -71,7 +80,7 @@ npx vercel@latest deploy --prod --yes
    - ◀ ▶ junto a cada selector de tipo (filtro, forma del LFO, algoritmo);
    - la memoria del FM-1 a la vista (ranuras USER usadas, espacio libre para samples).
 5. **Ideas de prioridad baja / grandes:** un banco que envíe solo las ranuras que cambiaron y escuchar antes de cargar; exportar un patrón de SEQ a `.mid`; separar en GLO lo que es del sonido de lo que es del aparato.
-6. **Lo que dejó la auditoría de lo nuevo (16/20, sin fallos graves). Hecho el 17 de noviembre, salvo los dos grises de antes:**
+6. **Lo que dejó la auditoría de lo nuevo (16/20, sin fallos graves). Todo hecho el 17 de noviembre** (los dos grises de antes ya no se usan):
    - el botón «Deshacer» de la línea de estado mide 24 px de alto; en la tableta, que se toca con el dedo, debería tener 44 px de zona de toque (`styles/frame/status.css`, `.stl .stu`);
    - al cerrar la ficha de un valor el foco se va al inicio de la página: devolverlo a la tarjeta (`code/frame/info.js`, `infoSheet`);
    - la ayuda de SPACE dice «reverb y delay», pero en el firmware también abre las voces en estéreo (`voice.c`, `P_MAC4` suma a SPREAD): completarla (`HELP[99]` en `info.js` y su inglés);
