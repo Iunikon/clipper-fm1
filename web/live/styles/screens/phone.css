@@ -190,4 +190,4 @@
   }
 
   /* the bar's grey boxes (17 nov) are for the tablet: the phone keeps the bar it chose */
-  @media (max-height: 540px) { .bar .bgrp { background: none; padding: 0; height: auto; } .tgrp .tbt:not(.on):not(.arm) { border-color: var(--line-2); } .tgrp .tbt { height: 32px; } .snd .now { min-width: 0; } .bar .snd { margin-inline: 0; } }
+  @media (max-height: 540px) { .bar .bgrp { background: none; padding: 0; height: auto; } .tgrp .tbt:not(.on):not(.arm) { border-color: var(--line-2); background: none; color: var(--tx-2); } .tgrp .tbt { height: 32px; } .snd .now { min-width: 0; } .bar .snd { margin-inline: 0; } }

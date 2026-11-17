@@ -59,9 +59,9 @@
   .conn .cpu { margin-left: 4px; } .conn .cpu b { display: inline; font-size: 12px; }
   .snd .now { min-width: 170px; padding: 0 10px; } .now .n { font-size: 17px; gap: 4px; } .now .m { font-size: 11px; gap: 6px; } .now .cv { width: 14px; height: 14px; }
   .snd .svb { height: 34px; }
-  .tgrp { gap: 4px; padding: 0 2px 0 10px; } .tgrp .tmp b { font-size: 18px; line-height: 18px; } .tgrp .tmp small { font-size: 10px; } .tgrp .tag2 { font-size: 14px; }
+  .tgrp { gap: 4px; padding: 0 2px 0 10px; } .tgrp .tmp b { font-size: 18px; line-height: 18px; } .tgrp .tmp small { font-size: 11px; } .tgrp .tag2 { font-size: 14px; }
   .tgrp .tbt { height: 36px; padding: 0 10px; font-size: 11px; } .tgrp .tbt .num { font-size: 14px; }
-  .tgrp .tbt:not(.on):not(.arm) { border-color: transparent; }
-  .tgrp .tbt:not(.on):not(.arm):active { background: var(--press); }
+  .tgrp .tbt:not(.on):not(.arm) { border-color: transparent; background: var(--press); color: var(--tx); }   /* (idle PLAY / REC: a filled key, not loose text) */
+  .tgrp .tbt:not(.on):not(.arm):active { background: var(--line); }
   .fgrp { gap: 0; } .fgrp .follow { height: 40px; font-size: 12px; }
   .bar #favh { display: none; }

@@ -67,7 +67,8 @@ function helpSheet() {
     ${li("Deshacer:", "⌘Z o Ctrl+Z, o ⋯ > Deshacer arriba a la derecha.")}
     ${li("Lo que borra", "pide un segundo toque, en rojo con ⚠.")}
     ${li("En los pasos de SEQ:", "‹ › nudge (adelanta o retrasa), F fill, L lock, ' acento, ~ slide.")}
-    ${li("Con ratón:", "arrastra en horizontal; Shift mientras arrastras = fino ×¼; Inicio / Fin = mínimo / máximo. La rueda solo desplaza la página.")}
+    ${li("Con ratón:", "arrastra en horizontal; Shift mientras arrastras = fino ×¼. La rueda solo desplaza la página.")}
+    ${li("Con teclado,", "sobre una tarjeta: ← → cambian el valor (con Shift, de uno en uno); RePág / AvPág, a saltos grandes; Inicio / Fin, mínimo / máximo. Esc cierra lo abierto.")}
   </ul><div class="askf"><button class="btn pri" data-askok="1">${esc(trUi("Entendido"))}</button></div></div>`;
   document.body.appendChild(w);
   const close = () => { w.remove(); document.removeEventListener("keydown", key, true); };

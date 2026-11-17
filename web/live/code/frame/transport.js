@@ -2,7 +2,7 @@
 function renderTransport() {
   const t = $("trn"); if (!t) return;
   const rec = M.rec | 0, recOn = rec & 1, armed = rec & 2, free = rec & 4, ci = rec & 8, pos = SQ.playing && SQ.pos >= 0 ? `${Math.floor(SQ.pos / 16) + 1}.${Math.floor((SQ.pos % 16) / 4) + 1}` : "";
-  setHtml(t, `<button class="tbt${SQ.playing ? " on" : ""}" data-tplay="1" aria-pressed="${SQ.playing}"><svg class="i"><use href="#i-${SQ.playing ? "stop" : "play"}"/></svg><span class="num">${SQ.playing ? pos : "PLAY"}</span></button>
+  setHtml(t, `<button class="tbt${SQ.playing ? " on" : ""}" data-tplay="1" aria-pressed="${SQ.playing}"><svg class="i"><use href="#i-${SQ.playing ? "stop" : "play"}"/></svg>${SQ.playing ? `<span class="num">${pos}</span>` : "<span>PLAY</span>"}</button>
     <button class="tbt rec${recOn || free ? " on" : armed || ci ? " arm" : ""}" data-trec="1" aria-pressed="${!!(recOn || armed)}"><i></i><span>${free ? "TOMA" : ci ? "CUENTA" : armed ? "ARMADO" : "REC"}</span></button>`);
   const sel2 = LAYOUT.find((x) => x.title === "SEL 2"), trn = sel2 && desc(0, sel2.ids[0]) ? val(0, sel2.ids[0]) | 0 : 0, oct = M.state ? M.state.oct | 0 : 0, bpm = desc(1, 0) ? val(1, 0) : null;
   setHtml($("tmp"), `${bpm != null ? `<b class="num">${bpm}</b><small>BPM</small>` : ""}${oct ? `<span class="tag2 num">OCT ${oct > 0 ? "+" : ""}${oct}</span>` : ""}${trn ? `<span class="tag2 trn num">TRN ${trn > 0 ? "+" : ""}${trn}</span>` : ""}`);
