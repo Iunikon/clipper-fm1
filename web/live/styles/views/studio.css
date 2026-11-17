@@ -16,7 +16,7 @@
   .hacc .cfgw.editing { margin-right: 0; }
   .fpad { height: 80px; }
   /* the bar, full: the conn narrower, Guardar an icon until there is room */
-  .bar { grid-template-columns: 190px minmax(0, 1fr) auto; }
+  .bar { grid-template-columns: auto minmax(0, 1fr) auto; }   /* (17 nov: the synth box as wide as its name, at most 240 px) */
   @media (max-width: 1599px) { .svb span { display: none; } .svb { padding: 0 10px; } .where { display: none; } }
 
   /* ==== ESTUDIO, Live's own: tabs, then the tab ==== */

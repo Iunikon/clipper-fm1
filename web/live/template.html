@@ -54,8 +54,8 @@ __CSS__
 <div class="app">
   <header class="bar">
     <button class="ib phb" id="lrh" aria-pressed="false" aria-label="Salida, en el sinte y cambios"><svg class="i"><use href="#i-lpanel"/></svg></button>
-    <div class="conn" id="conn"><span class="dot"></span><div><b id="cname">FM-1</b><span id="cstate">Sin conectar</span></div></div>
-    <div class="snd">
+    <div class="conn bgrp" id="conn"><span class="dot"></span><div><b id="cname">FM-1</b><span id="cstate">Sin conectar</span></div><span class="cpu" id="cpu"></span></div>
+    <div class="snd bgrp">
       <button class="ib" id="prev" aria-label="Favorito anterior"><svg class="i"><use href="#i-prev"/></svg></button>
       <button class="now" id="now" aria-haspopup="dialog" aria-expanded="false" aria-controls="br"><span class="n"><span id="name">Sin conectar</span><svg class="i cv"><use href="#i-down"/></svg></span><span class="m" id="meta"></span></button>
       <button class="ib" id="next" aria-label="Favorito siguiente"><svg class="i"><use href="#i-next"/></svg></button>
@@ -63,13 +63,13 @@ __CSS__
       <button class="svb" id="saveb" data-save="1"><svg class="i"><use href="#i-disk"/></svg><span>Guardar</span></button>
     </div>
     <div class="right">
-      <span class="tmp" id="tmp"></span><div class="trn" id="trn"></div><span class="cpu" id="cpu"></span>
+      <div class="tgrp bgrp"><span class="tmp" id="tmp"></span><div class="trn" id="trn"></div></div>
       <button class="ib mlb" id="mlb" aria-pressed="false" aria-label="MIDI learn: tu controlador mueve Live"><b>MIDI</b></button>
       <button class="ib" id="favh" aria-pressed="true" aria-label="Mostrar u ocultar los favoritos"><svg class="i"><use href="#i-favs"/></svg></button>
       <button class="ib" id="fs" hidden aria-label="Pantalla completa"><svg class="i"><use href="#i-fs"/></svg></button>
       <div class="where">En el sinte <b id="where"></b></div>
-      <button class="follow" id="follow" aria-pressed="true"><i></i>Seguir</button>
-      <button class="ib more" id="more" aria-label="Más" aria-haspopup="menu" aria-expanded="false" aria-controls="morem">⋯</button>
+      <div class="fgrp bgrp"><button class="follow" id="follow" aria-pressed="true"><i></i>Seguir</button>
+      <button class="ib more" id="more" aria-label="Más" aria-haspopup="menu" aria-expanded="false" aria-controls="morem">⋯</button></div>
       <div class="morem" id="morem" role="menu" hidden></div>
     </div>
   </header>

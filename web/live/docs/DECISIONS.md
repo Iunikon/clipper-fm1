@@ -51,8 +51,8 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 ## 3. Estructura de la pantalla (tablet)
 
 ```
-┌──────────── barra (64) ────────────────────────────────────────────────────┐
-│ FM-1 │ ‹ NOMBRE ● ⌄ › ★ [💾] │ 120 BPM  TRN −12  ▶PLAY  ●REC  CPU │ ◫ ⛶ Seguir │
+┌──────────── barra (56) ────────────────────────────────────────────────────┐
+│ [FM-1 · CPU] │ [‹ NOMBRE ⌄ › ★ 💾] │ [120 BPM  TRN −12  ▶PLAY  ●REC] │ [Seguir ⋯] │
 ├─ riel izq (232) ─┬──────────── trabajo ─────────────┬─ favoritos (216) ─┤
 │ Salida (scope)   │ la carpeta abierta               │ 01–16             │
 │ En el sinte      │                                  │ (se oculta con ◫; │
@@ -62,6 +62,8 @@ Una web app de un solo archivo que va al lado del sintetizador **FM-1** (firmwar
 │ LIVE HOME EDIT ENV LFO FX SEL ARP SEQ REC GLO SAVE │ ESTUDIO (azul)        │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
+
+La barra va en **cuatro cajas grises** (propuesta A, 17 nov): el sinte con su CPU en una línea (el estado solo si no contesta), el sonido, el transporte y «Seguir» con «⋯». El botón de mostrar los favoritos y MIDI learn van en «⋯» en la tableta; con ratón se quedan en la barra. En el celular las cajas no llevan fondo.
 
 | Carpeta | Qué tiene |
 |---|---|

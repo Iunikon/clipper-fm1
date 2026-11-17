@@ -101,6 +101,10 @@ Todo lo hecho en el fork [Iunikon/clipper-fm1](https://github.com/Iunikon/clippe
 - Auditoría de Impeccable (16/20) y sus arreglos: marcas de los pasos y «RANGO» a 11 px, el FM-1 de ejemplo ya no mueve el paso bajo el dedo, la pantalla solo sigue al paso del sinte si la rejilla está a la vista.
 
 
+## 17 de noviembre: la barra de arriba, en cajas
+
+Elegida entre cuatro propuestas (la A). La barra va en cuatro cajas grises, sin líneas: el sinte (nombre, estado y CPU), el sonido (‹ nombre › ★ y Guardar), el transporte (BPM, TRN, PLAY y REC, sin bordes dentro de la caja) y «Seguir» con «⋯». El botón de los favoritos pasa a «⋯» en la tableta. Después, más chica y con menos que leer: la barra baja de 64 a 56 px y las cajas a 40 px; el nombre del sonido va a 17 px y el BPM a 18 px; la caja del sinte es una línea con el nombre y la CPU, y su estado solo sale cuando el FM-1 no contesta. El celular conserva su barra. Archivos: `template.html`, `styles/frame/bar.css`, `styles/screens/desktop.css`, `styles/screens/phone.css`, `styles/views/studio.css`.
+
 ## 17 de noviembre: la tableta, con las notas de la prueba con el FM-1 real
 
 De [`PRUEBAS-TABLETA.md`](PRUEBAS-TABLETA.md), las notas sin firmware y ya decididas:

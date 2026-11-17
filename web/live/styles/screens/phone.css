@@ -188,3 +188,6 @@
     .svm > .svh { grid-column: 1; grid-row: 1; padding: 2px 0; margin: 0; } .svh h2 { font-size: 13px; }
     .svm > .scs { grid-column: 1; grid-row: 2; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; } .sc { min-height: 40px; padding: 4px 6px; } .scs > .sc { contain-intrinsic-size: auto 40px; }
   }
+
+  /* the bar's grey boxes (17 nov) are for the tablet: the phone keeps the bar it chose */
+  @media (max-height: 540px) { .bar .bgrp { background: none; padding: 0; height: auto; } .tgrp .tbt:not(.on):not(.arm) { border-color: var(--line-2); } .tgrp .tbt { height: 32px; } .snd .now { min-width: 0; } }
